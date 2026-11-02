@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="format-detection" content="telephone=no"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>3D Load Calculator</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
-:root{--bg:#eef1f4;--panel:#fff;--ink:#14202b;--mute:#5d6b78;--line:#d3dae1;--accent:#1f6f78;--sig:#f2b705;--bad:#b3261e;--view:#f7f9fa;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10171d;--panel:#18222b;--ink:#e6ecf1;--mute:#93a2b0;--line:#2c3a46;--accent:#4fb3bf;--bad:#ff8a80;--view:#0f161b;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#10171d;--panel:#18222b;--ink:#e6ecf1;--mute:#93a2b0;--line:#2c3a46;--accent:#4fb3bf;--bad:#ff8a80;--view:#0f161b;color-scheme:dark}
+:root{--bg:#f4f6f8;--panel:#fff;--ink:#14202b;--mute:#5d6b78;--line:#d7dee5;--accent:#0f6e7a;--accent2:#0b5963;--sig:#b26a00;--bad:#b3261e;--ok:#1b7f4b;--view:#f7f9fa;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10171d;--panel:#18222b;--ink:#e6ecf1;--mute:#93a2b0;--line:#2c3a46;--accent:#4fb3bf;--accent2:#66c4cf;--sig:#f2b705;--bad:#ff8a80;--ok:#3fbf77;--view:#0f161b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#10171d;--panel:#18222b;--ink:#e6ecf1;--mute:#93a2b0;--line:#2c3a46;--accent:#4fb3bf;--accent2:#66c4cf;--sig:#f2b705;--bad:#ff8a80;--ok:#3fbf77;--view:#0f161b;color-scheme:dark}
 *{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 main{max-width:1000px;margin:0 auto;padding:16px max(12px,env(safe-area-inset-right)) 16px max(12px,env(safe-area-inset-left))}html,body{overflow-x:hidden}input,textarea{-webkit-user-select:text;user-select:text}
@@ -22,7 +22,9 @@ label{display:block;font-size:.8rem;color:var(--mute);margin-bottom:3px}
 input,select,button{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 8px;width:100%}
 input[type=color]{padding:2px;height:34px;min-width:44px}input[type=range]{padding:0;border:0;background:none}input[type=checkbox]{width:auto}
 button{cursor:pointer;width:auto}button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;padding:9px 18px}
-:focus-visible{outline:2px solid var(--sig);outline-offset:2px}
+button.primary:hover{background:var(--accent2);border-color:var(--accent2)}
+button:disabled{opacity:.45;cursor:not-allowed}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .scroll{overflow-x:auto}table{border-collapse:collapse;width:100%}
 th{font-size:.78rem;text-align:left;color:var(--mute);font-weight:500;padding:4px}td{padding:3px 4px}
 .cb{white-space:nowrap;font-variant-numeric:tabular-nums}#rows td input{min-width:62px}#rows td.n input{min-width:120px}
@@ -31,6 +33,8 @@ th{font-size:.78rem;text-align:left;color:var(--mute);font-weight:500;padding:4p
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
 .stat{border:1px solid var(--line);border-radius:8px;padding:8px 10px}.stat b{display:block;font-size:1.3rem}.stat span{font-size:.78rem;color:var(--mute)}
 .bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:var(--accent)}
+.bar.cap i{background:linear-gradient(90deg,var(--ok) 0 55%,var(--sig) 78%,var(--bad) 100%)}
+.stat.ok b{color:var(--ok)}.stat.warn b{color:var(--sig)}.stat.bad b{color:var(--bad)}
 canvas{width:100%;height:auto;aspect-ratio:16/9;background:var(--view);border:1px solid var(--line);border-radius:8px;display:block}
 .sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:6px}
 .warn{color:var(--bad)}.note{color:var(--mute);font-size:.85rem}
@@ -69,6 +73,23 @@ details.card>summary{font-weight:600;cursor:pointer;font-size:1.05rem;list-style
 .cx{display:block;margin:2px auto 0;padding:0 8px;background:transparent;border:1px solid rgba(255,255,255,.7);color:#fff;border-radius:6px;font-size:.8rem}
 .cb2{font-size:.76rem;line-height:1.35;text-align:center}
 .tot{width:100%;border-collapse:collapse;margin:6px 0 12px}.tot th{background:var(--accent);color:#fff;padding:6px}.tot td{border:1px solid var(--line);padding:8px;text-align:center;font-size:.9rem}
+#sumbar{position:sticky;top:70px;z-index:15;display:flex;gap:14px;flex-wrap:wrap;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:7px 12px;margin-bottom:10px;font-size:.8rem;color:var(--mute);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+#sumbar b{font-size:1rem;color:var(--ink);font-variant-numeric:tabular-nums}#sumbar .grow{flex:1}
+.empty{text-align:center;color:var(--mute);padding:26px 10px;font-size:.95rem}.empty svg{width:104px;height:104px;display:block;margin:0 auto 12px;opacity:.55}
+.prog{position:fixed;inset:0;background:rgba(10,15,20,.4);display:none;align-items:center;justify-content:center;z-index:300}
+.prog.on{display:flex}
+.prog .box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 22px;display:flex;gap:12px;align-items:center;font-weight:600;max-width:88vw;box-shadow:0 12px 34px rgba(0,0,0,.3)}
+.spin{width:22px;height:22px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--accent);animation:sp .8s linear infinite;flex:none}
+@keyframes sp{to{transform:rotate(360deg)}}
+#glwrap{position:relative;display:none}#gl{width:100%;height:auto;aspect-ratio:1400/640;background:var(--view);border:1px solid var(--line);border-radius:8px;display:block;touch-action:none}
+#vw.glmode #cv{display:none}#vw.glmode #glwrap{display:block}
+#glabels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+#glabels .gl{position:absolute;transform:translate(-50%,-50%);background:var(--view);color:var(--accent);font-weight:700;font-size:.78rem;padding:1px 5px;border-radius:5px;white-space:nowrap;border:1px solid var(--line)}
+#glabels .glt{position:absolute;left:10px;top:8px;background:transparent;border:0;color:var(--accent);font-weight:700;font-size:.85rem}
+#glabels .glh{position:absolute;left:10px;top:30px;background:transparent;border:0;color:var(--sig);font-weight:700;font-size:.78rem}
+#preview{margin-top:12px;border:1px dashed var(--line);border-radius:10px;padding:10px 12px;font-size:.85rem;color:var(--mute)}
+#preview .bar{margin-top:8px}
+.cgcell{font-variant-numeric:tabular-nums;font-size:.82rem}
 </style></head>
 <body><main>
 <header id="hdr"><button id="hback" type="button" aria-label="Previous page">‹</button><div id="htitle"><div class="hstep" id="hstep">Step 1 of 4</div><h1 id="hname">Select Equipment and Cargo</h1></div><button id="hnext" type="button" aria-label="Next page">›</button></header>
@@ -96,33 +117,69 @@ details.card>summary{font-weight:600;cursor:pointer;font-size:1.05rem;list-style
 
 <section class="pg" id="p1"><div class="card"><h2>Cargo Data Entry</h2>
 <div id="rows"></div>
-<div id="cbmtot"></div><div class="row"><button id="add" type="button">Add Cargo Line</button><span class="note">Each press adds three more cargo columns.</span></div><p class="note" style="margin:8px 0 0">5 mm is added to the length, width and height of every carton for the CBM and the loading plan.</p>
+<div id="cbmtot"></div><div id="preview"></div><div class="row"><button id="add" type="button">Add Cargo Line</button><button id="dup" type="button">Duplicate Last Line</button><button id="undo" type="button">Undo</button><button id="redo" type="button">Redo</button><span class="note">Each press of Add adds three more cargo columns.</span></div><p class="note" style="margin:8px 0 0">5 mm is added to the length, width and height of every carton for the CBM and the loading plan.</p>
 <p class="note warn" id="msg" style="margin:8px 0 0"></p></div>
 <div class="navrow"><button type="button" data-go="0">‹ Back: Select Equipment and Cargo</button><button class="primary" id="calc" type="button">Next: Results (Calculate) ›</button></div></section>
 
-<section class="pg" id="p2"><div class="card"><h2>Results</h2><div id="empty" class="note">Calculate a load plan first.</div>
-<div id="out" style="display:none"><div class="stats" id="stats"></div>
-<div id="vw"><div class="row" style="margin:0 0 10px"><label for="csel" style="margin:0">Container</label><select id="csel" style="max-width:380px"></select></div><canvas id="cv" width="1120" height="630" aria-label="3D view of the load plan"></canvas>
-<div id="zbar"><button id="zout" type="button" aria-label="Zoom out">−</button><button id="zin" type="button" aria-label="Zoom in">+</button><button id="zfit" type="button">Fit cartons</button><button id="zrst" type="button">Reset view</button><button id="zfull" type="button">Full screen</button><span class="note">Scroll or pinch to zoom. Drag the diagram to rotate it (or switch to Move).</span></div>
+<section class="pg" id="p2"><div class="card"><h2>Results</h2><div id="empty" class="empty"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M6 26 32 12l26 14v22L32 62 6 48z"/><path d="M6 26l26 14 26-14M32 40v22"/><path d="M19 19l26 14"/></svg>Calculate a load plan first.</div>
+<div id="out" style="display:none"><p class="warn" id="stale2" style="display:none;margin:0 0 10px;font-weight:600">Inputs changed — recalculate to update these results.</p><div id="sumbar"></div><div class="stats" id="stats"></div>
+<div id="vw"><div class="row" style="margin:0 0 10px"><label for="csel" style="margin:0">Container</label><select id="csel" style="max-width:380px"></select></div><canvas id="cv" width="1120" height="630" aria-label="3D view of the load plan"></canvas><div id="glwrap"><canvas id="gl" aria-label="3D view of the load plan"></canvas><div id="glabels"></div></div>
+<div id="zbar"><button id="zout" type="button" aria-label="Zoom out">−</button><button id="zin" type="button" aria-label="Zoom in">+</button><button id="zfit" type="button">Fit cartons</button><button id="zrst" type="button">Reset view</button><button id="zfull" type="button">Full screen</button><button id="gmode" type="button">3D view</button><button id="gedit" type="button" style="display:none">Move cartons</button><span class="note">Scroll or pinch to zoom. Drag the diagram to rotate it (or switch to Move).</span></div>
 <div id="rbar" class="row" style="margin:0 0 8px;gap:8px"><button type="button" data-v="340,28">Isometric</button><button type="button" data-v="0,90">Top</button><button type="button" data-v="0,0">Side</button><button type="button" data-v="270,15">Door end</button><button type="button" data-v="90,15">Front end</button><button type="button" id="rl" aria-label="Rotate left 90 degrees">⟲ 90°</button><button type="button" id="rr" aria-label="Rotate right 90 degrees">⟳ 90°</button><label class="chk"><input id="auto" type="checkbox"> Auto-rotate</label><button type="button" id="zmode">Drag: rotate</button></div>
-<div class="row"><label for="yaw" style="margin:0">Rotate view</label><input id="yaw" type="range" min="0" max="360" value="340" style="max-width:150px"><label for="tilt" style="margin:0">Tilt</label><input id="tilt" type="range" min="0" max="90" value="28" style="max-width:110px"><label class="chk"><input id="step" type="checkbox"> Progressive loading</label>
+<div class="row"><label for="yaw" style="margin:0">Rotate view</label><input id="yaw" type="range" min="0" max="360" step="any" value="340" style="max-width:150px"><label for="tilt" style="margin:0">Tilt</label><input id="tilt" type="range" min="0" max="90" step="any" value="28" style="max-width:110px"><label class="chk"><input id="step" type="checkbox"> Progressive loading</label>
 <span id="sc" style="display:none;gap:8px;align-items:center;flex-wrap:wrap"><select id="smode" style="width:auto"><option value="row">By row</option><option value="layer">By layer</option><option value="piece">By carton</option></select><select id="spd" style="width:auto" aria-label="Speed"><option value="3000">Speed: very slow</option><option value="1800" selected>Speed: slow</option><option value="1000">Speed: normal</option><option value="500">Speed: fast</option><option value="150">Speed: very fast</option></select><button id="prev" type="button" aria-label="Previous">‹</button><button id="play" type="button">Play</button><button id="next" type="button" aria-label="Next">›</button><input id="stepr" type="range" min="1" max="1" value="1" style="max-width:220px" aria-label="Loading step"></span></div><p class="note" id="stepl" style="margin:6px 0 0"></p></div>
-<p class="note">The arrow on each carton points to its top (⊙ = top face toward you). Zoom in to see the carton sizes on each side. Loading runs from the front wall to the door side. Turn the phone sideways for a larger view.</p><div class="scroll" style="margin-top:10px"><table class="plan" id="ctab"></table></div><div class="scroll" style="margin-top:14px"><table class="plan" id="sum"></table></div></div></div><div class="navrow"><button type="button" data-go="1">‹ Back: Enter Cargo Data</button><button class="primary" type="button" data-go="3">Next: Load Plan, PDF and Excel ›</button></div></section>
+<p class="note">The arrow on each carton points to its top (⊙ = top face toward you). Zoom in to see the carton sizes on each side. Loading runs from the front wall to the door side. Turn the phone sideways for a larger view.</p><div class="scroll" style="margin-top:10px"><table class="plan" id="ctab"></table></div><div class="scroll" style="margin-top:14px"><table class="plan" id="cgtab"></table></div><div class="scroll" style="margin-top:14px"><table class="plan" id="sum"></table></div></div></div><div class="navrow"><button type="button" data-go="1">‹ Back: Enter Cargo Data</button><button class="primary" type="button" data-go="3">Next: Load Plan, PDF and Excel ›</button></div></section>
 
-<section class="pg" id="p3"><div class="card"><h2>Load plan</h2><div id="empty3" class="note">Calculate a load plan first.</div>
-<div id="out3" style="display:none"><div class="row" style="margin:0 0 10px"><select id="pdfmode" style="width:auto"><option value="row">PDF: one page per row</option><option value="layer">PDF: one page per layer</option><option value="none">PDF: summary only</option></select><button class="primary" id="pdf" type="button">Generate PDF</button><button id="xls" type="button">Export Excel sheet</button><button class="primary" id="pkg" type="button">Save to cloud drive (data + PDF + Excel)</button><button id="dat" type="button">Save data file only</button><span class="note" id="pmsg"></span></div><p class="note" style="margin:0 0 8px">PDF and Excel open the share sheet or save dialog, so you can send them to Google Drive, OneDrive, iCloud Drive, email or WhatsApp.</p>
-<p class="note" id="eqs"></p></div></div><div class="navrow"><button type="button" data-go="2">‹ Back: Results</button><button class="primary" type="button" data-go="0">Start Again: Select Equipment and Cargo ›</button></div></section>
+<section class="pg" id="p3"><div class="card"><h2>Load plan</h2><div id="empty3" class="empty"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M6 26 32 12l26 14v22L32 62 6 48z"/><path d="M6 26l26 14 26-14M32 40v22"/><path d="M40 16v10M40 26l-6-4M40 26l6-4"/></svg>Calculate a load plan first.</div>
+<div id="out3" style="display:none"><p class="warn" id="stale3" style="display:none;margin:0 0 10px;font-weight:600">Inputs changed — recalculate before exporting, or the files will use the previous results.</p><div class="row" style="margin:0 0 10px"><select id="pdfmode" style="width:auto"><option value="row">PDF: one page per row</option><option value="layer">PDF: one page per layer</option><option value="none">PDF: summary only</option></select><button class="primary" id="pdf" type="button">Generate PDF</button><button id="xls" type="button">Export Excel sheet</button><button class="primary" id="pkg" type="button">Save to cloud drive (data + PDF + Excel)</button><button id="dat" type="button">Save data file only</button><span class="note" id="pmsg"></span></div><p class="note" style="margin:0 0 8px">PDF and Excel open the share sheet or save dialog, so you can send them to Google Drive, OneDrive, iCloud Drive, email or WhatsApp.</p>
+<p class="note" id="eqs"></p></div></div><div class="navrow"><button type="button" data-go="2">‹ Back: Results</button><button class="primary" type="button" id="newcalc">New Calculation: Clear Everything ›</button></div></section>
 </main>
+<div class="prog" id="prog" role="status" aria-live="polite"><div class="box"><span class="spin"></span><span id="progmsg">Working…</span></div></div>
 <script>
 (function(){
-var EQ=[["Auto – 20’ first, then 40’ high cube",0,0,0,0],["20’ standard container",589.8,235.2,239.3,28200],["40’ high cube container",1203.2,235.2,269.8,26500]];
+var EQ=[["Auto – 20’ first, then 40’ high cube",0,0,0,0],["20’ standard container",589.8,235.2,239.3,28200],["40’ high cube container",1203.2,235.2,269.8,26500],["20’ high cube container",589.8,235.2,269.8,28200],["40’ standard container",1203.2,235.2,239.5,26700],["45’ high cube container",1355.6,235.2,269.8,27600],["13.6 m curtain-sided truck",1360,245,270,24000]];
 var PRE=[["Standard pallet (48×40)",48,40,48,500],["Euro pallet (47×31)",47.2,31.5,48,500],["Small carton",16,12,12,8],["Medium carton",24,16,16,15],["Large carton",30,20,20,25],["Drum",23,23,35,200]];
 var COL=["#1f6f78","#e07a1f","#6b5bd2","#3f9142","#c2410c","#0e7490","#b8860b","#a21caf"];
 var $=function(i){return document.getElementById(i)},tb=document.getElementById("rows");
 var du="in",wu="kg",R=null;
 function df(){return du=="in"?2.54:1}function wf(){return wu=="kg"?1:0.45359237}
 function fm(v,d){var p=Math.pow(10,d);return (Math.round(v*p)/p).toLocaleString()}
+function nf(v,d){var p=Math.pow(10,d),s=(Math.round(v*p)/p).toFixed(d);if(s.indexOf(".")>=0)s=s.replace(/0+$/,"").replace(/\.$/,"");return s==="-0"?"0":s}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function hasNonLatin(s){return /[^\u0000-\u00ff\u0152\u0153\u0160\u0161\u0178\u017d\u017e\u0192\u02c6\u02dc\u2013\u2014\u2018-\u201e\u2020\u2021\u2022\u2026\u2030\u2039\u203a\u20ac\u2122]/.test(String(s==null?"":s))}
+function PDF_T(d,str,x,y,o){str=String(str==null?"":str);if(!hasNonLatin(str)){d["text"](str,x,y,o);return}
+ try{var pt=d.getFontSize()||10,st=(d.getFont&&d.getFont().fontStyle)||"",bold=/bold/i.test(st),px=Math.max(10,Math.round(pt*96/72)),f=px+"px "+(bold?"bold ":"")+"system-ui,-apple-system,'Segoe UI',Roboto,sans-serif";
+  var mc=document.createElement("canvas").getContext("2d");mc.font=f;var w=Math.ceil(mc.measureText(str).width)+4,h=Math.ceil(px*1.6),c=document.createElement("canvas");c.width=w;c.height=h;var g=c.getContext("2d");g.font=f;g.fillStyle="#000";g.textBaseline="alphabetic";g.fillText(str,2,Math.round(px*1.2));
+  var mm=25.4/96,wm=w*mm,hm=h*mm,bs=Math.round(px*1.2)*mm,sc=1;if(o&&o.maxWidth&&wm>o.maxWidth){sc=o.maxWidth/wm;wm*=sc;hm*=sc;bs*=sc}
+  var xx=x,yy=y-bs;if(o&&o.align=="center")xx=x-wm/2;else if(o&&o.align=="right")xx=x-wm;d.addImage(c.toDataURL("image/png"),"PNG",xx,yy,wm,hm)}
+ catch(e){d["text"](str.replace(/[^\u0000-\u00ff]/g,"?"),x,y,o)}}
+var UNDO=[],REDO=[];
+function pushUndo(){try{UNDO.push(JSON.stringify({s:snap(),cur:cur}));if(UNDO.length>30)UNDO.shift();REDO.length=0}catch(e){}updateUndo()}
+function updateUndo(){var b=document.getElementById("undo");if(b)b.disabled=!UNDO.length;var r=document.getElementById("redo");if(r)r.disabled=!REDO.length}
+function doUndo(){if(!UNDO.length)return;try{REDO.push(JSON.stringify({s:snap(),cur:cur}));if(REDO.length>30)REDO.shift()}catch(e){}var st=JSON.parse(UNDO.pop());restore(st.s);updateUndo();var mm=document.getElementById("msg");if(mm)mm.textContent="";show(st.cur==null?1:st.cur)}
+function doRedo(){if(!REDO.length)return;try{UNDO.push(JSON.stringify({s:snap(),cur:cur}));if(UNDO.length>30)UNDO.shift()}catch(e){}var st=JSON.parse(REDO.pop());restore(st.s);updateUndo();var mm=document.getElementById("msg");if(mm)mm.textContent="";show(st.cur==null?1:st.cur)}
+function busy(msg){var p=document.getElementById("prog");if(!p)return;document.getElementById("progmsg").textContent=msg||"Working…";p.classList.add("on")}
+function notBusy(){var p=document.getElementById("prog");if(p)p.classList.remove("on");var st=!!(R&&R.stale);["pdf","xls","pkg"].forEach(function(id){var e=document.getElementById(id);if(e)e.disabled=st});var d=document.getElementById("dat");if(d)d.disabled=false}
+function lockExports(on){["pdf","xls","pkg","dat"].forEach(function(id){var e=document.getElementById(id);if(e)e.disabled=on})}
+function preview(){var el=document.getElementById("preview");if(!el)return;var f=df(),W=wf(),tv=0,tq=0,tu=0,tw=0;
+ CG.forEach(function(g,i){var l=cnum(i,"l")*f,w=cnum(i,"w")*f,h=cnum(i,"h")*f,q=Math.floor(cnum(i,"q")),up=Math.floor(cnum(i,"u"));if(l>0&&w>0&&h>0&&q>0){tv+=(l+MG)*(w+MG)*(h+MG)*q/1e6;tw+=cnum(i,"k")*W*q;tq+=q;tu+=up*q}});
+ if(!tq){el.innerHTML="<b>Live preview</b> — enter sizes and quantities to estimate the load.";return}
+ var i=+document.getElementById("eq").value;
+ function cap(ix){var c=EQ[ix];return{l:c[1],w:c[2],h:c[3],p:c[4],name:c[0]}}
+ var cs=i==0?[cap(1),cap(2)]:[cap(i)],best=null;
+ cs.forEach(function(c){var cv=c.l*c.w*c.h/1e6,nv=Math.ceil(tv/(cv*0.9)),nw=Math.ceil(tw/c.p),n=Math.max(nv,nw,1);if(!best||n<best.n||(n==best.n&&cv>best.cv))best={n:n,cv:cv,name:c.name}});
+ var pct=Math.max(2,Math.min(100,tv/(best.n*best.cv)*100));
+ el.innerHTML="<b>Live preview</b> — "+tq.toLocaleString()+" cartons · "+tu.toLocaleString()+" units · "+fm(tv,2)+" m3 · "+fm(tw,0)+" kg → about <b>"+best.n+"</b> container(s) of "+esc(best.name)+".<div class='bar cap'><i style='width:"+pct.toFixed(0)+"%'></i></div>"}
+function renderCG(){if(!R)return;var u=R.du,wu=R.wu,fd=u=="in"?2.54:1,fw=wu=="kg"?1:0.45359237;
+ var cgH='<tr><th>#</th><th>Container</th><th>Cargo mass ('+wu+')</th><th>CG from front wall</th><th>CG from side wall</th><th>CG height</th><th>Off-centre</th><th>Stability</th></tr>';
+ R.loads.forEach(function(L,k){var mm=0,mx=0,my=0,mz=0;L.P.forEach(function(b){var wgt=b.t.kg;mm+=wgt;mx+=wgt*(b.x+(b.l-L.C.m)/2);my+=wgt*(b.y+(b.w-L.C.m)/2);mz+=wgt*(b.z+(b.h-L.C.m)/2)});
+  if(mm>0){mx/=mm;my/=mm;mz/=mm}else{mx=my=mz=0}
+  var dx=mx-L.C.l/2,dy=my-L.C.w/2,off=Math.hypot(dx,dy),offp=off/(0.5*Math.hypot(L.C.l,L.C.w))*100,hp=mz/L.C.h*100;
+  var cls=offp<=10?"ok":offp<=25?"warn":"bad",tag=offp<=10?"Balanced":offp<=25?"Slightly off-centre":"Off-centre";
+  if(hp>60){if(cls=="ok")cls="warn";tag+=" · high CG"}
+  var col=cls=="ok"?"var(--ok)":cls=="warn"?"var(--sig)":"var(--bad)";
+  cgH+='<tr><td>'+(k+1)+'</td><td>'+esc(L.C.name)+'</td><td class="cgcell">'+fm(mm/fw,0)+'</td><td class="cgcell">'+fm(mx/fd,1)+' '+u+'</td><td class="cgcell">'+fm(my/fd,1)+' '+u+'</td><td class="cgcell">'+fm(mz/fd,1)+' '+u+' ('+fm(hp,0)+'%)</td><td class="cgcell">'+fm(offp,1)+'%</td><td style="color:'+col+';font-weight:600">'+tag+'</td></tr>'});
+ $("cgtab").innerHTML=cgH}
 EQ.forEach(function(e,i){var o=document.createElement("option");o.value=i;o.textContent=e[0];$("eq").appendChild(o)});
 $("eq").value=0;
 (function(){var pt=$("ptype"),o0=document.createElement("option");o0.value="";o0.textContent="Choose…";pt.appendChild(o0);
@@ -130,7 +187,7 @@ $("eq").value=0;
  var ox=document.createElement("option");ox.value="x";ox.textContent="Other — Enter My Own Size";pt.appendChild(ox)})();
 var PT=["Select Equipment and Cargo","Enter Cargo Data","Results","Load Plan, PDF and Excel"],cur=0;
 function hdr(n){$("hname").textContent=PT[n];$("hstep").textContent="3D Load Calculator · Step "+(n+1)+" of 4";$("hback").style.visibility=n==0?"hidden":"visible";$("hnext").style.visibility=n==3?"hidden":"visible"}
-function show(n){n=Math.max(0,Math.min(3,n));cur=n;hdr(n);document.querySelectorAll(".pg").forEach(function(s,i){s.classList.toggle("on",i==n)});document.querySelectorAll("nav button").forEach(function(b,i){b.classList.toggle("on",i==n)});window.scrollTo(0,0);if(n==2&&R)redraw()}
+function show(n){n=Math.max(0,Math.min(3,n));cur=n;hdr(n);document.querySelectorAll(".pg").forEach(function(s,i){s.classList.toggle("on",i==n)});document.querySelectorAll("nav button").forEach(function(b,i){b.classList.toggle("on",i==n)});window.scrollTo(0,0);if(n==2&&R){resizeCv();redraw()}}
 document.querySelectorAll("nav button").forEach(function(b){b.onclick=function(){show(+b.dataset.p)}});
 document.querySelectorAll("[data-go]").forEach(function(b){b.onclick=function(){show(+b.dataset.go)}});
 function ulab(k){var d=du=="in"?"in":"cm";return k=="l"?"Length ("+d+")":k=="w"?"Width ("+d+")":k=="h"?"Height ("+d+")":k=="k"?"Weight Each ("+wu+")":"Quantity (Cartons)"}
@@ -138,7 +195,7 @@ var MG=0.5,CG=[];
 function cin(i,k){return tb.querySelector('[data-i="'+i+'"][data-k="'+k+'"]')}
 function cval(i,k){var e=cin(i,k);return e?e.value:""}
 function cnum(i,k){return +cval(i,k)||0}
-function clearCargo(i){["n","l","w","h","k","q","u"].forEach(function(k){var e=cin(i,k);if(e)e.value=""});CG[i].p=null;chips();cbmRefresh()}
+function clearCargo(i){pushUndo();["n","l","w","h","k","q","u"].forEach(function(k){var e=cin(i,k);if(e)e.value=""});CG[i].p=null;chips();cbmRefresh()}
 function chips(){var c=$("chips");c.innerHTML="";CG.forEach(function(g,i){if(g.p==null)return;var sp=document.createElement("span");sp.className="chip";sp.appendChild(document.createTextNode((cval(i,"n")||"Cargo "+(i+1))+" "));var b=document.createElement("button");b.type="button";b.textContent="✕";b.setAttribute("aria-label","Remove");b.onclick=function(){clearCargo(i)};sp.appendChild(b);c.appendChild(sp)})}
 function addBlock(){
  var base=CG.length,div=document.createElement("div"),H='<table class="cgt"><thead><tr><th></th>',j,i,RW=[["Cargo Name","n"],["Color","c"],["l"],["w"],["h"],["k"],["q"],["Units per Carton","u"]];
@@ -154,26 +211,33 @@ function addBlock(){
  div.querySelectorAll(".cx").forEach(function(b){b.onclick=function(){clearCargo(+b.dataset.x)}});
  cbmRefresh()}
 function fillCargo(i,n,l,w,h,k,q,pi,c,u){var o={n:n,l:l,w:w,h:h,k:k,q:q,u:u};for(var key in o){var e=cin(i,key);if(e)e.value=o[key]==null?"":o[key]}if(c&&cin(i,"c"))cin(i,"c").value=c;CG[i].p=pi==null?null:pi}
-function addRow(n,l,w,h,k,q,pi,c){var i=-1,j;for(j=0;j<CG.length;j++){if(!cval(j,"n")&&!cval(j,"l")&&!cval(j,"w")&&!cval(j,"h")&&!cval(j,"k")&&!cval(j,"q")&&!cval(j,"u")){i=j;break}}if(i<0){i=CG.length;addBlock()}fillCargo(i,n,l,w,h,k,q,pi,c);cbmRefresh();return i}
+function addRow(n,l,w,h,k,q,pi,c,u){var i=-1,j;for(j=0;j<CG.length;j++){if(!cval(j,"n")&&!cval(j,"l")&&!cval(j,"w")&&!cval(j,"h")&&!cval(j,"k")&&!cval(j,"q")&&!cval(j,"u")){i=j;break}}if(i<0){i=CG.length;addBlock()}fillCargo(i,n,l,w,h,k,q,pi,c,u);cbmRefresh();return i}
 function uld(){var n=0;(R?R.T:[]).forEach(function(t){n+=(t.upc||0)*t.fit});return n}
 function cbmRefresh(){var f=df(),tv=0,tq=0,tw=0,tu=0;CG.forEach(function(g,i){var l=cnum(i,"l")*f,w=cnum(i,"w")*f,h=cnum(i,"h")*f,q=Math.floor(cnum(i,"q")),up=Math.floor(cnum(i,"u")),e=(l>0&&w>0&&h>0)?(l+MG)*(w+MG)*(h+MG)/1e6:0,t=e*q,un=q*up;
  var ce=tb.querySelector('[data-i="'+i+'"][data-c="e"]'),ct=tb.querySelector('[data-i="'+i+'"][data-c="t"]'),cu=tb.querySelector('[data-i="'+i+'"][data-c="u"]');if(ce)ce.textContent=e?fm(e,4):"–";if(ct)ct.textContent=t?fm(t,3):"–";if(cu)cu.textContent=un?un.toLocaleString():"–";tv+=t;tq+=q;tu+=un;tw+=cnum(i,"k")*wf()*q});
- $("cbmtot").innerHTML='<table class="tot"><tr><th colspan="4">Total Cargo</th></tr><tr><td>Total Cartons<br><b>'+tq.toLocaleString()+'</b></td><td>Total Units<br><b>'+tu.toLocaleString()+'</b></td><td>Total CBM<br><b>'+fm(tv,3)+'</b></td><td>Total Weight (kg)<br><b>'+fm(tw,0)+'</b></td></tr></table>'}
+ $("cbmtot").innerHTML='<table class="tot"><tr><th colspan="4">Total Cargo</th></tr><tr><td>Total Cartons<br><b>'+tq.toLocaleString()+'</b></td><td>Total Units<br><b>'+tu.toLocaleString()+'</b></td><td>Total CBM<br><b>'+fm(tv,3)+'</b></td><td>Total Weight (kg)<br><b>'+fm(tw,0)+'</b></td></tr></table>';preview()}
 document.addEventListener("input",function(e){if(tb.contains(e.target))cbmRefresh()});
-function pf(x){return fm(x,2).replace(/,/g,"")}
+function pf(x){return nf(x,2)}
 $("padd").onclick=function(){var v=$("ptype").value,m=$("pamsg");if(v===""){m.textContent="Select a cargo type first.";return}
  if(v=="x"){m.textContent="Enter your own cargo on the next page, in the cargo columns.";return}
  if(CG.some(function(g){return g.p==v})){m.textContent="That type is already in the list.";return}
- var p=PRE[v];addRow(p[0],pf(p[1]*2.54/df()),pf(p[2]*2.54/df()),pf(p[3]*2.54/df()),pf(p[4]/wf()),"",v);chips();m.textContent="Added. Enter the quantity on the next page."};
+ pushUndo();var p=PRE[v];addRow(p[0],pf(p[1]*2.54/df()),pf(p[2]*2.54/df()),pf(p[3]*2.54/df()),pf(p[4]/wf()),"",v);chips();m.textContent="Added. Enter the quantity on the next page."};
 document.addEventListener("input",function(e){if(e.target.dataset&&e.target.dataset.k=="n")chips()});
 document.addEventListener("keydown",function(e){var t=e.target;if(e.key!="Enter"&&e.key!="ArrowDown"&&e.key!="ArrowUp")return;if(!t||t.tagName!="INPUT"||!t.dataset||t.dataset.i==null||!tb.contains(t)||t.dataset.k=="c")return;
  var O=["n","l","w","h","k","q","u"],i=+t.dataset.i,x=O.indexOf(t.dataset.k),up=e.key=="ArrowUp",nx=up?(x>0?cin(i,O[x-1]):(i>0?cin(i-1,"u"):null)):(x<6?cin(i,O[x+1]):cin(i+1,"n"));
  e.preventDefault();if(nx){nx.focus();try{nx.select()}catch(_){}}else if(!up)t.blur()});
-$("add").onclick=function(){addBlock();$("msg").textContent=""};
+$("add").onclick=function(){pushUndo();addBlock();$("msg").textContent="";preview()};
+$("dup").onclick=function(){var i;for(i=CG.length-1;i>=0;i--){if(cval(i,"l")||cval(i,"w")||cval(i,"h"))break}
+ if(i<0){$("msg").textContent="Enter a cargo line first, then duplicate it.";return}
+ pushUndo();var u=cval(i,"u");var n=cval(i,"n");if(n)n=n.replace(/\s*\(\d+\)$/,"")+" (copy)";
+ addRow(n,cval(i,"l"),cval(i,"w"),cval(i,"h"),cval(i,"k"),cval(i,"q"),CG[i].p,cval(i,"c"),u);chips();$("msg").textContent="Duplicated the last cargo line.";preview()};
+$("undo").onclick=doUndo;$("redo").onclick=doRedo;
+function presetText(p){return p[0]+" — "+fm(p[1]*2.54/df(),1)+" × "+fm(p[2]*2.54/df(),1)+" × "+fm(p[3]*2.54/df(),1)+" "+du+", "+fm(p[4]/wf(),1)+" "+wu}
+function presetLabels(){var pt=$("ptype");for(var i=0;i<PRE.length;i++){var o=pt.options[i+1];if(o)o.textContent=presetText(PRE[i])}}
 function labels(){var d=du=="in"?"in":"cm";
  document.querySelectorAll("#rows [data-u]").forEach(function(e){e.textContent=ulab(e.dataset.u)});
-$("lclr").textContent="Door-Side Clearance ("+d+")";cbmRefresh()}
-function conv(sel,fn){document.querySelectorAll(sel).forEach(function(x){if(x.value!=="")x.value=fm(fn(+x.value),2).replace(/,/g,"")})}
+presetLabels();$("lclr").textContent="Door-Side Clearance ("+d+")";cbmRefresh()}
+function conv(sel,fn){document.querySelectorAll(sel).forEach(function(x){if(x.value!=="")x.value=nf(fn(+x.value),2)})}
 $("du").onchange=function(){var r=du=="in"?2.54:1/2.54;if($("du").value==du)return;conv('#rows [data-k="l"],#rows [data-k="w"],#rows [data-k="h"],#clr',function(v){return v*r});du=$("du").value;labels();info()};
 $("wu").onchange=function(){var r=wu=="kg"?1/0.45359237:0.45359237;if($("wu").value==wu)return;conv('#rows [data-k="k"],#cp',function(v){return v*r});wu=$("wu").value;labels();info()};
 function info(){var i=+$("eq").value,e=EQ[i];
@@ -212,7 +276,14 @@ function seq(L){var P=L.P;P.sort(function(a,b){return Math.round(a.x*10)-Math.ro
   else if(kz!==pz){ll++;pz=kz;L.gLay.push({end:0,row:rr,lay:ll})}
   b.row=rr;b.lay=ll;L.gRow[L.gRow.length-1].end=i+1;L.gLay[L.gLay.length-1].end=i+1});L.nRow=rr}
 function topText(b){return b.up==2?"Upright (top up)":b.up==0?"On side – top toward door":"On side – top toward side B"}
+function setExportEnabled(on){["pdf","xls","pkg"].forEach(function(id){var e=$(id);if(e)e.disabled=!on})}
+function markStale(){if(!R)return;R.stale=true;["stale2","stale3"].forEach(function(id){var e=$(id);if(e)e.style.display="block"});setExportEnabled(false)}
+function clearStale(){if(R)R.stale=false;["stale2","stale3"].forEach(function(id){var e=$(id);if(e)e.style.display="none"});setExportEnabled(true)}
+function clearResults(){R=null;stop();GLC=null;["stale2","stale3"].forEach(function(id){var e=$(id);if(e)e.style.display="none"});$("out").style.display="none";$("out3").style.display="none";$("empty").style.display="";$("empty3").style.display="";$("stats").innerHTML="";$("sumbar").innerHTML="";$("ctab").innerHTML="";$("cgtab").innerHTML="";$("sum").innerHTML="";$("csel").innerHTML="";$("eqs").textContent="";setExportEnabled(true)}
 function calc(){
+ if(R)markStale();
+ var bad=false;CG.forEach(function(_,bi){["l","w","h","k","q","u"].forEach(function(k){if(cnum(bi,k)<0)bad=true})});
+ if(bad){$("msg").textContent="Dimensions, weights and quantities cannot be negative.";return}
  var i=+$("eq").value,cands=[],clr=Math.max(0,+$("clr").value*df())||0;
  function mk(e){return{l:e[1],ul:e[1]-clr,w:e[2],h:e[3],p:e[4],name:e[0]}}
  if(i==0){for(var k=1;k<=2;k++)cands.push(mk(EQ[k]))}else cands.push(mk(EQ[i]));
@@ -240,7 +311,10 @@ function calc(){
  var left=U.length-placed;
  R={loads:loads,T:T,tot:U.length,wt:wt,vol:vol,capv:capv,left:left,du:du,wu:wu,C:loads[0].C,P:loads[0].P,eqName:$("eq").options[$("eq").selectedIndex].text,
   sum:loads.length+" container(s), "+placed+" cartons, "+fm(vol/1e6,2)+" m³"};
- $("stats").innerHTML=st(loads.length,"container(s) used",vol/capv*100)+st(placed+" / "+U.length,"pieces loaded",placed/U.length*100)+(uld()?st(uld().toLocaleString(),"Units loaded",100):"")+st(fm(vol/1e6,3)+" m³","total CBM stuffed",vol/capv*100)+st(fm(vol/capv*100,1)+"%","Container volume used",vol/capv*100)+st(fm(wt/wf(),0)+" "+wu,"cargo weight",100);
+ clearStale();
+ var totalCbm=0,totalUnits=0,payload=0;T.forEach(function(t){var cb=(t.l+MG)*(t.w+MG)*(t.h+MG)/1e6;totalCbm+=cb*t.q;totalUnits+=(t.upc||0)*t.q});loads.forEach(function(L){payload+=L.C.p});
+ $("stats").innerHTML=st(loads.length,"container(s) used")+st(placed+" / "+U.length,"pieces loaded",placed/U.length*100,false,placed>=U.length?"ok":(left?"warn":""))+(totalUnits?st(uld().toLocaleString()+" / "+totalUnits.toLocaleString(),"units loaded",uld()/totalUnits*100):"")+st(fm(vol/1e6,3)+" m³","total CBM stuffed",totalCbm?vol/totalCbm*100:0,true)+st(fm(vol/capv*100,1)+"%","container volume used",vol/capv*100,true,(vol/capv*100)>95?"warn":"")+st(fm(wt/wf(),0)+" "+wu,"cargo weight · "+fm(payload?wt/payload*100:0,0)+"% of payload",payload?wt/payload*100:0,true,(payload&&wt/payload>.95)?"warn":"");
+ $("sumbar").innerHTML='<span><b>'+loads.length+'</b> container(s)</span><span><b>'+placed.toLocaleString()+'/'+U.length.toLocaleString()+'</b> pieces</span><span><b>'+fm(vol/1e6,1)+'</b> m3 stuffed</span><span><b>'+fm(vol/capv*100,1)+'%</b> volume</span><span><b>'+fm(wt/wf(),0)+'</b> '+wu+'</span><span class="grow"></span>'+(left?'<span style="color:var(--sig);font-weight:700">'+left+' piece(s) not loaded</span>':'<span style="color:var(--ok);font-weight:700">All cargo fits</span>');
  var ct='<tr><th>#</th><th>Container</th><th>Pieces</th><th>CBM stuffed</th><th>Volume used</th><th>Weight ('+wu+')</th></tr>';
  loads.forEach(function(L,k){var cvv=L.C.l*L.C.w*L.C.h;ct+='<tr><td>'+(k+1)+'</td><td>'+esc(L.C.name)+' ('+fm(cvv/1e6,2)+' m³)</td><td>'+L.P.length+'</td><td>'+fm(L.vol/1e6,3)+' m³</td><td>'+fm(L.vol/cvv*100,1)+'%</td><td>'+fm(L.wt/wf(),0)+'</td></tr>'});
  $("ctab").innerHTML=ct;
@@ -248,13 +322,14 @@ function calc(){
  T.forEach(function(t){var cb=(t.l+MG)*(t.w+MG)*(t.h+MG)/1e6;h+='<tr><td><span class="sw" style="background:'+t.color+'"></span>'+esc(t.name)+'</td><td>'+fm(t.l/df(),1)+' × '+fm(t.w/df(),1)+' × '+fm(t.h/df(),1)+'</td><td>'+fm(cb,4)+' m³</td><td>'+t.fit+' of '+t.q+'</td><td class="'+(t.q-t.fit?"warn":"")+'">'+(t.q-t.fit)+'</td><td>'+(t.upc||'–')+'</td><td>'+(t.upc?(t.upc*t.fit).toLocaleString():'–')+'</td><td>'+fm(cb*t.fit,3)+' m³</td></tr>'});
  h+='<tr><td colspan="7"><b>Total CBM stuffed</b> (container capacity '+fm(capv/1e6,2)+' m³)</td><td><b>'+fm(vol/1e6,3)+' m³</b></td></tr><tr><td colspan="8" class="'+(left?"warn":"")+'">'+(left?left+" piece(s) could not be loaded (too large for any container or over the weight limit).":"All cargo fits.")+'</td></tr>';
  $("sum").innerHTML=h;
+ renderCG();
  $("csel").innerHTML=loads.map(function(L,k){return '<option value="'+k+'">Container '+(k+1)+': '+esc(L.C.name)+' ('+L.P.length+' pieces)</option>'}).join("");
  $("csel").value=0;R.C=loads[0].C;R.P=loads[0].P;$("step").checked=false;stop();setSteps();
  $("eqs").textContent=R.sum+". Download the PDF or Excel report for the full loading sequence.";
  $("empty").style.display=$("empty3").style.display="none";$("out").style.display=$("out3").style.display="block";vz.z=1;vz.px=0;vz.py=0;histAdd(R.sum);show(2);
 }
 $("csel").onchange=function(){var L=R.loads[+$("csel").value];R.C=L.C;R.P=L.P;vz.z=1;vz.px=0;vz.py=0;$("step").checked=false;stop();setSteps()};
-function st(a,b,p){return '<div class="stat"><b>'+a+'</b><span>'+b+'</span><div class="bar"><i style="width:'+Math.min(100,Math.max(0,p))+'%"></i></div></div>'}
+function st(a,b,p,cap,cls){return '<div class="stat'+(cls?" "+cls:"")+'"><b>'+a+'</b><span>'+b+'</span>'+(p==null?'':'<div class="bar'+(cap?" cap":"")+'"><i style="width:'+Math.min(100,Math.max(0,p))+'%"></i></div>')+'</div>'}
 var vz={z:1,px:0,py:0},lastBB=null,fs=false,vp=28,mv=false,ar=0;
 function shade(hex,k){var n=parseInt(hex.slice(1),16),f=function(v){return Math.max(0,Math.min(255,Math.round(v*k)))};return "rgb("+f(n>>16)+","+f(n>>8&255)+","+f(n&255)+")"}
 function draw(cv,yaw,bg,lim,hl){
@@ -300,18 +375,63 @@ function draw(cv,yaw,bg,lim,hl){
   if(vis){g.strokeStyle=col;g.globalAlpha=.55;g.lineWidth=1.5;g.beginPath();var sg=function(a,b){var pa=T(Lx,a[0],a[1]),pb=T(Lx,b[0],b[1]);g.moveTo(pa[0],pa[1]);g.lineTo(pb[0],pb[1])};
    sg([Wy/2,0],[Wy/2,Hz]);[.1,.3,.7,.9].forEach(function(f){sg([Wy*f,Hz*.04],[Wy*f,Hz*.96])});sg([Wy*.44,Hz*.5],[Wy*.44,Hz*.58]);sg([Wy*.56,Hz*.5],[Wy*.56,Hz*.58]);g.stroke()}
   g.globalAlpha=1;g.font="bold "+Math.max(12,Math.round(W/62))+"px system-ui,sans-serif";g.textAlign="center";
-  var lab=T(Lx,Wy/2,Hz),fp=T(0,Wy/2,Hz);g.fillStyle=col;g.fillText("DOOR SIDE",lab[0],lab[1]-10);g.fillStyle=bg?"#334":"#93a2b0";g.fillText("FRONT WALL (CLOSED END)",fp[0],fp[1]-10);g.restore()})();
+  var lab=T(Lx,Wy/2,Hz),fp=T(0,Wy/2,Hz),dlw=g.measureText("DOOR SIDE").width,flw=g.measureText("FRONT WALL (CLOSED END)").width;lab[0]=Math.max(dlw/2+6,Math.min(W-dlw/2-6,lab[0]));fp[0]=Math.max(flw/2+6,Math.min(W-flw/2-6,fp[0]));lab[1]=Math.max(16,lab[1]-10);fp[1]=Math.max(16,fp[1]-10);g.fillStyle=col;g.fillText("DOOR SIDE",lab[0],lab[1]);g.fillStyle=bg?"#334":"#93a2b0";g.fillText("FRONT WALL (CLOSED END)",fp[0],fp[1]);g.restore()})();
  var du2=(bg?R.du:R.du),fk=du2=="in"?2.54:1,fnt=Math.max(11,Math.round(W/75)),acc=bg?"#1f6f78":(getComputedStyle(document.body).getPropertyValue("--accent")||"#1f6f78").trim(),pill=bg?"#fff":(getComputedStyle(document.body).getPropertyValue("--view")||"#fff").trim();
  var cen=T(C.l/2,C.w/2,C.h/2);
  function dim(a,b,txt,off){var pa=T(a[0],a[1],a[2]),pb=T(b[0],b[1],b[2]);if(Math.hypot(pb[0]-pa[0],pb[1]-pa[1])<12)return;var mx=(pa[0]+pb[0])/2,my=(pa[1]+pb[1])/2,ux=mx-cen[0],uy=my-cen[1],ul=Math.hypot(ux,uy)||1;ux/=ul;uy/=ul;
   var ax=pa[0]+ux*off,ay=pa[1]+uy*off,bx=pb[0]+ux*off,by=pb[1]+uy*off;g.strokeStyle=acc;g.lineWidth=1.4;g.beginPath();g.moveTo(pa[0]+ux*4,pa[1]+uy*4);g.lineTo(ax+ux*4,ay+uy*4);g.moveTo(pb[0]+ux*4,pb[1]+uy*4);g.lineTo(bx+ux*4,by+uy*4);g.moveTo(ax,ay);g.lineTo(bx,by);g.stroke();
-  g.font="bold "+fnt+"px system-ui,sans-serif";g.textAlign="center";var tw=g.measureText(txt).width,tx=(ax+bx)/2,ty=(ay+by)/2;g.fillStyle=pill;g.fillRect(tx-tw/2-4,ty-fnt*.8,tw+8,fnt*1.5);g.fillStyle=acc;g.fillText(txt,tx,ty+fnt*.35)}
+  g.font="bold "+fnt+"px system-ui,sans-serif";g.textAlign="center";var tw=g.measureText(txt).width,tx=(ax+bx)/2,ty=(ay+by)/2;tx=Math.max(tw/2+6,Math.min(W-tw/2-6,tx));ty=Math.max(fnt+4,Math.min(H-4,ty));g.fillStyle=pill;g.fillRect(tx-tw/2-4,ty-fnt*.8,tw+8,fnt*1.5);g.fillStyle=acc;g.fillText(txt,tx,ty+fnt*.35)}
  var yA=T(C.l/2,0,0)[1],yB=T(C.l/2,C.w,0)[1],xA=T(0,C.w/2,0)[1],xB=T(C.l,C.w/2,0)[1];
  dim(yA>=yB?[0,0,0]:[0,C.w,0],yA>=yB?[C.l,0,0]:[C.l,C.w,0],"Length "+fm(C.l/fk,1)+" "+du2,26);
  dim(xA>=xB?[0,0,0]:[C.l,0,0],xA>=xB?[0,C.w,0]:[C.l,C.w,0],"Width "+fm(C.w/fk,1)+" "+du2,26);
  var c4=[[0,0],[C.l,0],[C.l,C.w],[0,C.w]],lm=c4.reduce(function(a,q){return T(q[0],q[1],0)[0]<T(a[0],a[1],0)[0]?q:a},c4[0]);
  dim([lm[0],lm[1],0],[lm[0],lm[1],C.h],"Height "+fm(C.h/fk,1)+" "+du2,30);
  g.font="bold "+(fnt+1)+"px system-ui,sans-serif";g.textAlign="left";g.fillStyle=acc;g.fillText((C.name||"Container")+" – Inside "+fm(C.l/fk,1)+" × "+fm(C.w/fk,1)+" × "+fm(C.h/fk,1)+" "+du2,12,fnt+8)}
+var GL={ok:false,on:false,inst:null,hi:null,baseDist:2000,center:null,edit:false,sel:-1,curC:null,curP:null,box:null,drag:null},GLC=null;
+function glVar(n,f){try{var v=getComputedStyle(document.body).getPropertyValue(n).trim();return v?new THREE.Color(v):new THREE.Color(f)}catch(e){return new THREE.Color(f)}}
+function glInit(){if(GL.ok)return true;if(!window.THREE)return false;
+ try{var cv=$("gl");GL.renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:false,preserveDrawingBuffer:true});GL.renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+  GL.scene=new THREE.Scene();GL.scene.background=glVar("--view","#f7f9fa");GL.camera=new THREE.PerspectiveCamera(38,1400/640,1,100000);GL.group=new THREE.Group();GL.scene.add(GL.group);
+  GL.scene.add(new THREE.AmbientLight(0xffffff,.75));var d1=new THREE.DirectionalLight(0xffffff,.6);d1.position.set(-1,2,1.4);GL.scene.add(d1);var d2=new THREE.DirectionalLight(0xffffff,.32);d2.position.set(1.3,-1,-1.1);GL.scene.add(d2);
+  GL.ray=new THREE.Raycaster();GL.pt=new THREE.Vector2();GL.box=new THREE.BoxGeometry(1,1,1);GL.ok=true;return true}catch(e){GL.ok=false;return false}}
+function glClear(){while(GL.group.children.length){var o=GL.group.children[GL.group.children.length-1];GL.group.remove(o);if(o.geometry&&o.geometry!==GL.box)o.geometry.dispose();if(o.material)o.material.dispose()}GL.inst=null;GL.hi=null;GL.sel=-1}
+function glBuild(){if(!GL.ok)return;glClear();var C=R.C,m=C.m;
+ var e=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(C.l,C.h,C.w)),new THREE.LineBasicMaterial({color:glVar("--mute","#94a3b8")}));e.position.set(C.l/2,C.h/2,C.w/2);GL.group.add(e);
+ var fg=new THREE.Mesh(new THREE.PlaneGeometry(C.l,C.w),new THREE.MeshBasicMaterial({color:glVar("--line","#cbd5e1"),side:THREE.DoubleSide}));fg.rotation.x=-Math.PI/2;fg.position.set(C.l/2,0.05,C.w/2);GL.group.add(fg);
+ var P=R.P,n=P.length,mat=new THREE.MeshLambertMaterial({}),d=new THREE.Object3D(),col=new THREE.Color();
+ GL.inst=new THREE.InstancedMesh(GL.box,mat,n);
+ for(var i=0;i<n;i++){var b=P[i],sl=Math.max(.1,b.l-m),sw=Math.max(.1,b.w-m),sh=Math.max(.1,b.h-m);d.position.set(b.x+sl/2,b.z+sh/2,b.y+sw/2);d.scale.set(sl,sh,sw);d.updateMatrix();GL.inst.setMatrixAt(i,d.matrix);col.set(b.t.color||"#0f6e7a");GL.inst.setColorAt(i,col)}
+ GL.inst.instanceMatrix.needsUpdate=true;if(GL.inst.instanceColor)GL.inst.instanceColor.needsUpdate=true;GL.group.add(GL.inst);GL.curC=R.C;GL.curP=R.P;glFrame()}
+function glFrame(){var C=R.C;GL.center=new THREE.Vector3(C.l/2,C.h/2,C.w/2);
+ var ya=(+$("yaw").value)*Math.PI/180,ti=Math.max(3,Math.min(87,+$("tilt").value))*Math.PI/180,dir=new THREE.Vector3(Math.cos(ti)*Math.sin(ya),Math.sin(ti),Math.cos(ti)*Math.cos(ya)).normalize();
+ var right=new THREE.Vector3().crossVectors(new THREE.Vector3(0,1,0),dir);if(right.length()<1e-6)right.set(1,0,0);right.normalize();var up=new THREE.Vector3().crossVectors(dir,right).normalize();
+ var tv=Math.tan((GL.camera.fov/2)*Math.PI/180),th=tv*(GL.camera.aspect||2.1875),d=0,p=new THREE.Vector3();
+ [[0,0,0],[C.l,0,0],[0,0,C.w],[C.l,0,C.w],[0,C.h,0],[C.l,C.h,0],[0,C.h,C.w],[C.l,C.h,C.w]].forEach(function(a){p.set(a[0],a[1],a[2]).sub(GL.center);var need=Math.max(Math.abs(p.dot(right))/th,Math.abs(p.dot(up))/tv)+p.dot(dir);if(need>d)d=need});
+ GL.baseDist=Math.max(50,d*1.12)}
+function glCamera(){var ya=(+$("yaw").value)*Math.PI/180,ti=Math.max(3,Math.min(87,+$("tilt").value))*Math.PI/180,dist=(GL.baseDist||2000)/Math.max(.15,vz.z);
+ var dir=new THREE.Vector3(Math.cos(ti)*Math.sin(ya),Math.sin(ti),Math.cos(ti)*Math.cos(ya)).normalize(),tgt=(GL.center||new THREE.Vector3()).clone();
+ var right=new THREE.Vector3().crossVectors(new THREE.Vector3(0,1,0),dir);if(right.length()<1e-6)right.set(1,0,0);right.normalize();var up=new THREE.Vector3().crossVectors(dir,right).normalize();
+ var sc=dist*0.0016;tgt.addScaledVector(right,-vz.px*sc).addScaledVector(up,vz.py*sc);
+ GL.camera.position.copy(tgt).addScaledVector(dir,dist);GL.camera.up.set(0,1,0);GL.camera.lookAt(tgt)}
+function glSetMatrix(i){var b=R.P[i],m=R.C.m,sl=Math.max(.1,b.l-m),sw=Math.max(.1,b.w-m),sh=Math.max(.1,b.h-m),d=new THREE.Object3D();d.position.set(b.x+sl/2,b.z+sh/2,b.y+sw/2);d.scale.set(sl,sh,sw);d.updateMatrix();GL.inst.setMatrixAt(i,d.matrix);GL.inst.instanceMatrix.needsUpdate=true}
+function glStep(lim,hl){if(GL.hi){GL.group.remove(GL.hi);if(GL.hi.geometry&&GL.hi.geometry!==GL.box)GL.hi.geometry.dispose();if(GL.hi.material)GL.hi.material.dispose();GL.hi=null}
+ if(hl==null||lim==null||lim<=hl)return;var n=lim-hl,m=R.C.m,mat=new THREE.MeshLambertMaterial({color:0xff9f1c}),mi=new THREE.InstancedMesh(GL.box,mat,n),d=new THREE.Object3D();
+ for(var i=0;i<n;i++){var b=R.P[hl+i],sl=Math.max(.1,b.l-m),sw=Math.max(.1,b.w-m),sh=Math.max(.1,b.h-m);d.position.set(b.x+sl/2,b.z+sh/2,b.y+sw/2);d.scale.set(sl,sh,sw);d.updateMatrix();mi.setMatrixAt(i,d.matrix)}
+ mi.instanceMatrix.needsUpdate=true;GL.hi=mi;GL.group.add(mi)}
+function glLabels(){var el=$("glabels");if(!el||!GL.camera||!R)return;var cv=$("gl"),C=R.C,du2=R.du,fk=du2=="in"?2.54:1;
+ function P(x,y,z){var v=new THREE.Vector3(x,z,y).project(GL.camera);return[(v.x*.5+.5)*cv.clientWidth,(-v.y*.5+.5)*cv.clientHeight]}
+ function mid(a,b){var p=P(a[0],a[1],a[2]),q=P(b[0],b[1],b[2]);return[(p[0]+q[0])/2,(p[1]+q[1])/2]}
+ var lc=mid([0,0,0],[C.l,0,0]),wc=mid([C.l,0,0],[C.l,C.w,0]),hc=mid([C.l,0,0],[C.l,0,C.h]);
+ el.innerHTML='<div class="glt">'+esc(C.name||"Container")+'</div><div class="glh">Inside '+fm(C.l/fk,1)+' × '+fm(C.w/fk,1)+' × '+fm(C.h/fk,1)+' '+du2+'</div>'
+  +'<div class="gl" style="left:'+lc[0]+'px;top:'+lc[1]+'px">Length '+fm(C.l/fk,1)+' '+du2+'</div>'
+  +'<div class="gl" style="left:'+wc[0]+'px;top:'+wc[1]+'px">Width '+fm(C.w/fk,1)+' '+du2+'</div>'
+  +'<div class="gl" style="left:'+hc[0]+'px;top:'+hc[1]+'px">Height '+fm(C.h/fk,1)+' '+du2+'</div>'}
+function glDraw(lim,hl){if(!GL.ok||!R)return;if(GL.curC!==R.C||GL.curP!==R.P)glBuild();
+ GL.inst.count=(lim==null?R.P.length:Math.max(0,Math.min(lim,R.P.length)));glStep(lim,hl);glCamera();
+ var cv=$("gl"),w=cv.clientWidth||1400,h=cv.clientHeight||640;GL.renderer.setSize(w,h,false);GL.camera.aspect=w/h;GL.camera.updateProjectionMatrix();GL.renderer.render(GL.scene,GL.camera);glLabels()}
+function glPick(e){var cv=$("gl"),r=cv.getBoundingClientRect(),x=e.clientX==null?e.pageX:e.clientX,y=e.clientY==null?e.pageY:e.clientY;
+ GL.pt.x=((x-r.left)/r.width)*2-1;GL.pt.y=-((y-r.top)/r.height)*2+1;GL.ray.setFromCamera(GL.pt,GL.camera);var h=GL.ray.intersectObject(GL.inst,false);return h.length?h[0]:null}
+function glHit(b){for(var i=0;i<R.P.length;i++){if(i===GL.drag.i)continue;var o=R.P[i];if(b.x<o.x+o.l-.01&&b.x+b.l>o.x+.01&&b.y<o.y+o.w-.01&&b.y+b.w>o.y+.01&&b.z<o.z+o.h-.01&&b.z+b.h>o.z+.01)return true}return false}
 function curL(){return R.loads[+$("csel").value]}
 function steps(){var L=curL(),m=$("smode").value,N=L.P.length;
  if(m=="piece")return{n:N,end:function(i){return i},lab:function(i){return "Carton "+i+" of "+N}};
@@ -320,13 +440,13 @@ function steps(){var L=curL(),m=$("smode").value,N=L.P.length;
 function setSteps(){if(!R)return;var s=steps();$("stepr").max=s.n;$("stepr").value=$("step").checked?1:s.n;redraw()}
 function redraw(){if(!R)return;var on=$("step").checked,lim=null,hl=null;$("sc").style.display=on?"inline-flex":"none";
  if(on){var s=steps(),i=Math.min(s.n,Math.max(1,+$("stepr").value));lim=s.end(i);hl=i>1?s.end(i-1):0;$("stepl").textContent=s.lab(i)}else $("stepl").textContent="";
- draw($("cv"),$("yaw").value,false,lim,hl)}
+ if(GL.on&&GL.ok)glDraw(lim,hl);else draw($("cv"),$("yaw").value,false,lim,hl)}
 var raf=0;function zr(){cancelAnimationFrame(raf);raf=requestAnimationFrame(function(){redraw();$("cv").style.touchAction="none"})}
 function zset(k,mx,my){var cv=$("cv"),W=cv.width,H=cv.height,z=Math.max(.5,Math.min(40,vz.z*k));k=z/vz.z;var dx=W/2-mx,dy=H/2-my;vz.px=(vz.px+dx)*k-dx;vz.py=(vz.py+dy)*k-dy;vz.z=z;zr()}
 $("zin").onclick=function(){zset(1.4,$("cv").width/2,$("cv").height/2)};
 $("zout").onclick=function(){zset(1/1.4,$("cv").width/2,$("cv").height/2)};
-$("zrst").onclick=function(){vz.z=1;vz.px=0;vz.py=0;zr()};
-$("zfit").onclick=function(){if(!R)return;redraw();var b=lastBB,cv=$("cv"),W=cv.width,H=cv.height;if(!b||b[0]>b[2])return;
+$("zrst").onclick=function(){vz.z=1;vz.px=0;vz.py=0;setView(340,28)};
+$("zfit").onclick=function(){if(!R)return;if(GL.on&&GL.ok){vz.z=1;vz.px=0;vz.py=0;glBuild();glCamera();var cv=$("gl");GL.renderer.setSize(cv.clientWidth||1400,cv.clientHeight||640,false);GL.camera.aspect=(cv.clientWidth||1400)/(cv.clientHeight||640);GL.camera.updateProjectionMatrix();GL.renderer.render(GL.scene,GL.camera);glLabels();return}redraw();var b=lastBB,cv=$("cv"),W=cv.width,H=cv.height;if(!b||b[0]>b[2])return;
  var k=Math.min((W-30)/(b[2]-b[0]),(H-30)/(b[3]-b[1])),z=Math.max(.5,Math.min(40,vz.z*k));k=z/vz.z;var cx=(b[0]+b[2])/2,cy=(b[1]+b[3])/2;
  vz.px=vz.px*k-(cx-W/2)*k;vz.py=vz.py*k-(cy-H/2)*k;vz.z=z;zr()};
 (function(){var cv=$("cv"),pts={};
@@ -336,7 +456,9 @@ $("zfit").onclick=function(){if(!R)return;redraw();var b=lastBB,cv=$("cv"),W=cv.
   if(ids.length==1){if(mv){vz.px+=(e.clientX-p.x)*sx;vz.py+=(e.clientY-p.y)*sy}else{$("yaw").value=((+$("yaw").value+(e.clientX-p.x)*.5)%360+360)%360;vp=Math.max(0,Math.min(90,vp+(e.clientY-p.y)*.4));$("tilt").value=vp}p.x=e.clientX;p.y=e.clientY;zr()}
   else if(ids.length==2){var o=pts[ids.filter(function(i){return i!=e.pointerId})[0]],d0=Math.hypot(p.x-o.x,p.y-o.y);p.x=e.clientX;p.y=e.clientY;var d1=Math.hypot(p.x-o.x,p.y-o.y);if(d0>0)zset(d1/d0,((p.x+o.x)/2-r.left)*sx,((p.y+o.y)/2-r.top)*sy)}});
  function pe(e){delete pts[e.pointerId]}cv.addEventListener("pointerup",pe);cv.addEventListener("pointercancel",pe)})();
-function resizeCv(){var cv=$("cv");if(fs){cv.style.aspectRatio="auto";var dpr=Math.min(2,window.devicePixelRatio||1);cv.width=Math.round(cv.clientWidth*dpr);cv.height=Math.round(cv.clientHeight*dpr)}else{cv.width=1400;cv.height=640;cv.style.aspectRatio="1400/640"}if(R)redraw()}
+function resizeCv(){var cv=$("cv");if(fs){cv.style.aspectRatio="auto";var dpr=Math.min(2,window.devicePixelRatio||1);cv.width=Math.round(cv.clientWidth*dpr);cv.height=Math.round(cv.clientHeight*dpr)}else{cv.width=1400;cv.height=640;cv.style.aspectRatio="1400/640"}
+ var gl=$("gl");if(gl&&GL.ok){var dpr2=Math.min(2,window.devicePixelRatio||1);gl.width=Math.round((gl.clientWidth||1400)*dpr2);gl.height=Math.round((gl.clientHeight||640)*dpr2);if(R){GL.camera.aspect=(gl.clientWidth||1400)/(gl.clientHeight||640);glFrame()}}
+ if(R)redraw()}
 function fsToggle(){fs=!fs;$("vw").classList.toggle("full",fs);document.body.style.overflow=fs?"hidden":"";$("zfull").textContent=fs?"Exit full screen":"Full screen";vz.z=1;vz.px=0;vz.py=0;resizeCv();$("cv").style.touchAction="none"}
 $("zfull").onclick=fsToggle;window.addEventListener("resize",resizeCv);window.addEventListener("orientationchange",function(){setTimeout(resizeCv,250)});
 document.addEventListener("keydown",function(e){if(e.key=="Escape"&&fs)fsToggle()});
@@ -346,6 +468,21 @@ $("rl").onclick=function(){setView((+$("yaw").value+270)%360,vp)};
 $("rr").onclick=function(){setView((+$("yaw").value+90)%360,vp)};
 $("tilt").oninput=function(){vp=+this.value;zr()};
 $("zmode").onclick=function(){mv=!mv;this.textContent=mv?"Drag: move":"Drag: rotate"};
+$("gmode").onclick=function(){if(!GL.on){if(!glInit()){this.textContent="3D not available";return}GL.on=true;$("vw").classList.add("glmode");this.textContent="2D view";$("gedit").style.display=""}
+ else{GL.on=false;$("vw").classList.remove("glmode");this.textContent="3D view";$("gedit").style.display="none";GL.edit=false;GL.drag=null;$("gedit").textContent="Move cartons";$("gedit").style.color=""}
+ setTimeout(function(){resizeCv();redraw();if(R)preview()},0)};
+$("gedit").onclick=function(){if(!R)return;GL.edit=!GL.edit;this.textContent=GL.edit?"Done moving":"Move cartons";this.style.color=GL.edit?"var(--accent)":""};
+(function(){var cv=$("gl");if(!cv)return;var pts={};function setPlane(b){return new THREE.Plane(new THREE.Vector3(0,1,0),-b.z)}
+ function ptr(e){var r=cv.getBoundingClientRect();GL.pt.x=((e.clientX-r.left)/r.width)*2-1;GL.pt.y=-((e.clientY-r.top)/r.height)*2+1;GL.ray.setFromCamera(GL.pt,GL.camera);return r}
+ cv.addEventListener("wheel",function(e){e.preventDefault();zset(e.deltaY<0?1.15:1/1.15,0,0)},{passive:false});
+ cv.addEventListener("pointerdown",function(e){if(GL.edit&&GL.ok&&R){var h=glPick(e);if(h&&h.instanceId!=null){var b=R.P[h.instanceId];ptr(e);var t=new THREE.Vector3();if(GL.ray.ray.intersectPlane(setPlane(b),t)){GL.drag={i:h.instanceId,ox:t.x-b.x,oz:t.z-b.y};GL.sel=h.instanceId;try{cv.setPointerCapture(e.pointerId)}catch(_){}return}}}
+  pts[e.pointerId]={x:e.clientX,y:e.clientY};try{cv.setPointerCapture(e.pointerId)}catch(_){}});
+ cv.addEventListener("pointermove",function(e){if(GL.drag){var b=R.P[GL.drag.i];ptr(e);var t=new THREE.Vector3();if(GL.ray.ray.intersectPlane(setPlane(b),t)){var C=R.C,nx=Math.round(t.x-GL.drag.ox),ny=Math.round(t.z-GL.drag.oz);nx=Math.max(0,Math.min(C.ul-b.l,nx));ny=Math.max(0,Math.min(C.w-b.w,ny));var ox=b.x,oy=b.y;b.x=nx;b.y=ny;if(glHit(b)){b.x=ox;b.y=oy}else{glSetMatrix(GL.drag.i);glCamera();GL.camera.aspect=(cv.clientWidth||1400)/(cv.clientHeight||640);GL.camera.updateProjectionMatrix();GL.renderer.render(GL.scene,GL.camera);glLabels()}}return}
+  var p=pts[e.pointerId];if(!p)return;var ids=Object.keys(pts),r=cv.getBoundingClientRect(),sx=cv.width/r.width,sy=cv.height/r.height;
+  if(ids.length==1){if(mv){vz.px+=(e.clientX-p.x)*sx;vz.py+=(e.clientY-p.y)*sy}else{$("yaw").value=((+$("yaw").value+(e.clientX-p.x)*.5)%360+360)%360;vp=Math.max(0,Math.min(90,vp+(e.clientY-p.y)*.4));$("tilt").value=vp}p.x=e.clientX;p.y=e.clientY;redraw()}
+  else if(ids.length==2){var o=pts[ids.filter(function(i){return i!=e.pointerId})[0]],d0=Math.hypot(p.x-o.x,p.y-o.y);p.x=e.clientX;p.y=e.clientY;var d1=Math.hypot(p.x-o.x,p.y-o.y);if(d0>0)zset(d1/d0,0,0)}});
+ function up(e){if(GL.drag){GL.drag=null;if(R){R.manual=true;try{seq(curL())}catch(_){}renderCG()}glBuild();glDraw(null,null)}delete pts[e.pointerId]}
+ cv.addEventListener("pointerup",up);cv.addEventListener("pointercancel",up)})();
 function arLoop(){if(!$("auto").checked)return;if($("p2").classList.contains("on")&&R){$("yaw").value=(+$("yaw").value+.4)%360;redraw()}ar=requestAnimationFrame(arLoop)}
 $("auto").onchange=function(){cancelAnimationFrame(ar);if(this.checked)arLoop()};
 var tm=null;function stop(){clearInterval(tm);tm=null;$("play").textContent="Play"}
@@ -356,7 +493,7 @@ $("spd").onchange=function(){if(tm){clearInterval(tm);tm=setInterval(tick,+$("sp
 $("prev").onclick=function(){stop();$("stepr").value=Math.max(1,+$("stepr").value-1);redraw()};
 $("next").onclick=function(){stop();$("stepr").value=Math.min(+$("stepr").max,+$("stepr").value+1);redraw()};
 $("play").onclick=function(){if(!R)return;if(tm){stop();return}var s=steps();if(+$("stepr").value>=s.n)$("stepr").value=1;redraw();$("play").textContent="Pause";tm=setInterval(tick,+$("spd").value)};
-$("calc").onclick=function(){$("msg").textContent="Calculating…";setTimeout(function(){try{calc()}catch(e){$("msg").textContent="Couldn’t calculate: "+e.message}},30)};
+$("calc").onclick=function(){$("msg").textContent="Calculating…";busy("Packing cartons…");setTimeout(function(){try{calc()}catch(e){$("msg").textContent="Couldn’t calculate: "+e.message}finally{notBusy()}},30)};
 async function buildPdf(){
  if(!R)return null;
  if(!window.jspdf){$("pmsg").textContent="PDF library not loaded.";return null}
@@ -365,42 +502,48 @@ async function buildPdf(){
   var d=new window.jspdf.jsPDF({unit:"mm",format:"a4",orientation:"portrait"}),u=R.du,f=u=="in"?2.54:1,wf2=R.wu=="kg"?1:0.45359237,y=20,m=R.loads[0].C.m,name=$("pn").value.trim()||"Load plan";
   function np(o){d.addPage("a4",o=="l"?"landscape":"portrait");pgs.push(o)}
   function dimTxt(C){return fm(C.l/f,1)+" x "+fm(C.w/f,1)+" x "+fm(C.h/f,1)+" "+u}
-  d.setFontSize(18);d.text("3D Load Plan",14,y);d.setFontSize(10);y+=7;
-  d.text(name+" – "+stamp()+" – "+R.eqName,14,y);y+=6;
-  d.text(R.loads.length+" container(s) | CBM stuffed "+fm(R.vol/1e6,3)+" m3 of "+fm(R.capv/1e6,2)+" m3 ("+fm(R.vol/R.capv*100,1)+"%) | Cargo weight "+fm(R.wt/wf2,0)+" "+R.wu+(R.left?" | "+R.left+" not loaded":""),14,y,{maxWidth:182});y+=11;
-  d.setFontSize(8);d.setFont(undefined,"bold");d.text("#",14,y);d.text("Container",22,y);d.text("Pieces",98,y);d.text("CBM stuffed",118,y);d.text("Volume used",146,y);d.text("Weight ("+R.wu+")",172,y);d.setFont(undefined,"normal");y+=5;
-  R.loads.forEach(function(L,k){var cv=L.C.l*L.C.w*L.C.h;d.text(String(k+1),14,y);d.text(L.C.name.slice(0,40),22,y);d.text(String(L.P.length),98,y);d.text(fm(L.vol/1e6,3),118,y);d.text(fm(L.vol/cv*100,1)+"%",146,y);d.text(fm(L.wt/wf2,0),172,y);y+=5;d.text("Inside size: "+dimTxt(L.C),22,y);y+=5});y+=3;
-  d.setFont(undefined,"bold");d.text("Cargo line",14,y);d.text("Carton size ("+u+")",46,y);d.text("CBM/carton",80,y);d.text("Loaded",102,y);d.text("Left",122,y);d.text("Units/ctn",134,y);d.text("Total units",155,y);d.text("Total CBM",181,y);d.setFont(undefined,"normal");y+=5;
-  R.T.forEach(function(t){if(y>280){np("p");y=20}var cb=(t.l+MG)*(t.w+MG)*(t.h+MG)/1e6;d.text(t.name.slice(0,18),14,y);d.text(fm(t.l/f,1)+" x "+fm(t.w/f,1)+" x "+fm(t.h/f,1),46,y);d.text(fm(cb,4),80,y);d.text(t.fit+" of "+t.q,102,y);d.text(String(t.q-t.fit),122,y);d.text(t.upc?String(t.upc):"-",134,y);d.text(t.upc?(t.upc*t.fit).toLocaleString():"-",155,y);d.text(fm(cb*t.fit,3),181,y);y+=5});
-  d.setFont(undefined,"bold");d.text("Total CBM stuffed: "+fm(R.vol/1e6,3)+" m3"+(uld()?"   |   Total units loaded: "+uld().toLocaleString():""),14,y+3);d.setFont(undefined,"normal");
-  d.text("Loading runs from the front wall to the door. Arrow on each carton = THIS SIDE UP. CBM and the loading plan include 5 mm added to every carton dimension. The diagrams follow on landscape pages.",14,y+9);
+  d.setFontSize(18);PDF_T(d,"3D Load Plan",14,y);d.setFontSize(10);y+=7;
+  PDF_T(d,name+" – "+stamp()+" – "+R.eqName,14,y);y+=6;
+  PDF_T(d,R.loads.length+" container(s) | CBM stuffed "+fm(R.vol/1e6,3)+" m3 of "+fm(R.capv/1e6,2)+" m3 ("+fm(R.vol/R.capv*100,1)+"%) | Cargo weight "+fm(R.wt/wf2,0)+" "+R.wu+(R.left?" | "+R.left+" not loaded":""),14,y,{maxWidth:182});y+=11;
+  d.setFontSize(8);d.setFont(undefined,"bold");PDF_T(d,"#",14,y);PDF_T(d,"Container",22,y);PDF_T(d,"Pieces",98,y);PDF_T(d,"CBM stuffed",118,y);PDF_T(d,"Volume used",146,y);PDF_T(d,"Weight ("+R.wu+")",172,y);d.setFont(undefined,"normal");y+=5;
+  R.loads.forEach(function(L,k){var cv=L.C.l*L.C.w*L.C.h;PDF_T(d,String(k+1),14,y);PDF_T(d,L.C.name.slice(0,40),22,y);PDF_T(d,String(L.P.length),98,y);PDF_T(d,fm(L.vol/1e6,3),118,y);PDF_T(d,fm(L.vol/cv*100,1)+"%",146,y);PDF_T(d,fm(L.wt/wf2,0),172,y);y+=5;PDF_T(d,"Inside size: "+dimTxt(L.C),22,y);y+=5});y+=3;
+  d.setFont(undefined,"bold");PDF_T(d,"Cargo line",14,y);PDF_T(d,"Carton size ("+u+")",46,y);PDF_T(d,"CBM/carton",80,y);PDF_T(d,"Loaded",102,y);PDF_T(d,"Left",122,y);PDF_T(d,"Units/ctn",134,y);PDF_T(d,"Total units",155,y);PDF_T(d,"Total CBM",181,y);d.setFont(undefined,"normal");y+=5;
+  R.T.forEach(function(t){if(y>280){np("p");y=20}var cb=(t.l+MG)*(t.w+MG)*(t.h+MG)/1e6;PDF_T(d,t.name.slice(0,18),14,y);PDF_T(d,fm(t.l/f,1)+" x "+fm(t.w/f,1)+" x "+fm(t.h/f,1),46,y);PDF_T(d,fm(cb,4),80,y);PDF_T(d,t.fit+" of "+t.q,102,y);PDF_T(d,String(t.q-t.fit),122,y);PDF_T(d,t.upc?String(t.upc):"-",134,y);PDF_T(d,t.upc?(t.upc*t.fit).toLocaleString():"-",155,y);PDF_T(d,fm(cb*t.fit,3),181,y);y+=5});
+  d.setFont(undefined,"bold");PDF_T(d,"Total CBM stuffed: "+fm(R.vol/1e6,3)+" m3"+(uld()?"   |   Total units loaded: "+uld().toLocaleString():""),14,y+3);d.setFont(undefined,"normal");
+  PDF_T(d,"Loading runs from the front wall to the door. Arrow on each carton = THIS SIDE UP. CBM and the loading plan include 5 mm added to every carton dimension. The diagrams follow on landscape pages.",14,y+9,{maxWidth:182});
+   y+=19;if(y>250){np("p");y=20}
+   d.setFont(undefined,"bold");PDF_T(d,"Stability — centre of gravity (CG) per container",14,y);y+=5;d.setFont(undefined,"normal");
+   R.loads.forEach(function(L,k){var mm=0,mx=0,my=0,mz=0;L.P.forEach(function(b){var wgt=b.t.kg;mm+=wgt;mx+=wgt*(b.x+(b.l-L.C.m)/2);my+=wgt*(b.y+(b.w-L.C.m)/2);mz+=wgt*(b.z+(b.h-L.C.m)/2)});if(mm>0){mx/=mm;my/=mm;mz/=mm}
+    var offp=Math.hypot(mx-L.C.l/2,my-L.C.w/2)/(0.5*Math.hypot(L.C.l,L.C.w))*100;
+    PDF_T(d,"Container "+(k+1)+": mass "+fm(mm/wf2,0)+" "+R.wu+"  |  CG x,y,z = "+fm(mx/f,1)+", "+fm(my/f,1)+", "+fm(mz/f,1)+" "+u+"  |  off-centre "+fm(offp,1)+"%",14,y,{maxWidth:182});y+=5});
+   PDF_T(d,"CG is the mass-weighted centre of the packed cartons. Keep it close to the container centre and as low as practical.",14,y,{maxWidth:182});y+=4;
   var IW=277,IH=IW*700/1500,c=document.createElement("canvas");c.width=1500;c.height=700;var img=function(){return c.toDataURL("image/jpeg",.9)};
-  function ctable(L,cnt,hd){d.setFontSize(8);d.setFont(undefined,"bold");d.text("Cargo",10,y);d.text("Size ("+u+")",90,y);d.text("Weight each ("+R.wu+")",140,y);d.text("Units/carton",170,y);d.text(hd,200,y);d.setFont(undefined,"normal");y+=4;
-   R.T.slice(0,6).forEach(function(t){d.text(t.name.slice(0,40),10,y);d.text(fm(t.l/f,1)+" x "+fm(t.w/f,1)+" x "+fm(t.h/f,1),90,y);d.text(fm(t.kg/wf2,1),140,y);d.text(t.upc?String(t.upc):"-",170,y);d.text(String(cnt[t.id]||0),200,y);y+=4})}
+  function ctable(L,cnt,hd){d.setFontSize(8);d.setFont(undefined,"bold");PDF_T(d,"Cargo",10,y);PDF_T(d,"Size ("+u+")",90,y);PDF_T(d,"Weight each ("+R.wu+")",140,y);PDF_T(d,"Units/carton",170,y);PDF_T(d,hd,200,y);d.setFont(undefined,"normal");y+=4;
+   R.T.slice(0,6).forEach(function(t){PDF_T(d,t.name.slice(0,40),10,y);PDF_T(d,fm(t.l/f,1)+" x "+fm(t.w/f,1)+" x "+fm(t.h/f,1),90,y);PDF_T(d,fm(t.kg/wf2,1),140,y);PDF_T(d,t.upc?String(t.upc):"-",170,y);PDF_T(d,String(cnt[t.id]||0),200,y);y+=4})}
   var before=0;
   for(var k=0;k<R.loads.length;k++){var L=R.loads[k];R.C=L.C;R.P=L.P;var ctn={};L.P.forEach(function(b){ctn[b.t.id]=(ctn[b.t.id]||0)+1});
-   [340,200].forEach(function(a,vi){np("l");y=11;d.setFontSize(13);d.text("Container "+(k+1)+" of "+R.loads.length+": "+L.C.name+" – full load, view "+(vi+1)+" of 2",10,y);y+=5;
-    d.setFontSize(9);d.text("Inside size "+dimTxt(L.C)+"  |  Payload "+fm(L.C.p/wf2,0)+" "+R.wu+"  |  Cartons "+L.P.length+"  |  CBM stuffed "+fm(L.vol/1e6,3)+" m3 ("+fm(L.vol/(L.C.l*L.C.w*L.C.h)*100,1)+"%)",10,y);y+=3;
+   [340,200].forEach(function(a,vi){np("l");y=11;d.setFontSize(13);PDF_T(d,"Container "+(k+1)+" of "+R.loads.length+": "+L.C.name+" – full load, view "+(vi+1)+" of 2",10,y);y+=5;
+    d.setFontSize(9);PDF_T(d,"Inside size "+dimTxt(L.C)+"  |  Payload "+fm(L.C.p/wf2,0)+" "+R.wu+"  |  Cartons "+L.P.length+"  |  CBM stuffed "+fm(L.vol/1e6,3)+" m3 ("+fm(L.vol/(L.C.l*L.C.w*L.C.h)*100,1)+"%)",10,y);y+=3;
     draw(c,a,true);d.addImage(img(),"JPEG",10,y,IW,IH);y+=IH+5;ctable(L,ctn,"In this container")});
    if(mode!="none"){var G=mode=="row"?L.gRow:L.gLay;
     for(var gi=0;gi<G.length;gi++){var q=G[gi],pv=gi?G[gi-1].end:0,cn={};for(var z=pv;z<q.end;z++)cn[L.P[z].t.id]=(cn[L.P[z].t.id]||0)+1;
-     np("l");y=11;d.setFontSize(13);d.text("Container "+(k+1)+" of "+R.loads.length+": "+L.C.name+" – "+(mode=="row"?"Row "+q.row+" of "+L.nRow:"Row "+q.row+" of "+L.nRow+", layer "+q.lay),10,y);y+=5;
-     d.setFontSize(9);d.text("Cartons loaded so far: "+(before+q.end)+" of "+R.tot+"  |  This container: "+q.end+" of "+L.P.length+"  |  Added in this step: "+(q.end-pv)+"  |  Inside size "+dimTxt(L.C),10,y);y+=4;
+     np("l");y=11;d.setFontSize(13);PDF_T(d,"Container "+(k+1)+" of "+R.loads.length+": "+L.C.name+" – "+(mode=="row"?"Row "+q.row+" of "+L.nRow:"Row "+q.row+" of "+L.nRow+", layer "+q.lay),10,y);y+=5;
+     d.setFontSize(9);PDF_T(d,"Cartons loaded so far: "+(before+q.end)+" of "+R.tot+"  |  This container: "+q.end+" of "+L.P.length+"  |  Added in this step: "+(q.end-pv)+"  |  Inside size "+dimTxt(L.C),10,y);y+=4;
      ctable(L,cn,"This step");y+=1;draw(c,340,true,q.end,pv);d.addImage(img(),"JPEG",10,y,IW,IH);y+=IH+4;
-     d.setFontSize(8);d.text("Orange outline = cartons added in this step. Arrow on each carton = this side up; (o) = top face toward you. Loading runs from the front wall to the door.",10,y);
+     d.setFontSize(8);PDF_T(d,"Orange outline = cartons added in this step. Arrow on each carton = this side up; (o) = top face toward you. Loading runs from the front wall to the door.",10,y);
      if(gi%6==5){$("pmsg").textContent="Building PDF… container "+(k+1)+", step "+(gi+1)+" of "+G.length;await new Promise(function(r){setTimeout(r,0)})}}}
    before+=L.P.length}
   R.C=R.loads[si].C;R.P=R.loads[si].P;
-  np("p");y=20;d.setFontSize(12);d.text("Packing list ("+u+") – in loading order",14,y);y+=7;d.setFontSize(8);
-  d.setFont(undefined,"bold");d.text("Cont.",14,y);d.text("Seq",24,y);d.text("Row",34,y);d.text("Lay",43,y);d.text("Item",52,y);d.text("Size",92,y);d.text("Top faces",125,y);d.text("Position x, y, z",163,y);d.setFont(undefined,"normal");y+=5;
+  np("p");y=20;d.setFontSize(12);PDF_T(d,"Packing list ("+u+") – in loading order",14,y);y+=7;d.setFontSize(8);
+  d.setFont(undefined,"bold");PDF_T(d,"Cont.",14,y);PDF_T(d,"Seq",24,y);PDF_T(d,"Row",34,y);PDF_T(d,"Lay",43,y);PDF_T(d,"Item",52,y);PDF_T(d,"Size",92,y);PDF_T(d,"Top faces",125,y);PDF_T(d,"Position x, y, z",163,y);d.setFont(undefined,"normal");y+=5;
   R.loads.forEach(function(L,k){L.P.forEach(function(b,j){if(y>285){np("p");y=20}
-   d.text(String(k+1),14,y);d.text(String(j+1),24,y);d.text(String(b.row),34,y);d.text(String(b.lay),43,y);d.text(b.t.name.slice(0,22),52,y);d.text(fm((b.l-m)/f,1)+" x "+fm((b.w-m)/f,1)+" x "+fm((b.h-m)/f,1),92,y);d.text(topText(b).replace("–","-"),125,y);d.text(fm(b.x/f,1)+", "+fm(b.y/f,1)+", "+fm(b.z/f,1),163,y);y+=4.4})});
-  var N=d.getNumberOfPages();for(var i=1;i<=N;i++){d.setPage(i);d.setFontSize(8);var w=pgs[i-1]=="l"?297:210;d.text("Page "+i+" of "+N,w-10,6,{align:"right"});d.text(name+" – 3D Load Plan",10,6)}
+   PDF_T(d,String(k+1),14,y);PDF_T(d,String(j+1),24,y);PDF_T(d,String(b.row),34,y);PDF_T(d,String(b.lay),43,y);PDF_T(d,b.t.name.slice(0,22),52,y);PDF_T(d,fm((b.l-m)/f,1)+" x "+fm((b.w-m)/f,1)+" x "+fm((b.h-m)/f,1),92,y);PDF_T(d,topText(b).replace("–","-"),125,y);PDF_T(d,fm(b.x/f,1)+", "+fm(b.y/f,1)+", "+fm(b.z/f,1),163,y);y+=4.4})});
+  var N=d.getNumberOfPages();for(var i=1;i<=N;i++){d.setPage(i);d.setFontSize(8);var w=pgs[i-1]=="l"?297:210;PDF_T(d,"Page "+i+" of "+N,w-10,6,{align:"right"});PDF_T(d,name+" – 3D Load Plan",10,6)}
   out=d.output("arraybuffer");$("pmsg").textContent="PDF ready ("+N+" pages)."
  }catch(e){$("pmsg").textContent=/cancel/i.test(e&&e.message||"")?"Save cancelled.":"Couldn’t create the PDF."}
  R.C=R.loads[si].C;R.P=R.loads[si].P;redraw();return out
 }
-$("pdf").onclick=async function(){var b=await buildPdf();if(b)await saveFile(fname()+".pdf",b,"application/pdf")};
+$("pdf").onclick=async function(){if(!R)return;busy("Building PDF…");lockExports(true);try{var b=await buildPdf();if(b)await saveFile(fname()+".pdf",b,"application/pdf")}catch(e){}finally{notBusy()}};
 async function saveFile(name,buf,mime){
  if(window.claude&&claude.use){var dl=null;try{dl=await claude.use("downloads")}catch(e){}if(dl){await dl.save({filename:name,data:buf});return}}
  var cp=window.Capacitor,pl=cp&&cp.Plugins;
@@ -435,14 +578,18 @@ async function buildXlsx(){
   rows.push([B(""),B("Total"),B(pc),TT(R.vol/1e6),TT(R.capv/1e6),{v:R.vol/R.capv*100,s:8},TT(R.wt/wf2)],[]);
   rows.push([H("Cargo line"),H("Length ("+u+")"),H("Width ("+u+")"),H("Height ("+u+")"),H("CBM per carton (m³)"),H("Quantity"),H("Loaded"),H("Left over"),H("Units per carton"),H("Total units loaded"),H("Total CBM loaded (m³)"),H("Weight each ("+R.wu+")"),H("Weight loaded ("+R.wu+")")]);
   var tq=0,tl=0,tc=0,tw=0,tu=0;R.T.forEach(function(t){var cb=(t.l+MG)*(t.w+MG)*(t.h+MG)/1e6;tq+=t.q;tl+=t.fit;tu+=(t.upc||0)*t.fit;tc+=cb*t.fit;tw+=t.kg*t.fit/wf2;rows.push([X(t.name),N2(t.l/f),N2(t.w/f),N2(t.h/f),{v:cb,s:7},I(t.q),I(t.fit),I(t.q-t.fit),I(t.upc||0),I((t.upc||0)*t.fit),N3(cb*t.fit),N2(t.kg/wf2),N2(t.kg*t.fit/wf2)])});
-  rows.push([B("Total"),B(""),B(""),B(""),B(""),B(tq),B(tl),B(tq-tl),B(""),B(tu),TT(tc),B(""),TT(tw)],[],[X("Loading runs from the front wall to the door. Arrow on each carton = THIS SIDE UP. CBM includes 5 mm added to every carton dimension. See the Packing list sheet for the exact position of every carton.")]);
+  rows.push([B("Total"),B(""),B(""),B(""),B(""),B(tq),B(tl),B(tq-tl),B(""),B(tu),TT(tc),B(""),TT(tw)],[]);
+  rows.push([B("Stability — centre of gravity (CG) per container")],[]);
+  rows.push([H("#"),H("Container"),H("Cargo mass ("+R.wu+")"),H("CG front ("+u+")"),H("CG side ("+u+")"),H("CG height ("+u+")"),H("Off-centre (%)")]);
+  R.loads.forEach(function(L,k){var mm=0,mx=0,my=0,mz=0;L.P.forEach(function(b){var wgt=b.t.kg;mm+=wgt;mx+=wgt*(b.x+(b.l-L.C.m)/2);my+=wgt*(b.y+(b.w-L.C.m)/2);mz+=wgt*(b.z+(b.h-L.C.m)/2)});if(mm>0){mx/=mm;my/=mm;mz/=mm}var offp=Math.hypot(mx-L.C.l/2,my-L.C.w/2)/(0.5*Math.hypot(L.C.l,L.C.w))*100;rows.push([I(k+1),X(L.C.name),N2(mm/wf2),N2(mx/f),N2(my/f),N2(mz/f),N2(offp)])});
+  rows.push([],[X("Loading runs from the front wall to the door. Arrow on each carton = THIS SIDE UP. CBM includes 5 mm added to every carton dimension. See the Packing list sheet for the exact position of every carton.")]);
   var s1={name:"Summary",rows:rows,w:[24,30,16,18,18,16,16,12,14,16,20,18,20],m:["A1:G1","A"+rows.length+":M"+rows.length]};
   var pr=[[H("Container"),H("Seq"),H("Row"),H("Layer"),H("Cargo line"),H("Length ("+u+")"),H("Width ("+u+")"),H("Height ("+u+")"),H("Top faces"),H("X ("+u+")"),H("Y ("+u+")"),H("Z ("+u+")")]];
   R.loads.forEach(function(L,k){L.P.forEach(function(b,j){pr.push([I(k+1),I(j+1),I(b.row),I(b.lay),X(b.t.name),N2((b.l-m)/f),N2((b.w-m)/f),N2((b.h-m)/f),X(topText(b)),N2(b.x/f),N2(b.y/f),N2(b.z/f)])})});
   var s2={name:"Packing list",rows:pr,w:[11,8,8,8,26,12,12,12,28,10,10,10],m:[]};
   var buf=await makeXlsx([s1,s2]);$("pmsg").textContent="Excel sheet ready.";return buf
  }catch(e){$("pmsg").textContent="Couldn’t create the Excel file.";return null}}
-$("xls").onclick=async function(){var b=await buildXlsx();if(b)await saveFile(fname()+".xlsx",b,"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")};
+$("xls").onclick=async function(){if(!R)return;busy("Building Excel sheet…");lockExports(true);try{var b=await buildXlsx();if(b)await saveFile(fname()+".xlsx",b,"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")}catch(e){}finally{notBusy()}};
 var KEY="loadcalc.last",PK="loadcalc.projects";
 function p2(n){return (n<10?"0":"")+n}
 function stamp(){var d=new Date();return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())+" "+p2(d.getHours())+":"+p2(d.getMinutes())}
@@ -455,13 +602,31 @@ function ls(k){try{return JSON.parse(localStorage.getItem(k)||"null")}catch(e){r
 function lw(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 var tsv=null;function autosave(){clearTimeout(tsv);tsv=setTimeout(function(){lw(KEY,snap())},300)}
 document.addEventListener("input",autosave,true);document.addEventListener("change",autosave,true);document.addEventListener("click",autosave,true);
+function isFormTarget(t){return t&&t.closest&&t.closest("#p0,#p1")}
+["input","change"].forEach(function(ev){document.addEventListener(ev,function(e){if(!R||!isFormTarget(e.target)||e.target.id=="pn")return;markStale()},true)});
+document.addEventListener("click",function(e){if(!R||!isFormTarget(e.target))return;if(e.target.closest("#padd,#add,#chips")||e.target.classList.contains("cx"))markStale()},true);
 function plist(sel){var P=ls(PK)||{},ks=Object.keys(P).sort(function(a,b){return (P[b].ts||0)-(P[a].ts||0)});$("pl").innerHTML=ks.map(function(k){var o=P[k];return '<option value="'+esc(k)+'">'+esc(k)+(o.sum?" — "+esc(o.sum):"")+'</option>'}).join("");if(sel)$("pl").value=sel}
-function histAdd(sum){var P=ls(PK)||{},n=$("pn").value.trim(),k=n||("Calc "+stamp());P[k]={snap:snap(),sum:sum,ts:Date.now(),a:n?0:1};
+function histAdd(sum){var P=ls(PK)||{},n=$("pn").value.trim(),k=n||("Calc "+stamp()),ex=P[k];
+ if(ex&&!ex.a)k=k+" · "+stamp();
+ P[k]={snap:snap(),sum:sum,ts:Date.now(),a:1};
  Object.keys(P).filter(function(x){return P[x].a}).sort(function(a,b){return P[b].ts-P[a].ts}).slice(20).forEach(function(x){delete P[x]});lw(PK,P);plist(k)}
 $("psave").onclick=function(){var n=$("pn").value.trim();if(!n){$("pmsg2").textContent="Enter a project name first.";return}var P=ls(PK)||{};P[n]={snap:snap(),sum:R?R.sum:"",ts:Date.now(),a:0};lw(PK,P);plist(n);$("pmsg2").textContent="Saved “"+n+"”."};
-function openP(go){var P=ls(PK)||{},n=$("pl").value;if(!n||!P[n]){$("pmsg2").textContent="Select a saved calculation first.";return}restore(P[n].snap);if(!P[n].a)$("pn").value=n;if(go)calc();else $("pmsg2").textContent="Loaded “"+n+"”."}
+function openP(go){var P=ls(PK)||{},n=$("pl").value;if(!n||!P[n]){$("pmsg2").textContent="Select a saved calculation first.";return}pushUndo();restore(P[n].snap);if(!P[n].a)$("pn").value=n;if(go)calc();else{clearResults();$("pmsg2").textContent="Loaded “"+n+"”. Results cleared — press Calculate to refresh."}}
 $("prec").onclick=function(){openP(true)};$("pload").onclick=function(){openP(false)};
-$("pdel").onclick=function(){var P=ls(PK)||{},n=$("pl").value;if(!n)return;delete P[n];lw(PK,P);plist();$("pmsg2").textContent="Deleted “"+n+"”."};
+$("pdel").onclick=function(){var P=ls(PK)||{},n=$("pl").value;if(!n)return;if(!confirm("Delete “"+n+"”?"))return;delete P[n];lw(PK,P);plist();$("pmsg2").textContent="Deleted “"+n+"”."};
+$("newcalc").onclick=function(){
+ if(!confirm("Start a new calculation? This clears the current cargo and results. Saved projects and history are kept."))return;
+ pushUndo();tb.innerHTML="";CG.length=0;addBlock();
+ var e;
+ e=$("pn");if(e)e.value="";e=$("clr");if(e)e.value=0;
+ $("eq").value=0;$("rot").value=2;$("stack").checked=true;
+ du="in";wu="kg";$("du").value="in";$("wu").value="kg";
+ e=$("ptype");if(e)e.value="";
+ $("msg").textContent="";$("pamsg").textContent="Add the types you ship, then enter sizes and quantities on the next page.";
+ clearResults();
+ try{localStorage.removeItem(KEY)}catch(_){}
+ labels();info();chips();cbmRefresh();preview();updateUndo();show(0);
+};
 function fname(){var n=$("pn").value.trim();if(!n){n="Load plan "+stamp().slice(0,10);$("pn").value=n}return n.replace(/[\\\/:*?"<>|]/g,"").trim()||"Load plan"}
 function dataObj(){return{app:"loadcalc",v:2,saved:new Date().toISOString(),name:$("pn").value.trim()||"Load plan",sum:R?R.sum:"",snap:snap()}}
 function dataBuf(){return new TextEncoder().encode(JSON.stringify(dataObj(),null,1)).buffer}
@@ -470,19 +635,19 @@ async function saveData(){try{await saveFile(fname()+".json",dataBuf(),"applicat
 $("csave").onclick=saveData;$("dat").onclick=saveData;
 $("pkg").onclick=async function(){
  if(!R){cmsg("Calculate a load plan first.");return}if(!window.JSZip){cmsg("Zip library not loaded.");return}
- cmsg("Building package…");
+ cmsg("Building package…");busy("Building package…");lockExports(true);
  try{var z=new JSZip();z.file("data.json",JSON.stringify(dataObj(),null,1));
   var pdf=await buildPdf();if(pdf)z.file(fname()+".pdf",pdf);var xl=await buildXlsx();if(xl)z.file(fname()+".xlsx",xl);
   var buf=await z.generateAsync({type:"arraybuffer",compression:"DEFLATE"});
   await saveFile(fname()+".zip",buf,"application/zip");cmsg("Package ready: data to recall, PDF and Excel in one file.")
- }catch(e){cmsg(/cancel/i.test(e&&e.message||"")?"Save cancelled.":"Couldn’t save the package.")}};
+ }catch(e){cmsg(/cancel/i.test(e&&e.message||"")?"Save cancelled.":"Couldn’t save the package.")}finally{notBusy()}};
 $("copen").onclick=function(){$("cloudf").value="";$("cloudf").click()};
 $("cloudf").onchange=async function(){var f=this.files&&this.files[0];if(!f)return;$("cmsg").textContent="Opening…";
  try{var txt;if(/\.json$/i.test(f.name))txt=await f.text();else{var z=await JSZip.loadAsync(f),d=z.file("data.json");if(!d)throw new Error("x");txt=await d.async("string")}
   var o=JSON.parse(txt);if(!o||o.app!="loadcalc"||!o.snap)throw new Error("x");
   restore(o.snap);$("pn").value=o.name&&o.name!="Load plan"?o.name:"";$("cmsg").textContent="Opened “"+(o.name||f.name)+"”. Recalculating…";calc()
  }catch(e){$("cmsg").textContent="That file isn’t a Load Calculator save file."}};
-plist();addBlock();
+plist();var last=ls(KEY);if(last){try{restore(last)}catch(e){tb.innerHTML="";CG.length=0;addBlock()}}else addBlock();
 document.addEventListener("touchend",function(e){var t=e.target;if(t&&t.tagName=="INPUT"&&/^(text|number)$/.test(t.type)){setTimeout(function(){if(document.activeElement!==t)t.focus()},0)}},true);
 document.addEventListener("focusin",function(e){var t=e.target;if(t&&(t.tagName=="INPUT"||t.tagName=="SELECT")&&t.type!="range"&&t.type!="checkbox"){setTimeout(function(){try{t.scrollIntoView({block:"center",behavior:"smooth"})}catch(_){}},350)}});
 var TCS="h1,h2,summary,label,button,option,th,.stat span",SMW={and:1,or:1,of:1,to:1,the:1,a:1,an:1,for:1,with:1,from:1,by:1,per:1,at:1,on:1,in:1,as:1,is:1};
@@ -495,6 +660,6 @@ function tcUI(r){if(!r||r.nodeType!=1)return;if(r.matches(TCS))tcEl(r);r.querySe
 function tcNode(n){var p=n.nodeType==3?n.parentNode:n;if(!p||p.nodeType!=1)return;if(n.nodeType==3){if(p.matches(TCS))tcEl(p);else if(p.matches("p,.note"))sentEl(p)}else tcUI(n)}
 new MutationObserver(function(ms){ms.forEach(function(m){if(m.type=="characterData")tcNode(m.target);else m.addedNodes.forEach(tcNode)})}).observe(document.body,{childList:true,subtree:true,characterData:true});
 $("hback").onclick=function(){show(cur-1)};$("hnext").onclick=function(){show(cur+1)};
-labels();info();chips();resizeCv();tcUI(document.body);show(0);
+labels();info();chips();resizeCv();tcUI(document.body);preview();updateUndo();show(0);
 })();
 </script></body></html>
