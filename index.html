@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="format-detection" content="telephone=no"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>3D Load Calculator</title>
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="3D Load Calc"><meta name="theme-color" content="#1f6f78">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%223D%20Load%20Calculator%22%2C%22short_name%22%3A%22LoadCalc%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f7f9fa%22%2C%22theme_color%22%3A%22%231f6f78%22%2C%22description%22%3A%22Offline%203D%20Container%20and%20Truck%20Load%20Calculator%22%7D">
 <script>/* jsPDF 2.5.1 (MIT) - embedded for offline use; licence notice is kept inside the library header */
 /** @license
  *
@@ -506,6 +508,15 @@ details.card>summary{font-weight:600;cursor:pointer;font-size:1.05rem;list-style
 #balalert.on{display:flex}#balalert b{flex:none;color:var(--bad)}
 #toast{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:500;width:max-content;max-width:min(560px,calc(100vw - 24px));background:var(--panel);border:1px solid var(--line);border-left:6px solid var(--bad);border-radius:10px;padding:10px 14px;box-shadow:0 12px 34px rgba(0,0,0,.32);font-size:.9rem;line-height:1.4;color:var(--ink);display:none}
 #toast.on{display:block}#toast b{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--bad);margin-bottom:2px}
+/* Phase 1 & 2 Modals, Dropzones & Branding */
+.dropzone{border:2px dashed var(--line);border-radius:10px;padding:16px;text-align:center;background:var(--bg);cursor:pointer;transition:all .15s ease;margin-bottom:12px}
+.dropzone:hover,.dropzone.dragover{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,var(--bg))}
+.dropzone b{color:var(--accent);display:block;margin-bottom:4px}
+.modal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:10px 0}
+.axle-badge{display:inline-block;padding:2px 6px;border-radius:4px;font-size:.76rem;font-weight:700;margin-left:6px}
+.axle-ok{background:rgba(16,185,129,.15);color:#10b981;border:1px solid #10b981}
+.axle-over{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid #ef4444}
+.bulkhead-line{stroke-dasharray:6 4;stroke:#d97706;stroke-width:2}
 .empty{text-align:center;color:var(--mute);padding:26px 10px;font-size:.95rem}.empty svg{width:104px;height:104px;display:block;margin:0 auto 12px;opacity:.55}
 .prog{position:fixed;inset:0;background:rgba(10,15,20,.45);display:none;align-items:center;justify-content:center;z-index:300;backdrop-filter:blur(2px)}
 .prog.on{display:flex}
@@ -582,6 +593,16 @@ button.tile:not(.on) svg{opacity:.4}button.tile.mix{border-color:var(--accent);b
 <div class="lrg"><h3>Packing</h3><div class="grid lr"><div class="fld"><div class="fh"><label for="rot">Default Orientation Rule</label><span class="hlp" tabindex="0" role="button" aria-label="Help: Default orientation" data-t="Default orientation" data-w="How cartons may be turned when they are placed. Upright fixed: never turned. Upright + turn on floor: can be spun flat (length and width swap) but always stay top-up. Any direction: may also be laid on their side or end. You can override this for a single cargo line on Step 2." data-u="Keep Upright + turn on floor. Use Any direction only for sturdy goods where the top does not matter. Liquids, machinery and cartons marked This Side Up must stay upright.">?</span></div><select id="rot"><option value="0">Upright fixed (none)</option><option value="1" selected>Upright + turn on floor</option><option value="2">Any direction (may lay cartons on their side)</option></select></div><div class="fld"><div class="fh"><label for="alw">Packing Allowance (mm)</label><span class="hlp" tabindex="0" role="button" aria-label="Help: Packing allowance" data-t="Packing allowance" data-w="Extra millimetres added to every carton length, width and height when checking fit, to cover carton bulge, wrapping and loading clearance. Larger allowance means fewer cartons per container but a safer fit." data-u="Leave 5 mm. Use 0 only for rigid cartons measured exactly. For soft goods that bulge (towels, garments) you can try 10 mm.">?</span></div><input id="alw" type="number" min="0" step="any" inputmode="decimal" value="5"></div></div></div>
 <div class="lrg"><h3>Stacking</h3><div class="grid lr"><div class="fld"><div class="fh"><label class="chk" for="stack"><input id="stack" type="checkbox" checked> Allow Stacking</label><span class="hlp" tabindex="0" role="button" aria-label="Help: Allow stacking" data-t="Allow stacking" data-w="When ticked, cartons may be placed on top of each other. When off, every carton stays on the floor in a single layer." data-u="Keep it ticked unless your cartons cannot take any weight. Block Stacking on Top for individual lines on Step 2 instead of switching stacking off for everything.">?</span></div></div><div class="fld"><div class="fh"><label class="chk" for="nohv"><input id="nohv" type="checkbox" checked> No Heavier Carton on a Lighter One</label><span class="hlp" tabindex="0" role="button" aria-label="Help: No heavier on lighter" data-t="No heavier on lighter" data-w="Stops the planner from putting a heavier carton on top of a lighter one, so light cartons are not crushed." data-u="Keep it ticked. Switch it off only if all your cartons weigh about the same or are strong enough to carry heavier ones.">?</span></div></div></div></div>
 <div class="lrg"><h3>Space and Weight Limits</h3><div class="grid lr"><div class="fld"><div class="fh"><label for="clr" id="lclr">Door-Side Clearance (in)</label><span class="hlp" tabindex="0" role="button" aria-label="Help: Door-side clearance" data-t="Door-side clearance" data-w="Empty space kept free at the door end of the container, so the doors close easily and cartons do not press against them. The unit follows the Dimensions unit on this page." data-u="Leave 0 for a normal load. If your forwarder or shipper asks for a gap at the doors, or the load may shift, enter 5 to 10 cm (2 to 4 in).">?</span></div><input id="clr" type="number" min="0" step="any" inputmode="decimal" value="0"></div><div class="fld"><div class="fh"><label for="clrt" id="lclrt">Top Clearance (in)</label><span class="hlp" tabindex="0" role="button" aria-label="Help: Top clearance" data-t="Top clearance" data-w="Empty height kept free under the roof (headroom). It reduces the usable height of every container." data-u="Leave 0 for a normal load. Use 5 to 10 cm (2 to 4 in) if cartons must not touch the roof or you load with a forklift.">?</span></div><input id="clrt" type="number" min="0" step="any" inputmode="decimal" value="0"></div><div class="fld"><div class="fh"><label for="plim" id="lplim">Payload Limit Override (kg)</label><span class="hlp" tabindex="0" role="button" aria-label="Help: Payload limit override" data-t="Payload limit override" data-w="The most cargo weight you are allowed to load per container, if that is lower than the container’s own payload. For example a road weight limit or a limit set by the shipping line. 0 means use the payload of the selected equipment." data-u="Leave 0. If you are not sure, ask your forwarder or trucker for the permitted cargo weight on your route and enter that number.">?</span></div><input id="plim" type="number" min="0" step="any" inputmode="decimal" value="0"></div></div></div>
+<div class="lrg"><h3>Chassis &amp; Multi-Drop Logistics</h3><div class="grid lr"><div class="fld"><div class="fh"><label for="chassis">Vehicle / Axle Dynamics</label><span class="hlp" tabindex="0" role="button" aria-label="Help: Vehicle chassis" data-t="Vehicle chassis" data-w="Calculates highway road compliance for steer, drive and trailer axles based on fifth-wheel kingpin and bogie moments." data-u="Use Standard Semi-Trailer for highway compliance checks.">?</span></div><select id="chassis"><option value="standard">Standard Container (2-Point Centroid %)</option><option value="semi3" selected>3-Axle Tractor + Tridem Trailer (EU 40t / US DOT)</option><option value="truck2">2-Axle Straight Truck (18t Max)</option></select></div><div class="fld"><div class="fh"><label class="chk" for="lifozones" style="margin-top:20px"><input id="lifozones" type="checkbox" checked> Strict LIFO Multi-Drop Containment (Bulkhead Isolation)</label><span class="hlp" tabindex="0" role="button" aria-label="Help: LIFO containment" data-t="LIFO containment" data-w="Prevents later delivery stops from filling voids behind earlier stops, ensuring clean unloading at each destination." data-u="Keep ticked for multi-destination shipments.">?</span></div></div></div>
+<details id="chassis_adv" style="margin-top:8px"><summary style="font-size:.85rem;color:var(--mute);cursor:pointer">Custom Chassis Dimensions &amp; Curb Weights (Optional)</summary>
+  <div class="grid lr" style="margin-top:8px">
+    <div><label for="ch_kp">Kingpin Position (% from front)</label><input id="ch_kp" type="number" min="5" max="35" step="1" placeholder="15"></div>
+    <div><label for="ch_bog">Bogie Center / Sliding Tandem (% from front)</label><input id="ch_bog" type="number" min="50" max="95" step="1" placeholder="75"></div>
+    <div><label for="ch_trac_steer">Tractor Steer Tare (kg)</label><input id="ch_trac_steer" type="number" min="0" step="100" placeholder="4500"></div>
+    <div><label for="ch_trac_drive">Tractor Drive Tandem Tare (kg)</label><input id="ch_trac_drive" type="number" min="0" step="100" placeholder="3500"></div>
+    <div><label for="ch_trl_tare">Trailer / Chassis Tare (kg)</label><input id="ch_trl_tare" type="number" min="0" step="100" placeholder="4500"></div>
+  </div>
+</details></div>
 <div class="lrg"><h3>Balance Warnings</h3><div class="grid lr"><div class="fld"><div class="fh"><label for="cgl">Max Centre-of-Gravity Offset (%)</label><span class="hlp" tabindex="0" role="button" aria-label="Help: Max centre-of-gravity offset" data-t="Max centre-of-gravity offset" data-w="How far the centre of the load’s weight may sit from the centre of the container before a warning is shown. 0 means perfectly centred. This only creates warnings; it does not change how cartons are packed." data-u="Keep 10. Enter a smaller number only if your forwarder or trucker asks for a tighter balance.">?</span></div><input id="cgl" type="number" min="1" step="any" inputmode="decimal" value="10"></div><div class="fld"><div class="fh"><label for="hsl">Max Weight Share in Either Half (%)</label><span class="hlp" tabindex="0" role="button" aria-label="Help: Max weight share in either half" data-t="Max weight share in either half" data-w="The most weight allowed in the front half or the door half of the container length. With 60, no more than 60% of the weight may be in one half. This only creates warnings; it does not change how cartons are packed." data-u="Keep 60, a common guideline. Lower it for a stricter balance, for example 55.">?</span></div><input id="hsl" type="number" min="50" max="100" step="any" inputmode="decimal" value="60"></div></div></div></details>
 <details class="card" id="sp"><summary>Saved Projects and Calculation History</summary><div class="grid" style="margin-top:10px"><div><label for="pl">Saved Calculations</label><select id="pl" class="no-tc"></select></div></div>
 <div class="row"><button id="psave" type="button">Save Project</button><button id="prec" type="button">Open and Recalculate</button><button id="pload" type="button">Load Inputs Only</button><button id="pdel" type="button">Delete</button></div><p class="note" id="pmsg2" style="margin:6px 0 0">Every calculation is saved on this device automatically.</p></details>
@@ -591,7 +612,12 @@ button.tile:not(.on) svg{opacity:.4}button.tile.mix{border-color:var(--accent);b
 <section class="pg" id="p1"><div class="card"><h2>Cargo Data Entry</h2>
 <p class="swipehint">Swipe table horizontally to edit all cargo columns →</p>
 <div id="rows"></div>
-<div id="cbmtot"></div><div id="preview" class="no-tc"></div><div class="row"><button id="add" type="button">Add Cargo Line</button><button id="dup" type="button">Duplicate Last Line</button><button id="csvtog" type="button">Paste CSV / Excel</button><button id="undo" type="button">Undo</button><button id="redo" type="button">Redo</button><span class="note">Each press of Add adds three more cargo columns.</span></div>
+<div id="cbmtot"></div><div id="preview" class="no-tc"></div><div class="row"><button id="add" type="button">Add Cargo Line</button><button id="dup" type="button">Duplicate Last Line</button><button id="csvtog" type="button">Paste CSV / Text</button><button id="dropbtn" type="button">📂 Drop Excel / CSV</button><button id="palbtn" type="button">📦 Palletize Cargo</button><button id="xlstempl" type="button">⬇ Download Template</button><button id="undo" type="button">Undo</button><button id="redo" type="button">Redo</button><span class="note">Each press of Add adds three more cargo columns.</span></div>
+<input type="file" id="xlsin" accept=".xlsx,.csv,.tsv,.txt" style="display:none">
+<div class="dropzone" id="xldrop" style="display:none">
+  <b>Drop Excel (.xlsx) or CSV file here, or click to browse</b>
+  <span class="note">Supports automatic column mapping, multi-SKU imports, and custom headers.</span>
+</div>
 <div id="csvbox"><label for="csvtxt">Paste rows from Excel or CSV: Name, Length, Width, Height, Weight, Qty, Units/Carton (optional)</label><textarea id="csvtxt" placeholder="Carton A, 40, 30, 25, 12, 120, 6&#10;Pallet B, 120, 100, 110, 320, 8, 1"></textarea><div class="row" style="margin-top:8px"><button class="primary sm" id="csvgo" type="button">Import Pasted Rows</button><button class="sm" id="csvclr" type="button">Close</button><span class="note" id="csvmsg"></span></div></div>
 <p class="note" style="margin:8px 0 0">The packing allowance (Loading Rules, default 5 mm) is added to each carton dimension for CBM and fit calculations.</p>
 <p class="note warn" id="msg" style="margin:8px 0 0"></p></div>
@@ -610,9 +636,74 @@ button.tile:not(.on) svg{opacity:.4}button.tile.mix{border-color:var(--accent);b
 <p class="note">Tap any carton in 3D view to inspect its SKU, orientation and position, or enable Move Cartons to drag/rotate boxes. Switch to 2D View for face arrows (⊙ = top face toward you) and printed carton side dimensions. Loading runs from Front Wall to Door Side.</p><div class="scroll" style="margin-top:10px"><table class="plan" id="ctab"></table></div><div class="scroll" style="margin-top:14px"><table class="plan" id="cgtab"></table></div><div class="scroll" style="margin-top:14px"><table class="plan" id="sum"></table></div></div></div><div class="navrow"><button type="button" data-go="1">‹ Back: Cargo</button><button class="primary" type="button" data-go="3">Next: Load Plan, PDF and Excel ›</button></div></section>
 
 <section class="pg" id="p3"><div class="card"><h2>Load Plan &amp; Exports</h2><div id="empty3" class="empty"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M6 26 32 12l26 14v22L32 62 6 48z"/><path d="M6 26l26 14 26-14M32 40v22"/><path d="M40 16v10M40 26l-6-4M40 26l6-4"/></svg>Calculate a load plan first.</div>
-<div id="out3" style="display:none"><div class="stalebar" id="stale3"><span>Inputs changed — recalculate before exporting, or files are locked to protect accuracy.</span><button class="primary sm" id="recalc3" type="button">Recalculate Now</button></div><div class="row" style="margin:0 0 10px"><select id="pdfmode" style="width:auto"><option value="row">PDF: one page per row</option><option value="layer">PDF: one page per layer</option><option value="none">PDF: summary only</option></select><button class="primary" id="pdf" type="button">Generate PDF</button><button id="xls" type="button">Export Excel Sheet</button><button id="pkg" type="button">Download Package (.zip)</button><button id="dat" type="button">Save Data (.json)</button><span class="note" id="pmsg"></span></div><p class="note" style="margin:0 0 8px">Downloads save directly on desktop or open the iOS/Android share sheet for Google Drive, OneDrive, iCloud Drive, email or WhatsApp.</p>
+<div id="out3" style="display:none">
+<details class="card" id="repcard" style="margin-bottom:12px"><summary>Company Branding &amp; Shipping Header (Optional)</summary>
+<p class="note" style="margin:8px 0 0">Add your company details and logo to print on official PDF manifests and Excel exports.</p>
+<div class="grid" style="margin-top:10px">
+  <div><label for="rep_ship">Shipper / Company Name</label><input id="rep_ship" type="text" placeholder="e.g. Acme Global Logistics Ltd" enterkeyhint="done"></div>
+  <div><label for="rep_cons">Consignee Name</label><input id="rep_cons" type="text" placeholder="e.g. Pacific Retailers Corp" enterkeyhint="done"></div>
+  <div><label for="rep_bol">Booking / B/L Reference</label><input id="rep_bol" type="text" placeholder="e.g. BKG-2026-98421" enterkeyhint="done"></div>
+  <div><label for="rep_seal">Container / Seal Number</label><input id="rep_seal" type="text" placeholder="e.g. MSKU 948210-4 / Seal #84920" enterkeyhint="done"></div>
+</div>
+<div class="row" style="margin-top:10px;align-items:center">
+  <div style="flex:1;min-width:220px">
+    <label for="replogo">Company Logo (PNG / JPEG)</label>
+    <input id="replogo" type="file" accept="image/png,image/jpeg" style="padding:6px">
+  </div>
+  <div id="logoprev" style="display:none;align-items:center;gap:8px">
+    <img id="logoimg" src="" alt="Logo preview" style="max-height:40px;max-width:120px;border:1px solid var(--line);border-radius:4px;padding:2px;background:#fff">
+    <button class="sm danger" id="logoclr" type="button">Remove Logo</button>
+  </div>
+</div>
+</details>
+<div class="stalebar" id="stale3"><span>Inputs changed — recalculate before exporting, or files are locked to protect accuracy.</span><button class="primary sm" id="recalc3" type="button">Recalculate Now</button></div><div class="row" style="margin:0 0 10px"><select id="pdfmode" style="width:auto"><option value="row">PDF: one page per row</option><option value="layer">PDF: one page per layer</option><option value="none">PDF: summary only</option></select><button class="primary" id="pdf" type="button">Generate PDF</button><button id="xls" type="button">Export Excel Sheet</button><button id="pkg" type="button">Download Package (.zip)</button><button id="dat" type="button">Save Data (.json)</button><span class="note" id="pmsg"></span></div><p class="note" style="margin:0 0 8px">Downloads save directly on desktop or open the iOS/Android share sheet for Google Drive, OneDrive, iCloud Drive, email or WhatsApp.</p>
 <p class="note" id="eqs"></p></div></div><div class="navrow"><button type="button" data-go="2">‹ Back: Results</button><button type="button" id="newcalc">↺ Start New Calculation</button></div></section>
 </main>
+<div class="prog" id="colmapmodal" role="dialog" aria-modal="true" aria-labelledby="colmapttl">
+  <div class="box" style="max-width:680px;width:95vw;max-height:90vh;overflow-y:auto">
+    <div class="top"><h3 id="colmapttl" style="margin:0;font-size:1.15rem">Import &amp; Map Excel / CSV Columns</h3></div>
+    <p class="note" style="margin:4px 0 10px">Match your file's columns to the cargo planner fields below.</p>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px" id="colmapfields">
+      <div><label for="cm_name">SKU / Cargo Name</label><select id="cm_name"></select></div>
+      <div><label for="cm_len">Length</label><select id="cm_len"></select></div>
+      <div><label for="cm_wid">Width</label><select id="cm_wid"></select></div>
+      <div><label for="cm_hgt">Height</label><select id="cm_hgt"></select></div>
+      <div><label for="cm_wgt">Weight Each</label><select id="cm_wgt"></select></div>
+      <div><label for="cm_qty">Quantity (Cartons)</label><select id="cm_qty"></select></div>
+      <div><label for="cm_upc">Units per Carton (Optional)</label><select id="cm_upc"></select></div>
+      <div><label for="cm_ctl">Max Top Load (kg) (Optional)</label><select id="cm_ctl"></select></div>
+    </div>
+    <div class="scroll" style="margin-top:10px;max-height:160px;border:1px solid var(--line);border-radius:6px"><table class="plan" id="colprevtab"></table></div>
+    <div class="row" style="margin-top:12px">
+      <button class="primary" id="colmapapply" type="button">Import Cargo Lines</button>
+      <button id="colmapcancel" type="button">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="prog" id="palmodal" role="dialog" aria-modal="true" aria-labelledby="palttl">
+  <div class="box" style="max-width:620px;width:95vw;max-height:90vh;overflow-y:auto">
+    <div class="top"><h3 id="palttl" style="margin:0;font-size:1.15rem">Two-Tier Pallet Builder</h3></div>
+    <p class="note" style="margin:4px 0 10px">Pack loose cartons onto standard shipping pallets with interlocking layers before loading into containers.</p>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px">
+      <div><label for="pal_src">Select Cargo to Palletize</label><select id="pal_src"></select></div>
+      <div><label for="pal_type">Base Pallet Standard</label><select id="pal_type">
+        <option value="eur1" selected>EUR 1 (Euro Pallet: 120 × 80 cm, Tare 25 kg)</option>
+        <option value="gma">US GMA (Standard 48 × 40 in / 121.9 × 101.6 cm, Tare 20 kg)</option>
+        <option value="eur2">EUR 2 (Industrial: 120 × 100 cm, Tare 30 kg)</option>
+      </select></div>
+      <div><label for="pal_maxh">Max Stack Height (<span class="pal_u">cm</span>)</label><input id="pal_maxh" type="number" min="50" step="any" value="180"></div>
+      <div><label for="pal_maxw">Max Pallet Gross Weight (<span class="pal_wu">kg</span>)</label><input id="pal_maxw" type="number" min="100" step="any" value="1000"></div>
+      <div><label for="pal_ovh">Max Overhang Allowance (<span class="pal_u">cm</span>)</label><input id="pal_ovh" type="number" min="0" max="5" step="0.5" value="0"></div>
+    </div>
+    <div id="palres" style="background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;margin-top:10px;font-size:.88rem"></div>
+    <div class="row" style="margin-top:12px">
+      <button class="primary" id="palapply" type="button">Add Pallet Loads to Cargo</button>
+      <button id="palcancel" type="button">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast" class="no-tc" role="alert" aria-live="assertive"></div>
 <div class="prog" id="dlg" role="dialog" aria-modal="true" aria-labelledby="dlgmsg"><div class="box"><div class="no-tc" id="dlgmsg" style="font-weight:600"></div><div class="row" style="margin:6px 0 0"><button class="primary danger" id="dlgyes" type="button">Yes, continue</button><button id="dlgno" type="button">Cancel</button></div></div></div>
 <div class="prog" id="prog" role="status" aria-live="polite"><div class="box"><div class="top"><span class="spin"></span><span class="no-tc" id="progmsg">Working…</span></div><div class="pbar" id="progwrap"><i id="progbar"></i></div></div></div>
@@ -661,6 +752,7 @@ function preview(){var el=document.getElementById("preview");if(!el)return;var f
  el.innerHTML="<b>Live preview</b> — "+tq.toLocaleString()+" cartons · "+(tu?tu.toLocaleString()+" units · ":"")+fm(tv,3)+" m³ · "+fm(tw/W,0)+" "+wu+" → about <b>"+best.n+"</b> container(s) of "+esc(best.name)+".<div class='bar'><i style='width:"+pct.toFixed(0)+"%'></i></div>"}
 function renderCG(){if(!R)return;var u=R.du,wu=R.wu,fd=u=="in"?2.54:1,fw=wu=="kg"?1:0.45359237;
  var cgH='<tr><th>#</th><th>Container</th><th>Cargo mass ('+wu+')</th><th>CG from front wall</th><th>CG from side wall</th><th>CG height</th><th>Axle split (Front / Door)</th><th>Off-centre</th><th>Stability</th></tr>';
+ var chassis=$("chassis")?$("chassis").value:"standard";
  R.loads.forEach(function(L,k){var mm=0,mx=0,my=0,mz=0;L.P.forEach(function(b){var wgt=b.t.kg;mm+=wgt;mx+=wgt*(b.x+(b.l-L.C.m)/2);my+=wgt*(b.y+(b.w-L.C.m)/2);mz+=wgt*(b.z+(b.h-L.C.m)/2)});
   if(mm>0){mx/=mm;my/=mm;mz/=mm}else{mx=L.C.l/2;my=L.C.w/2;mz=0}
   var dx=mx-L.C.l/2,dy=my-L.C.w/2,off=Math.hypot(dx,dy),offp=off/(0.5*Math.hypot(L.C.l,L.C.w))*100,hp=mz/L.C.h*100;
@@ -671,9 +763,38 @@ function renderCG(){if(!R)return;var u=R.du,wu=R.wu,fd=u=="in"?2.54:1,fw=wu=="kg
   if(offp>CL)msgs.push("centre of gravity "+fm(offp,1)+"% off-centre (limit "+CL+"%)");
   if(mm>0&&mxs>HS){if(cls=="ok")cls="warn";tag+=" · "+fm(mxs,0)+"% of weight in one half";msgs.push(fm(mxs,0)+"% of the weight is in one half of the length (limit "+HS+"%)")}
   if(hp>60){if(cls=="ok")cls="warn";tag+=" · high CG";msgs.push("high centre of gravity ("+fm(hp,0)+"% of height)")}
+  var axleBadges="";
+  if(chassis=="semi3"&&mm>0){
+    var Llen=L.C.l;
+    var kpPct=Math.max(5,Math.min(35,parseFloat($("ch_kp")?$("ch_kp").value:"")||15))/100;
+    var bogPct=Math.max(50,Math.min(95,parseFloat($("ch_bog")?$("ch_bog").value:"")||75))/100;
+    var xkp=Llen*kpPct,xbog=Llen*bogPct,f5th=mm*(xbog-mx)/(xbog-xkp),ftrl=mm-f5th;
+    var tSteerTare=parseFloat($("ch_trac_steer")?$("ch_trac_steer").value:"")||4500;
+    var tDriveTare=parseFloat($("ch_trac_drive")?$("ch_trac_drive").value:"")||3500;
+    var trlTare=parseFloat($("ch_trl_tare")?$("ch_trl_tare").value:"")||4500;
+    var wSteer=tSteerTare+f5th*(-30/380),wDrive=tDriveTare+f5th*(410/380),wTrl=Math.max(0,ftrl)+trlTare;
+    var stOk=wSteer<=10000,drOk=wDrive<=11500,trOk=wTrl<=24000;
+    axleBadges='<div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">' +
+      '<span class="axle-badge '+(stOk?"axle-ok":"axle-over")+'">Steer: '+fm(wSteer/fw,0)+' '+wu+'</span>' +
+      '<span class="axle-badge '+(drOk?"axle-ok":"axle-over")+'">Drive: '+fm(wDrive/fw,0)+' '+wu+'</span>' +
+      '<span class="axle-badge '+(trOk?"axle-ok":"axle-over")+'">Trailer: '+fm(wTrl/fw,0)+' '+wu+'</span></div>';
+    if(!stOk||!drOk||!trOk){cls="bad";tag+=" · Axle Overweight"}
+    if(!stOk)msgs.push("Steer axle overweight ("+fm(wSteer/fw,0)+" "+wu+" > "+fm(10000/fw,0)+" limit)");
+    if(!drOk)msgs.push("Drive tandem overweight ("+fm(wDrive/fw,0)+" "+wu+" > "+fm(11500/fw,0)+" limit)");
+    if(!trOk)msgs.push("Trailer tridem overweight ("+fm(wTrl/fw,0)+" "+wu+" > "+fm(24000/fw,0)+" limit)");
+  }else if(chassis=="truck2"&&mm>0){
+    var Llen=L.C.l,wb=Llen*0.65,wfnt=3000+mm*(Llen*0.8-mx)/wb,wrr=4000+(mm-(wfnt-3000));
+    var fOk=wfnt<=6500,rOk=wrr<=11500;
+    axleBadges='<div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">' +
+      '<span class="axle-badge '+(fOk?"axle-ok":"axle-over")+'">Front: '+fm(wfnt/fw,0)+' '+wu+'</span>' +
+      '<span class="axle-badge '+(rOk?"axle-ok":"axle-over")+'">Rear: '+fm(wrr/fw,0)+' '+wu+'</span></div>';
+    if(!fOk||!rOk){cls="bad";tag+=" · Axle Overweight"}
+    if(!fOk)msgs.push("Front axle overweight ("+fm(wfnt/fw,0)+" "+wu+" > "+fm(6500/fw,0)+" limit)");
+    if(!rOk)msgs.push("Rear axle overweight ("+fm(wrr/fw,0)+" "+wu+" > "+fm(11500/fw,0)+" limit)");
+  }
   L.chk={msgs:msgs};
   var col=cls=="ok"?"var(--ok)":cls=="warn"?"var(--sig)":"var(--bad)";
-  cgH+='<tr><td>'+(k+1)+'</td><td>'+esc(L.C.name)+'</td><td class="cgcell">'+fm(mm/fw,0)+'</td><td class="cgcell">'+fm(mx/fd,1)+' '+u+'</td><td class="cgcell">'+fm(my/fd,1)+' '+u+'</td><td class="cgcell">'+fm(mz/fd,1)+' '+u+' ('+fm(hp,0)+'%)</td><td class="cgcell"><span class="axlebar"><span>'+frontPct+'% / '+rearPct+'%</span><span class="axletrack"><i class="axlefill" style="width:'+frontPct+'%"></i></span></span></td><td class="cgcell">'+fm(offp,1)+'%</td><td style="color:'+col+';font-weight:600">'+tag+'</td></tr>'});
+  cgH+='<tr><td>'+(k+1)+'</td><td>'+esc(L.C.name)+'</td><td class="cgcell">'+fm(mm/fw,0)+'</td><td class="cgcell">'+fm(mx/fd,1)+' '+u+'</td><td class="cgcell">'+fm(my/fd,1)+' '+u+'</td><td class="cgcell">'+fm(mz/fd,1)+' '+u+' ('+fm(hp,0)+'%)</td><td class="cgcell"><span class="axlebar"><span>'+frontPct+'% / '+rearPct+'%</span><span class="axletrack"><i class="axlefill" style="width:'+frontPct+'%"></i></span></span>'+axleBadges+'</td><td class="cgcell">'+fm(offp,1)+'%</td><td style="color:'+col+';font-weight:600">'+tag+'</td></tr>'});
  $("cgtab").innerHTML=cgH;
  var fl=[];R.loads.forEach(function(L,k){if(L.chk&&L.chk.msgs.length)fl.push("Container "+(k+1)+": "+L.chk.msgs.join("; "))});
  R.balMsg=fl.length?"Balance check - "+fl.join(" | "):"";
@@ -711,7 +832,7 @@ function dupCargo(i){if(!cval(i,"l")&&!cval(i,"w")&&!cval(i,"h")&&!cval(i,"n")){
  chips();$("msg").textContent="Duplicated Cargo "+(i+1)+".";preview();if(R)markStale()}
 function chips(){var c=$("chips");c.innerHTML="";CG.forEach(function(g,i){if(g.p==null)return;var sp=document.createElement("span");sp.className="chip no-tc";sp.appendChild(document.createTextNode((cval(i,"n")||"Cargo "+(i+1))+" "));var b=document.createElement("button");b.type="button";b.textContent="✕";b.setAttribute("aria-label","Remove");b.onclick=function(){clearCargo(i)};sp.appendChild(b);c.appendChild(sp)})}
 function addBlock(){
- var base=CG.length,div=document.createElement("div"),H='<table class="cgt"><thead><tr><th></th>',j,i,RW=[["Cargo Name","n"],["Color","c"],["l"],["w"],["h"],["k"],["q"],["Units per Carton","u"],["Orientation","rm"],["Stacking","st"],["Loading Order","pr"]];
+ var base=CG.length,div=document.createElement("div"),H='<table class="cgt"><thead><tr><th></th>',j,i,RW=[["Cargo Name","n"],["Color","c"],["l"],["w"],["h"],["k"],["q"],["Units per Carton","u"],["Max Top Load ("+wu+")","ctl"],["Orientation","rm"],["Stacking","st"],["Loading Order","pr"]];
  for(j=0;j<3;j++)H+='<th>Cargo '+(base+j+1)+' <span class="colact"><button type="button" class="cd" data-d="'+(base+j)+'" title="Duplicate Cargo '+(base+j+1)+'" aria-label="Duplicate Cargo '+(base+j+1)+'">⧉</button><button type="button" class="cx" data-x="'+(base+j)+'" title="Clear Cargo '+(base+j+1)+'" aria-label="Clear Cargo '+(base+j+1)+'">✕</button></span></th>';
  H+='</tr></thead><tbody>';
  RW.forEach(function(r,ri){var key=r[r.length-1],lab=r.length==2?r[0]:ulab(key);H+='<tr'+((key=="rm"||key=="st"||key=="pr")?' style="display:none"':'')+'><th'+(r.length==1?' data-u="'+key+'"':'')+'>'+lab+'</th>';
@@ -729,8 +850,8 @@ function addBlock(){
  div.querySelectorAll(".cd").forEach(function(b){b.onclick=function(){dupCargo(+b.dataset.d)}});
  if(typeof tcUI==="function")tcUI(div);
  cbmRefresh()}
-function fillCargo(i,n,l,w,h,k,q,pi,c,u,rm,st,pr){var o={n:n,l:l,w:w,h:h,k:k,q:q,u:u};for(var key in o){var e=cin(i,key);if(e){e.value=o[key]==null?"":o[key];if(e.dataset){delete e.dataset.cv;delete e.dataset.sh}}}if(c&&cin(i,"c"))cin(i,"c").value=c;if(cin(i,"rm"))cin(i,"rm").value=rm==null?"":rm;if(cin(i,"st"))cin(i,"st").value=st||"";if(cin(i,"pr"))cin(i,"pr").value=pr||"3";CG[i].p=pi==null?null:pi}
-function addRow(n,l,w,h,k,q,pi,c,u,rm,st,pr){var i=-1,j;for(j=0;j<CG.length;j++){if(!cval(j,"n")&&!cval(j,"l")&&!cval(j,"w")&&!cval(j,"h")&&!cval(j,"k")&&!cval(j,"q")&&!cval(j,"u")){i=j;break}}if(i<0){i=CG.length;addBlock()}fillCargo(i,n,l,w,h,k,q,pi,c,u,rm,st,pr);cbmRefresh();return i}
+function fillCargo(i,n,l,w,h,k,q,pi,c,u,rm,st,pr,ctl){var o={n:n,l:l,w:w,h:h,k:k,q:q,u:u,ctl:ctl};for(var key in o){var e=cin(i,key);if(e){e.value=o[key]==null?"":o[key];if(e.dataset){delete e.dataset.cv;delete e.dataset.sh}}}if(c&&cin(i,"c"))cin(i,"c").value=c;if(cin(i,"rm"))cin(i,"rm").value=rm==null?"":rm;if(cin(i,"st"))cin(i,"st").value=st||"";if(cin(i,"pr"))cin(i,"pr").value=pr||"3";CG[i].p=pi==null?null:pi}
+function addRow(n,l,w,h,k,q,pi,c,u,rm,st,pr,ctl){var i=-1,j;for(j=0;j<CG.length;j++){if(!cval(j,"n")&&!cval(j,"l")&&!cval(j,"w")&&!cval(j,"h")&&!cval(j,"k")&&!cval(j,"q")&&!cval(j,"u")){i=j;break}}if(i<0){i=CG.length;addBlock()}fillCargo(i,n,l,w,h,k,q,pi,c,u,rm,st,pr,ctl);cbmRefresh();return i}
 function uld(){var n=0;(R?R.T:[]).forEach(function(t){n+=(t.upc||0)*t.fit});return n}
 function cbmRefresh(){var f=df(),tv=0,tq=0,tw=0,tu=0;CG.forEach(function(g,i){var l=cnum(i,"l")*f,w=cnum(i,"w")*f,h=cnum(i,"h")*f,q=Math.floor(cnum(i,"q")),up=Math.floor(cnum(i,"u")),e=(l>0&&w>0&&h>0)?(l+MG)*(w+MG)*(h+MG)/1e6:0,t=e*q,un=q*up;
  var ce=tb.querySelector('[data-i="'+i+'"][data-c="e"]'),ct=tb.querySelector('[data-i="'+i+'"][data-c="t"]'),cu=tb.querySelector('[data-i="'+i+'"][data-c="u"]');if(ce)ce.textContent=e?fm(e,4):"–";if(ct)ct.textContent=t?fm(t,3):"–";if(cu)cu.textContent=un?un.toLocaleString():"–";if(!g.x){tv+=t;tq+=q;tu+=un;tw+=cnum(i,"k")*wf()*q}});
@@ -784,23 +905,33 @@ function orients(l,w,h,m,mk){
  for(var i=0;i<6;i++){var ok=mk?!!mk[i]:(i==0||(i==1&&m>=1)||m>=2);if(!ok)continue;var q=PM[i],r=[d[q[0]],d[q[1]],d[q[2]]];r.up=q.indexOf(2);r.pi=i;out.push(r)}
  return out}
 function packOne(U,C,m,rm,stack,md,v){
- var F=[{x:0,y:0,z:0,l:C.ul,w:C.w,h:C.h}],P=[],left=[],wt=0,vol=0,cnt={},SO=[[0,1,2],[1,0,2],[2,0,1]][v.sc];
+ var F=[{x:0,y:0,z:0,l:C.ul,w:C.w,h:C.h,under:[]}],P=[],left=[],wt=0,vol=0,cnt={},SO=[[0,1,2],[1,0,2],[2,0,1]][v.sc];
+ var lifoOn=$("lifozones")?$("lifozones").checked:true,priMaxX={};
  U.forEach(function(t){
   if(wt+t.kg>C.p){left.push(t);return}
   var irm=(t.rm!=null?t.rm:rm),flOnly=(t.st=="floor"||t.st=="both"),canTop=(stack&&t.st!="notop"&&t.st!="both");
   var os=orients(t.l+m,t.w+m,t.h+m,irm,t.om),bi=-1,bo=null,bs=0,bf=0,i,j;
   if(v.se==0)F.sort(LAYER?function(a,b){return a.z-b.z||a.x-b.x||a.y-b.y}:function(a,b){return a.x-b.x||a.z-b.z||a.y-b.y});
-  for(i=0;i<F.length;i++){if(v.se==0&&bi>=0)break;var f=F[i];if(flOnly&&f.z>0.001)continue;if(NOHV&&f.bw!==undefined&&t.kg>f.bw+1e-6)continue;var fv=f.l*f.w*f.h;
+  var reqMinX=0;
+  if(lifoOn&&t.pri>1){for(var p=1;p<t.pri;p++)if(priMaxX[p])reqMinX=Math.max(reqMinX,priMaxX[p])}
+  for(i=0;i<F.length;i++){if(v.se==0&&bi>=0)break;var f=F[i];if(flOnly&&f.z>0.001)continue;if(NOHV&&f.bw!==undefined&&t.kg>f.bw+1e-6)continue;
+   if(reqMinX>0&&f.x<reqMinX-0.05)continue;
+   if(f.under&&f.under.length){var crush=false;for(var ui=0;ui<f.under.length;ui++){var ubox=f.under[ui];if(ubox.t&&ubox.t.ctl>0&&((ubox.accumW||0)+t.kg)>ubox.t.ctl+1e-6){crush=true;break}}if(crush)continue}
+   var fv=f.l*f.w*f.h;
    for(j=0;j<os.length;j++){var o=os[j];if(o[0]>f.l+.001||o[1]>f.w+.001||o[2]>f.h+.001)continue;
     var d=[f.l-o[0],f.w-o[1],f.h-o[2]],sc=d[SO[0]]*1e6+d[SO[1]]*1e3+d[SO[2]];
     if(v.se==0){if(!bo||sc<bs){bo=o;bs=sc;bi=i}}
     else if(!bo||fv<bf-1e-6||(fv<bf+1e-6&&sc<bs)){bo=o;bs=sc;bf=fv;bi=i}}}
   if(bi<0){left.push(t);return}
   var g=F[bi],q=bo,n=[];F.splice(bi,1);
-  P.push({x:g.x,y:g.y,z:g.z,l:q[0],w:q[1],h:q[2],t:t,up:q.up});cnt[t.id]=(cnt[t.id]||0)+1;wt+=t.kg;vol+=(t.l+m)*(t.w+m)*(t.h+m);
-  if(v.sp==0){n.push({x:g.x+q[0],y:g.y,z:g.z,l:g.l-q[0],w:g.w,h:g.h},{x:g.x,y:g.y+q[1],z:g.z,l:q[0],w:g.w-q[1],h:g.h});if(canTop)n.push({x:g.x,y:g.y,z:g.z+q[2],l:q[0],w:q[1],h:g.h-q[2]})}
-  else if(v.sp==1){n.push({x:g.x+q[0],y:g.y,z:g.z,l:g.l-q[0],w:q[1],h:g.h},{x:g.x,y:g.y+q[1],z:g.z,l:g.l,w:g.w-q[1],h:g.h});if(canTop)n.push({x:g.x,y:g.y,z:g.z+q[2],l:q[0],w:q[1],h:g.h-q[2]})}
-  else{n.push({x:g.x+q[0],y:g.y,z:g.z,l:g.l-q[0],w:g.w,h:q[2]},{x:g.x,y:g.y+q[1],z:g.z,l:q[0],w:g.w-q[1],h:q[2]});if(canTop)n.push({x:g.x,y:g.y,z:g.z+q[2],l:q[0],w:q[1],h:g.h-q[2]})}
+  var placedBox={x:g.x,y:g.y,z:g.z,l:q[0],w:q[1],h:q[2],t:t,up:q.up,accumW:0};
+  if(g.under&&g.under.length){g.under.forEach(function(ubox){ubox.accumW=(ubox.accumW||0)+t.kg})}
+  P.push(placedBox);cnt[t.id]=(cnt[t.id]||0)+1;wt+=t.kg;vol+=(t.l+m)*(t.w+m)*(t.h+m);
+  if(lifoOn)priMaxX[t.pri]=Math.max(priMaxX[t.pri]||0,g.x+q[0]);
+  var latUnder=g.under?g.under.slice():[],topUnder=(g.under?g.under.slice():[]).concat([placedBox]);
+  if(v.sp==0){n.push({x:g.x+q[0],y:g.y,z:g.z,l:g.l-q[0],w:g.w,h:g.h,under:latUnder},{x:g.x,y:g.y+q[1],z:g.z,l:q[0],w:g.w-q[1],h:g.h,under:latUnder});if(canTop)n.push({x:g.x,y:g.y,z:g.z+q[2],l:q[0],w:q[1],h:g.h-q[2],under:topUnder})}
+  else if(v.sp==1){n.push({x:g.x+q[0],y:g.y,z:g.z,l:g.l-q[0],w:q[1],h:g.h,under:latUnder},{x:g.x,y:g.y+q[1],z:g.z,l:g.l,w:g.w-q[1],h:g.h,under:latUnder});if(canTop)n.push({x:g.x,y:g.y,z:g.z+q[2],l:q[0],w:q[1],h:g.h-q[2],under:topUnder})}
+  else{n.push({x:g.x+q[0],y:g.y,z:g.z,l:g.l-q[0],w:g.w,h:q[2],under:latUnder},{x:g.x,y:g.y+q[1],z:g.z,l:q[0],w:g.w-q[1],h:q[2],under:latUnder});if(canTop)n.push({x:g.x,y:g.y,z:g.z+q[2],l:q[0],w:q[1],h:g.h-q[2],under:topUnder})}
   n.forEach(function(r){r.bw=(r.z>g.z+0.001)?t.kg:g.bw;if(r.l>=md&&r.w>=md&&r.h>=md)F.push(r)})});
  return{P:P,left:left,wt:wt,vol:vol,cnt:cnt}}
 var V18=[],V4=[{sp:0,sc:0,se:0},{sp:1,sc:1,se:0},{sp:2,sc:0,se:1},{sp:2,sc:2,se:0}];
@@ -817,7 +948,7 @@ function topText(b){return b.up==2?"Upright (top up)":b.up==0?"On side – top t
 function setExportEnabled(on){["pdf","xls","pkg"].forEach(function(id){var e=$(id);if(e)e.disabled=!on})}
 function markStale(){if(!R)return;R.stale=true;["stale2","stale3"].forEach(function(id){var e=$(id);if(e)e.classList.add("on")});setExportEnabled(false)}
 function clearStale(){if(R)R.stale=false;["stale2","stale3"].forEach(function(id){var e=$(id);if(e)e.classList.remove("on")});setExportEnabled(true)}
-function clearResults(){R=null;stop();GLC=null;GL.edit=false;GL.drag=null;GL.sel=-1;hideToast();if($("gedit")){$("gedit").textContent="Move Cartons";$("gedit").style.color=""}if($("geditbar"))$("geditbar").classList.remove("on");if($("ginfo"))$("ginfo").classList.remove("on");["stale2","stale3"].forEach(function(id){var e=$(id);if(e)e.classList.remove("on")});$("out").style.display="none";$("out3").style.display="none";$("empty").style.display="";$("empty3").style.display="";$("stats").innerHTML="";$("sumbar").innerHTML="";var ba=$("balalert");if(ba){ba.innerHTML="";ba.classList.remove("on")}$("ctab").innerHTML="";$("cgtab").innerHTML="";$("sum").innerHTML="";$("csel").innerHTML="";$("eqs").textContent="";setExportEnabled(true)}
+function clearResults(){R=null;window.R=null;stop();GLC=null;GL.edit=false;GL.drag=null;GL.sel=-1;hideToast();if($("gedit")){$("gedit").textContent="Move Cartons";$("gedit").style.color=""}if($("geditbar"))$("geditbar").classList.remove("on");if($("ginfo"))$("ginfo").classList.remove("on");["stale2","stale3"].forEach(function(id){var e=$(id);if(e)e.classList.remove("on")});$("out").style.display="none";$("out3").style.display="none";$("empty").style.display="";$("empty3").style.display="";$("stats").innerHTML="";$("sumbar").innerHTML="";var ba=$("balalert");if(ba){ba.innerHTML="";ba.classList.remove("on")}$("ctab").innerHTML="";$("cgtab").innerHTML="";$("sum").innerHTML="";$("csel").innerHTML="";$("eqs").textContent="";setExportEnabled(true)}
 function calc(skipHist){
  if(R)markStale();
  var bad=false;CG.forEach(function(_,bi){["l","w","h","k","q","u"].forEach(function(k){if(cnum(bi,k)<0)bad=true})});
@@ -834,7 +965,7 @@ function calc(skipHist){
  if(!cands.every(function(c){return c.ul>0&&c.h>0})){flashMsg("A clearance is larger than the container.");return}
  setAllow();NOHV=$("nohv").checked;LAYER=(LD=="f");var m=MG,rm=+$("rot").value,stack=$("stack").checked,T=[],U=[];
  CG.forEach(function(_,i){var g=function(k){return cnum(i,k)};var rv=cval(i,"rm");
-  var t={name:cval(i,"n")||"Cargo "+(i+1),l:g("l")*df(),w:g("w")*df(),h:g("h")*df(),kg:g("k")*wf(),q:Math.floor(g("q")),upc:Math.floor(g("u")),color:cval(i,"c")||"#1f6f78",rm:(rv===""||/^[01]{6}$/.test(rv))?null:+rv,om:(/^[01]{6}$/.test(rv)&&rv.indexOf("1")>=0)?rv.split("").map(Number):null,st:cval(i,"st")||"",pri:+(cval(i,"pr")||3),fit:0,id:T.length+1};
+  var t={name:cval(i,"n")||"Cargo "+(i+1),l:g("l")*df(),w:g("w")*df(),h:g("h")*df(),kg:g("k")*wf(),ctl:Math.max(0,g("ctl")*wf())||0,q:Math.floor(g("q")),upc:Math.floor(g("u")),color:cval(i,"c")||"#1f6f78",rm:(rv===""||/^[01]{6}$/.test(rv))?null:+rv,om:(/^[01]{6}$/.test(rv)&&rv.indexOf("1")>=0)?rv.split("").map(Number):null,st:cval(i,"st")||"",pri:+(cval(i,"pr")||3),fit:0,id:T.length+1};
   if(t.l>0&&t.w>0&&t.h>0&&t.q>0&&!CG[i].x){T.push(t);for(var k=0;k<t.q;k++)U.push(t)}});
  if(!T.length){flashMsg("Add at least one cargo line with length, width, height and quantity.");return}
  hideToast();$("msg").textContent="";
@@ -856,6 +987,7 @@ function calc(skipHist){
  var left=U.length-placed;
  R={loads:loads,T:T,tot:U.length,wt:wt,vol:vol,capv:capv,left:left,du:du,wu:wu,C:loads[0].C,P:loads[0].P,eqName:$("eq").options[$("eq").selectedIndex].text,
   sum:loads.length+" container(s), "+placed+" cartons, "+fm(vol/1e6,2)+" m³"};
+ window.R=R;
  clearStale();
  var totalUnits=0,payload=0;T.forEach(function(t){totalUnits+=(t.upc||0)*t.q});loads.forEach(function(L){payload+=L.C.p});
  var vp=capv?vol/capv*100:0,wp=payload?wt/payload*100:0,volCls=vp>95?"warn":(vp>=50?"ok":""),wtCls=wp>95?"bad":(wp>85?"warn":"ok");
@@ -908,6 +1040,7 @@ function draw(cv,yaw,bg,lim,hl){
    poly(q[0].map(function(i){return v[i]}),shade(b.t.color,q[3]),new_?"#ff9f1c":"rgba(0,0,0,.35)",new_?2:1);
    var cc=[O[0]+S[0]/2,O[1]+S[1]/2,O[2]+S[2]/2];cc[na]=O[na]+(sg>0?S[na]:0);var ua=b.up;
    if(ua==na){if(sg>0){var pc=T(cc[0],cc[1],cc[2]),rad=s*Math.min(S[0],S[1],S[2])*.17;if(rad>=2.5){g.beginPath();g.arc(pc[0],pc[1],rad,0,7);g.fillStyle="#fff";g.fill();g.strokeStyle="#000";g.lineWidth=1.2;g.stroke();g.beginPath();g.arc(pc[0],pc[1],rad*.38,0,7);g.fillStyle="#000";g.fill()}}}
+    if(sg>0&&s*Math.min(S[0],S[1],S[2])>=16){var fcen=T(cc[0],cc[1],cc[2]);g.font="bold "+Math.max(9,Math.min(14,s*Math.min(S[0],S[1],S[2])*.24))+"px system-ui,sans-serif";g.textAlign="center";g.textBaseline="middle";g.fillStyle="rgba(0,0,0,.6)";g.fillText("#"+(o.i+1),fcen[0],fcen[1]+1);g.fillStyle="#fff";g.fillText("#"+(o.i+1),fcen[0],fcen[1]);g.textBaseline="alphabetic"}
    else{var A=cc.slice(),B=cc.slice();A[ua]-=S[ua]*.34;B[ua]+=S[ua]*.34;var pa=T(A[0],A[1],A[2]),pb=T(B[0],B[1],B[2]);if(Math.hypot(pb[0]-pa[0],pb[1]-pa[1])>=7)arrow(pa,pb)}
    var qi=q[0],e0=Math.hypot(v[qi[1]][0]-v[qi[0]][0],v[qi[1]][1]-v[qi[0]][1]),e1=Math.hypot(v[qi[2]][0]-v[qi[1]][0],v[qi[2]][1]-v[qi[1]][1]);
    if(Math.min(e0,e1)>=44){var mid=[0,1,2,3].reduce(function(a2,i2){return[a2[0]+v[qi[i2]][0]/4,a2[1]+v[qi[i2]][1]/4]},[0,0]),fs3=Math.max(8,Math.min(20,Math.min(e0,e1)*.2));
@@ -919,6 +1052,18 @@ function draw(cv,yaw,bg,lim,hl){
  if(!bg)lastBB=bb;var tp=[T(0,0,C.h),T(C.l,0,C.h),T(C.l,C.w,C.h),T(0,C.w,C.h)];g.strokeStyle=line;g.lineWidth=1;g.globalAlpha=.55;g.setLineDash([5,4]);
  [[0,1],[1,2],[2,3],[3,0]].forEach(function(e){g.beginPath();g.moveTo(tp[e[0]][0],tp[e[0]][1]);g.lineTo(tp[e[1]][0],tp[e[1]][1]);g.stroke();g.beginPath();g.moveTo(fl[e[0]][0],fl[e[0]][1]);g.lineTo(tp[e[0]][0],tp[e[0]][1]);g.stroke()});
  g.setLineDash([]);g.globalAlpha=1;
+ var pris2d={},priMax2d={};
+ P.forEach(function(b){if(b.t&&b.t.pri){pris2d[b.t.pri]=true;priMax2d[b.t.pri]=Math.max(priMax2d[b.t.pri]||0,b.x+b.l-C.m)}});
+ var sortedPris2d=Object.keys(pris2d).map(Number).sort(function(a,b){return a-b});
+ if(sortedPris2d.length>1){
+  sortedPris2d.slice(0,-1).forEach(function(pCur){
+   var xPos=priMax2d[pCur];
+   if(xPos>0&&xPos<C.ul-5){
+    var bhFl=[T(xPos,0,0),T(xPos,C.w,0),T(xPos,C.w,C.h),T(xPos,0,C.h)];
+    g.save();g.setLineDash([6,4]);poly(bhFl,"rgba(217,119,6,.14)","#d97706",2);g.setLineDash([]);
+    var bhl=T(xPos,C.w/2,C.h);g.font="bold 11px system-ui,sans-serif";g.textAlign="center";g.fillStyle="#d97706";
+    g.fillText("BULKHEAD / STOP "+pCur,bhl[0],bhl[1]-6);g.restore()}
+  })}
  (function(){var Lx=C.l,Wy=C.w,Hz=C.h,vis=(-sa)*ce>0.001,col=bg?"#b45309":"#f2b705",P4=[T(Lx,0,0),T(Lx,Wy,0),T(Lx,Wy,Hz),T(Lx,0,Hz)];
   g.save();if(vis){poly(P4,"rgba(242,183,5,.14)",col,3)}else{g.setLineDash([8,5]);poly(P4,null,col,2);g.setLineDash([])}
   if(vis){g.strokeStyle=col;g.globalAlpha=.55;g.lineWidth=1.5;g.beginPath();var sg=function(a,b){var pa=T(Lx,a[0],a[1]),pb=T(Lx,b[0],b[1]);g.moveTo(pa[0],pa[1]);g.lineTo(pb[0],pb[1])};
@@ -946,7 +1091,7 @@ function glInit(){if(GL.ok)return true;if(!window.THREE)return false;
 function glClear(){while(GL.group.children.length){var o=GL.group.children[GL.group.children.length-1];GL.group.remove(o);if(o.geometry&&o.geometry!==GL.box)o.geometry.dispose();if(o.material)o.material.dispose()}GL.inst=null;GL.hi=null;GL.edges=null;GL.selBox=null}
 var GL_E=[[0,0,0,1,0,0],[1,0,0,1,0,1],[1,0,1,0,0,1],[0,0,1,0,0,0],[0,1,0,1,1,0],[1,1,0,1,1,1],[1,1,1,0,1,1],[0,1,1,0,1,0],[0,0,0,0,1,0],[1,0,0,1,1,0],[1,0,1,1,1,1],[0,0,1,0,1,1]];
 function glEdges(P,m){if(GL.edges){GL.group.remove(GL.edges);if(GL.edges.geometry)GL.edges.geometry.dispose();if(GL.edges.material)GL.edges.material.dispose();GL.edges=null}
- var n=P.length;if(n<=0||n>500)return;
+ var n=P.length;if(n<=0||n>15000)return;
  var pos=new Float32Array(n*72),idx=0;
  for(var i=0;i<n;i++){var b=P[i],sl=Math.max(.1,b.l-m),sh=Math.max(.1,b.h-m),sw=Math.max(.1,b.w-m);
   for(var e=0;e<12;e++){var s=GL_E[e];pos[idx++]=b.x+s[0]*sl;pos[idx++]=b.z+s[1]*sh;pos[idx++]=b.y+s[2]*sw;pos[idx++]=b.x+s[3]*sl;pos[idx++]=b.z+s[4]*sh;pos[idx++]=b.y+s[5]*sw}}
@@ -979,7 +1124,23 @@ function glBuild(){if(!GL.ok)return;glClear();var C=R.C,m=C.m;
  GL.inst=new THREE.InstancedMesh(GL.box,mat,Math.max(1,n));
  for(var i=0;i<n;i++){var b=P[i],sl=Math.max(.1,b.l-m),sw=Math.max(.1,b.w-m),sh=Math.max(.1,b.h-m);d.position.set(b.x+sl/2,b.z+sh/2,b.y+sw/2);d.scale.set(sl,sh,sw);d.updateMatrix();GL.inst.setMatrixAt(i,d.matrix);col.set(b.t.color||"#0f766e");GL.inst.setColorAt(i,col)}
  GL.inst.count=n;GL.inst.instanceMatrix.needsUpdate=true;if(GL.inst.instanceColor)GL.inst.instanceColor.needsUpdate=true;GL.group.add(GL.inst);
- glEdges(P,m);glUpdateSelBox();GL.curC=R.C;GL.curP=R.P;glFrame()}
+ var pris3d={};
+  P.forEach(function(b){if(b.t&&b.t.pri)pris3d[b.t.pri]=true});
+  var priList3d=Object.keys(pris3d).map(Number).sort(function(a,b){return a-b});
+  if(priList3d.length>1){
+   priList3d.slice(0,-1).forEach(function(pCur){
+    var xPos=0;
+    P.forEach(function(b){if(b.t&&b.t.pri===pCur)xPos=Math.max(xPos,b.x+b.l-m)});
+    if(xPos>0&&xPos<C.ul-5){
+     var bhPos=new Float32Array([xPos,0,0, xPos,C.h,0, xPos,C.h,0, xPos,C.h,C.w, xPos,C.h,C.w, xPos,0,C.w, xPos,0,C.w, xPos,0,0, xPos,0,0, xPos,C.h,C.w, xPos,0,C.w, xPos,C.h,0]);
+     var bhGeo=new THREE.BufferGeometry();bhGeo.setAttribute("position",new THREE.BufferAttribute(bhPos,3));
+     var bhLine=new THREE.LineSegments(bhGeo,new THREE.LineBasicMaterial({color:0xd97706,transparent:true,opacity:.75}));
+     bhLine.name="bulkheadDivider_"+pCur;
+     GL.group.add(bhLine);
+    }
+   });
+  }
+  glEdges(P,m);glUpdateSelBox();GL.curC=R.C;GL.curP=R.P;glFrame()}
 function glFrame(){var C=R.C;GL.center=new THREE.Vector3(C.l/2,C.h/2,C.w/2);
  var ya=(+$("yaw").value)*Math.PI/180,ti=Math.max(3,Math.min(87,+$("tilt").value))*Math.PI/180,dir=new THREE.Vector3(Math.cos(ti)*Math.sin(ya),Math.sin(ti),Math.cos(ti)*Math.cos(ya)).normalize();
  var right=new THREE.Vector3().crossVectors(new THREE.Vector3(0,1,0),dir);if(right.length()<1e-6)right.set(1,0,0);right.normalize();var up=new THREE.Vector3().crossVectors(dir,right).normalize();
@@ -1023,7 +1184,7 @@ function glDraw(lim,hl){if(!GL.ok||!R)return;if(GL.curC!==R.C||GL.curP!==R.P)glB
  var cv=$("gl"),w=cv.clientWidth||1400,h=cv.clientHeight||640;GL.renderer.setSize(w,h,false);GL.camera.aspect=w/h;GL.camera.updateProjectionMatrix();GL.renderer.render(GL.scene,GL.camera);glLabels()}
 function glPick(e){var cv=$("gl"),r=cv.getBoundingClientRect(),x=e.clientX==null?e.pageX:e.clientX,y=e.clientY==null?e.pageY:e.clientY;
  GL.pt.x=((x-r.left)/r.width)*2-1;GL.pt.y=-((y-r.top)/r.height)*2+1;GL.ray.setFromCamera(GL.pt,GL.camera);var h=GL.ray.intersectObject(GL.inst,false);return h.length?h[0]:null}
-function glHit(b,skip){for(var i=0;i<R.P.length;i++){if(i===skip)continue;var o=R.P[i];if(b.x<o.x+o.l-.01&&b.x+b.l>o.x+.01&&b.y<o.y+o.w-.01&&b.y+b.w>o.y+.01&&b.z<o.z+o.h-.01&&b.z+b.h>o.z+.01)return true}return false}
+function glHit(b,skip){for(var i=0;i<R.P.length;i++){if(i===skip)continue;var o=R.P[i];if(b.x<o.x+o.l-.01&&b.x+b.l>o.x+.01&&b.y<o.y+o.w-.01&&b.y+b.w>o.y+.01&&b.z<o.z+o.h-.01&&b.z+b.h>o.z+.01)return{hit:true,index:i,box:o}}return false}
 function glSupportZ(b,skip){var z=0;for(var i=0;i<R.P.length;i++){if(i===skip)continue;var o=R.P[i];if(b.x<o.x+o.l-.05&&b.x+b.l>o.x+.05&&b.y<o.y+o.w-.05&&b.y+b.w>o.y+.05&&o.z+o.h<=b.z+.05)z=Math.max(z,o.z+o.h)}return z}
 function glEnsureOrig(){var L=curL();if(L&&!L.origP)L.origP=L.P.map(function(b){return{x:b.x,y:b.y,z:b.z,l:b.l,w:b.w,h:b.h,up:b.up,row:b.row,lay:b.lay,t:b.t}})}
 function glCommitEdit(msg){var L=curL(),selObj=(GL.sel>=0&&L&&L.P[GL.sel])||null;R.manual=true;try{seq(L)}catch(_){}if(selObj)GL.sel=L.P.indexOf(selObj);renderCG();glBuild();glSelect(GL.sel);setSteps();autosave();if(msg){$("geditmsg").textContent=msg;$("geditmsg").style.color="var(--ink)"}}
@@ -1079,10 +1240,27 @@ $("gresetmove").onclick=function(){var L=curL();if(!L||!L.origP){$("geditmsg").t
  function ptr(e){var r=cv.getBoundingClientRect();GL.pt.x=((e.clientX-r.left)/r.width)*2-1;GL.pt.y=-((e.clientY-r.top)/r.height)*2+1;GL.ray.setFromCamera(GL.pt,GL.camera);return r}
  cv.addEventListener("wheel",function(e){e.preventDefault();zset(e.deltaY<0?1.15:1/1.15,0,0)},{passive:false});
  cv.addEventListener("pointerdown",function(e){tap={x:e.clientX,y:e.clientY,moved:false};
-  if(GL.edit&&GL.ok&&R){var h=glPick(e);if(h&&h.instanceId!=null){var b=R.P[h.instanceId];ptr(e);var t=new THREE.Vector3();if(GL.ray.ray.intersectPlane(setPlane(b),t)){glEnsureOrig();GL.drag={i:h.instanceId,ox:t.x-b.x,oz:t.z-b.y};glSelect(h.instanceId);try{cv.setPointerCapture(e.pointerId)}catch(_){}return}}}
+  if(GL.edit&&GL.ok&&R){var h=glPick(e);if(h&&h.instanceId!=null){var b=R.P[h.instanceId];ptr(e);var t=new THREE.Vector3();if(GL.ray.ray.intersectPlane(setPlane(b),t)){glEnsureOrig();GL.drag={i:h.instanceId,ox:t.x-b.x,oz:t.z-b.y,wasSnapped:false};glSelect(h.instanceId);try{cv.setPointerCapture(e.pointerId)}catch(_){}return}}}
   pts[e.pointerId]={x:e.clientX,y:e.clientY};try{cv.setPointerCapture(e.pointerId)}catch(_){}});
  cv.addEventListener("pointermove",function(e){if(tap&&Math.hypot(e.clientX-tap.x,e.clientY-tap.y)>5)tap.moved=true;
-  if(GL.drag){var b=R.P[GL.drag.i];ptr(e);var t=new THREE.Vector3();if(GL.ray.ray.intersectPlane(setPlane(b),t)){var C=R.C,nx=Math.round((t.x-GL.drag.ox)*2)/2,ny=Math.round((t.z-GL.drag.oz)*2)/2;nx=Math.max(0,Math.min(C.ul-b.l,nx));ny=Math.max(0,Math.min(C.w-b.w,ny));var ox=b.x,oy=b.y;b.x=nx;b.y=ny;if(glHit(b,GL.drag.i)){b.x=ox;b.y=oy;$("geditmsg").textContent="Collision — move blocked.";$("geditmsg").style.color="var(--bad)"}else{$("geditmsg").textContent="Dragging Carton #"+(GL.drag.i+1)+"…";$("geditmsg").style.color="var(--ink)";glSetMatrix(GL.drag.i);glCamera();GL.camera.aspect=(cv.clientWidth||1400)/(cv.clientHeight||640);GL.camera.updateProjectionMatrix();GL.renderer.render(GL.scene,GL.camera);glLabels()}}return}
+  if(GL.drag){var di=GL.drag.i,b=R.P[di];ptr(e);var t=new THREE.Vector3();if(GL.ray.ray.intersectPlane(setPlane(b),t)){
+  var C=R.C,nx=(t.x-GL.drag.ox),ny=(t.z-GL.drag.oz),snapDist=3.5,snapped=false,snapTgt="";
+  if(Math.abs(nx)<snapDist){nx=0;snapped=true;snapTgt="Front Wall"}
+  else if(Math.abs(nx-(C.ul-b.l))<snapDist){nx=C.ul-b.l;snapped=true;snapTgt="Door End"}
+  if(Math.abs(ny)<snapDist){ny=0;snapped=true;snapTgt="Side Wall"}
+  else if(Math.abs(ny-(C.w-b.w))<snapDist){ny=C.w-b.w;snapped=true;snapTgt="Side Wall"}
+  for(var ki=0;ki<R.P.length;ki++){if(ki===di)continue;var kb=R.P[ki];
+   if(Math.abs(kb.z-b.z)<Math.max(kb.h,b.h)*.9){
+    if(Math.abs(nx-(kb.x+kb.l))<snapDist){nx=kb.x+kb.l;snapped=true;snapTgt="Carton #"+(ki+1)}
+    else if(Math.abs((nx+b.l)-kb.x)<snapDist){nx=kb.x-b.l;snapped=true;snapTgt="Carton #"+(ki+1)}
+    if(Math.abs(ny-(kb.y+kb.w))<snapDist){ny=kb.y+kb.w;snapped=true;snapTgt="Carton #"+(ki+1)}
+    else if(Math.abs((ny+b.w)-kb.y)<snapDist){ny=kb.y-b.w;snapped=true;snapTgt="Carton #"+(ki+1)}}}
+  nx=Math.max(0,Math.min(C.ul-b.l,Math.round(nx*2)/2));ny=Math.max(0,Math.min(C.w-b.w,Math.round(ny*2)/2));
+  var ox=b.x,oy=b.y;b.x=nx;b.y=ny;var hit=glHit(b,di);
+  if(hit){b.x=ox;b.y=oy;$("geditmsg").textContent="Collision with Carton #"+(hit.index+1)+" — move blocked.";$("geditmsg").style.color="var(--bad)";if(GL.selBox)GL.selBox.material.color.setHex(0xef4444)}
+  else{if(snapped&&!GL.drag.wasSnapped){try{if(typeof navigator!=="undefined"&&navigator.vibrate)navigator.vibrate(12)}catch(_){}}
+    GL.drag.wasSnapped=snapped;
+    $("geditmsg").textContent="Carton #"+(di+1)+(snapped?" (Snapped to "+snapTgt+")":" moving…");$("geditmsg").style.color=snapped?"var(--ok)":"var(--ink)";if(GL.selBox)GL.selBox.material.color.setHex(snapped?0x10b981:0x0f766e);glSetMatrix(di);glCamera();GL.camera.aspect=(cv.clientWidth||1400)/(cv.clientHeight||640);GL.camera.updateProjectionMatrix();GL.renderer.render(GL.scene,GL.camera);glLabels()}}return}
   var p=pts[e.pointerId];if(!p)return;var ids=Object.keys(pts);
   if(ids.length==1){if(mv){vz.px+=(e.clientX-p.x);vz.py+=(e.clientY-p.y)}else{$("yaw").value=((+$("yaw").value+(e.clientX-p.x)*.5)%360+360)%360;vp=Math.max(0,Math.min(90,vp+(e.clientY-p.y)*.4));$("tilt").value=vp}p.x=e.clientX;p.y=e.clientY;redraw()}
   else if(ids.length==2){var o=pts[ids.filter(function(i){return i!=e.pointerId})[0]],d0=Math.hypot(p.x-o.x,p.y-o.y);p.x=e.clientX;p.y=e.clientY;var d1=Math.hypot(p.x-o.x,p.y-o.y);if(d0>0)zset(d1/d0,0,0)}});
@@ -1110,8 +1288,22 @@ async function buildPdf(){
   var d=new window.jspdf.jsPDF({unit:"mm",format:"a4",orientation:"portrait"}),u=R.du,f=u=="in"?2.54:1,wf2=R.wu=="kg"?1:0.45359237,y=20,m=R.loads[0].C.m,name=$("pn").value.trim()||"Load plan";
   function np(o){d.addPage("a4",o=="l"?"landscape":"portrait");pgs.push(o)}
   function dimTxt(C){return fm(C.l/f,1)+" x "+fm(C.w/f,1)+" x "+fm(C.h/f,1)+" "+u}
-  d.setFontSize(18);PDF_T(d,"3D Load Plan",14,y);d.setFontSize(10);y+=7;
+  var logoData=window._userLogoData||null,repShip=$("rep_ship")?$("rep_ship").value.trim():"",repCons=$("rep_cons")?$("rep_cons").value.trim():"",repBol=$("rep_bol")?$("rep_bol").value.trim():"",repSeal=$("rep_seal")?$("rep_seal").value.trim():"";
+  if(logoData){try{d.addImage(logoData,"PNG",148,12,48,16,undefined,'FAST')}catch(_){}}
+  d.setFontSize(18);PDF_T(d,"3D Load Plan & Manifest",14,y);d.setFontSize(10);y+=7;
   PDF_T(d,name+" – "+stamp()+" – "+R.eqName,14,y);y+=6;
+  if(repShip||repCons||repBol||repSeal){
+   d.setFillColor(248,250,252);d.setDrawColor(203,213,225);d.setLineWidth(0.3);
+   d.roundedRect(14,y,182,14,1.5,1.5,"FD");
+   d.line(105,y,105,y+14);d.line(14,y+7,196,y+7);
+   d.setFontSize(7.5);d.setFont(undefined,"bold");
+   PDF_T(d,"SHIPPER: ",17,y+4.8);PDF_T(d,"CONSIGNEE: ",108,y+4.8);
+   PDF_T(d,"B/L REF: ",17,y+11.8);PDF_T(d,"SEAL / CONT #: ",108,y+11.8);
+   d.setFont(undefined,"normal");
+   PDF_T(d,(repShip||"–").slice(0,40),33,y+4.8);PDF_T(d,(repCons||"–").slice(0,40),127,y+4.8);
+   PDF_T(d,(repBol||"–").slice(0,40),32,y+11.8);PDF_T(d,(repSeal||"–").slice(0,40),133,y+11.8);
+   y+=18;d.setFontSize(10);
+  }
   PDF_T(d,R.loads.length+" container(s) | CBM stuffed "+fm(R.vol/1e6,3)+" m3 of "+fm(R.capv/1e6,2)+" m3 ("+fm(R.vol/R.capv*100,1)+"%) | Cargo weight "+fm(R.wt/wf2,0)+" "+R.wu+(R.left?" | "+R.left+" not loaded":""),14,y,{maxWidth:182});y+=11;
   d.setFontSize(8);d.setFont(undefined,"bold");PDF_T(d,"#",14,y);PDF_T(d,"Container",22,y);PDF_T(d,"Pieces",98,y);PDF_T(d,"CBM stuffed",118,y);PDF_T(d,"Volume used",146,y);PDF_T(d,"Weight ("+R.wu+")",172,y);d.setFont(undefined,"normal");y+=5;
   R.loads.forEach(function(L,k){var cv=L.C.l*L.C.w*L.C.h;if(y>275){np("p");y=20}PDF_T(d,String(k+1),14,y);PDF_T(d,L.C.name.slice(0,40),22,y);PDF_T(d,String(L.P.length),98,y);PDF_T(d,fm(L.vol/1e6,3),118,y);PDF_T(d,fm(L.vol/cv*100,1)+"%",146,y);PDF_T(d,fm(L.wt/wf2,0),172,y);y+=5;PDF_T(d,"Inside size: "+dimTxt(L.C),22,y);y+=5});y+=3;
@@ -1194,8 +1386,11 @@ async function buildXlsx(){
  if(!R)return null;if(!window.JSZip){$("pmsg").textContent="Excel library not loaded.";return null}
  try{var u=R.du,f=u=="in"?2.54:1,wf2=R.wu=="kg"?1:0.45359237,name=$("pn").value.trim()||"Load plan",m=R.loads[0].C.m;
   var H=function(v){return{v:v,s:1}},X=function(v){return{v:v,s:2}},N3=function(v){return{v:v,s:3}},N2=function(v){return{v:v,s:9}},I=function(v){return{v:v,s:5}},B=function(v){return{v:v,s:6}},TT=function(v){return{v:v,s:8}};
-  var rows=[[{v:"Container Load Summary",s:4}],[B("Project"),X(name),B("Date"),X(stamp())],[B("Equipment"),X(R.eqName),B("Units"),X("Size in "+u+", weight in "+R.wu)],R.balMsg?[B("WARNING"),X(R.balMsg)]:[],
-   [H("#"),H("Container"),H("Cartons loaded"),H("CBM stuffed (m³)"),H("Container CBM (m³)"),H("Volume used (%)"),H("Weight ("+R.wu+")")]];
+  var repShip=$("rep_ship")?$("rep_ship").value.trim():"",repCons=$("rep_cons")?$("rep_cons").value.trim():"",repBol=$("rep_bol")?$("rep_bol").value.trim():"",repSeal=$("rep_seal")?$("rep_seal").value.trim():"";
+   var rows=[[{v:"Container Load Summary",s:4}],[B("Project"),X(name),B("Date"),X(stamp())],[B("Equipment"),X(R.eqName),B("Units"),X("Size in "+u+", weight in "+R.wu)]];
+   if(repShip||repCons||repBol||repSeal)rows.push([B("Shipper"),X(repShip||"–"),B("Consignee"),X(repCons||"–"),B("B/L Reference"),X(repBol||"–"),B("Seal #"),X(repSeal||"–")]);
+   if(R.balMsg)rows.push([B("WARNING"),X(R.balMsg)]);
+   rows.push([H("#"),H("Container"),H("Cartons loaded"),H("CBM stuffed (m³)"),H("Container CBM (m³)"),H("Volume used (%)"),H("Weight ("+R.wu+")")]);
   R.loads.forEach(function(L,k){var cv=L.C.l*L.C.w*L.C.h;rows.push([I(k+1),X(L.C.name),I(L.P.length),N3(L.vol/1e6),N3(cv/1e6),N2(L.vol/cv*100),N2(L.wt/wf2)])});
   var pc=0;R.loads.forEach(function(L){pc+=L.P.length});
   rows.push([B(""),B("Total"),B(pc),TT(R.vol/1e6),TT(R.capv/1e6),{v:R.vol/R.capv*100,s:8},TT(R.wt/wf2)],[]);
@@ -1216,8 +1411,8 @@ $("xls").onclick=async function(){if(!R)return;busy("Building Excel sheet…",45
 var KEY="loadcalc.last",PK="loadcalc.projects";
 function p2(n){return (n<10?"0":"")+n}
 function stamp(){var d=new Date();return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())+" "+p2(d.getHours())+":"+p2(d.getMinutes())}
-function snap(){var rw=[];CG.forEach(function(g,i){rw.push({n:cval(i,"n"),l:cval(i,"l"),w:cval(i,"w"),h:cval(i,"h"),k:cval(i,"k"),q:cval(i,"q"),u:cval(i,"u"),c:cval(i,"c"),rm:cval(i,"rm"),st:cval(i,"st"),pr:cval(i,"pr"),p:g.p,x:g.x?1:0})});
- var o={pn:$("pn").value,du:du,wu:wu,eq:$("eq").value,ceql:$("ceql").value,ceqw:$("ceqw").value,ceqh:$("ceqh").value,ceqp:$("ceqp").value,rot:$("rot").value,clr:$("clr").value,stack:$("stack").checked,alw:$("alw").value,ld:LD,clrt:$("clrt").value,cgl:$("cgl").value,hsl:$("hsl").value,plim:$("plim").value,nohv:$("nohv").checked,rows:rw};
+function snap(){var rw=[];CG.forEach(function(g,i){rw.push({n:cval(i,"n"),l:cval(i,"l"),w:cval(i,"w"),h:cval(i,"h"),k:cval(i,"k"),q:cval(i,"q"),u:cval(i,"u"),ctl:cval(i,"ctl"),c:cval(i,"c"),rm:cval(i,"rm"),st:cval(i,"st"),pr:cval(i,"pr"),p:g.p,x:g.x?1:0})});
+ var o={pn:$("pn").value,du:du,wu:wu,eq:$("eq").value,ceql:$("ceql").value,ceqw:$("ceqw").value,ceqh:$("ceqh").value,ceqp:$("ceqp").value,rot:$("rot").value,clr:$("clr").value,stack:$("stack").checked,alw:$("alw").value,ld:LD,clrt:$("clrt").value,cgl:$("cgl").value,hsl:$("hsl").value,plim:$("plim").value,nohv:$("nohv").checked,chassis:$("chassis")?$("chassis").value:"semi3",lifozones:$("lifozones")?$("lifozones").checked:true,rep_ship:$("rep_ship")?$("rep_ship").value:"",rep_cons:$("rep_cons")?$("rep_cons").value:"",rep_bol:$("rep_bol")?$("rep_bol").value:"",rep_seal:$("rep_seal")?$("rep_seal").value:"",rows:rw};
  if(R&&R.manual&&!R.stale&&R.tot<=1500)o.ml=R.loads.map(function(L){return L.P.map(function(b){return{x:Math.round(b.x*10)/10,y:Math.round(b.y*10)/10,z:Math.round(b.z*10)/10,l:Math.round(b.l*10)/10,w:Math.round(b.w*10)/10,h:Math.round(b.h*10)/10,up:b.up,id:b.t.id}})});
  return o}
 function restoreManual(ml){if(!R||!ml||!Array.isArray(ml)||ml.length!==R.loads.length)return false;
@@ -1238,7 +1433,8 @@ function restore(o){if(!o)return;if(o.pn!=null)$("pn").value=o.pn;du=o.du||"in";
  $("rot").value=o.rot!=null?o.rot:1;$("clr").value=o.clr||0;$("stack").checked=o.stack!=null?!!o.stack:true;$("alw").value=o.alw!=null?o.alw:5;LD=o.ld==="f"?"f":"w";$("clrt").value=o.clrt||0;$("cgl").value=o.cgl||10;$("hsl").value=o.hsl||60;$("plim").value=o.plim||0;setAllow();$("nohv").checked=o.nohv!=null?!!o.nohv:true;
  ["ceql","ceqw","ceqh","ceqp","clr","clrt","plim"].forEach(function(id){var e=$(id);if(e&&e.dataset){delete e.dataset.cv;delete e.dataset.sh}});
  tb.innerHTML="";CG.length=0;var rows=o.rows||[],nb=Math.max(1,Math.ceil(rows.length/3));for(var b=0;b<nb;b++)addBlock();
- rows.forEach(function(r,i){fillCargo(i,r.n,r.l,r.w,r.h,r.k,r.q,r.p,r.c,r.u,r.rm,r.st,r.pr);CG[i].x=!!r.x});chips();labels();info();setTimeout(function(){try{renderPack()}catch(e){}},0)}
+ if(o.chassis!=null&&$("chassis"))$("chassis").value=o.chassis;if(o.lifozones!=null&&$("lifozones"))$("lifozones").checked=!!o.lifozones;if(o.rep_ship!=null&&$("rep_ship"))$("rep_ship").value=o.rep_ship;if(o.rep_cons!=null&&$("rep_cons"))$("rep_cons").value=o.rep_cons;if(o.rep_bol!=null&&$("rep_bol"))$("rep_bol").value=o.rep_bol;if(o.rep_seal!=null&&$("rep_seal"))$("rep_seal").value=o.rep_seal;
+  rows.forEach(function(r,i){fillCargo(i,r.n,r.l,r.w,r.h,r.k,r.q,r.p,r.c,r.u,r.rm,r.st,r.pr,r.ctl);CG[i].x=!!r.x});chips();labels();info();setTimeout(function(){try{renderPack()}catch(e){}},0)}
 function ls(k){try{return JSON.parse(localStorage.getItem(k)||"null")}catch(e){return null}}
 function setSaveFail(b){var e=document.getElementById("savebanner");if(e)e.classList.toggle("on",b)}
 var dlgReturn=null;
@@ -1391,6 +1587,403 @@ $("packui").addEventListener("change",function(e){var c=e.target;if(!c||!c.datas
  if(c.dataset.inc){pushUndo();CG[+c.dataset.i].x=!c.checked;cbmRefresh();pkChanged()}
  else if(c.classList.contains("pkpr")){pushUndo();cin(+c.dataset.i,"pr").value=c.value;pkChanged()}});
 var _cbm=cbmRefresh;cbmRefresh=function(){_cbm.apply(this,arguments);packSoon()};
+
+/* ==========================================================================
+   PHASE 1 & 2 ADVANCED LOGISTICS, EXCEL & BRANDING HANDLERS
+   ========================================================================== */
+
+// --- White-label Logo Uploader ---
+window._userLogoData = null;
+if($("replogo")) {
+  $("replogo").onchange = function(e) {
+    var f = e.target.files && e.target.files[0];
+    if(!f) return;
+    var reader = new FileReader();
+    reader.onload = function(evt) {
+      window._userLogoData = evt.target.result;
+      if($("logoimg")) $("logoimg").src = window._userLogoData;
+      if($("logoprev")) $("logoprev").style.display = "inline-flex";
+    };
+    reader.readAsDataURL(f);
+  };
+}
+if($("logoclr")) {
+  $("logoclr").onclick = function() {
+    window._userLogoData = null;
+    if($("replogo")) $("replogo").value = "";
+    if($("logoimg")) $("logoimg").src = "";
+    if($("logoprev")) $("logoprev").style.display = "none";
+  };
+}
+
+// --- Excel & CSV Drag-and-Drop & Parsing ---
+var parsedImportRows = [];
+if($("dropbtn")) {
+  $("dropbtn").onclick = function() {
+    if($("xldrop")) {
+      var d = $("xldrop");
+      d.style.display = d.style.display === "none" ? "block" : "none";
+    }
+  };
+}
+if($("xldrop")) {
+  $("xldrop").onclick = function() { if($("xlsin")) $("xlsin").click(); };
+  $("xldrop").ondragover = function(e) { e.preventDefault(); $("xldrop").classList.add("dragover"); };
+  $("xldrop").ondragleave = function() { $("xldrop").classList.remove("dragover"); };
+  $("xldrop").ondrop = function(e) {
+    e.preventDefault();
+    $("xldrop").classList.remove("dragover");
+    if(e.dataTransfer.files && e.dataTransfer.files[0]) handleUploadedFile(e.dataTransfer.files[0]);
+  };
+}
+if($("xlsin")) {
+  $("xlsin").onchange = function(e) {
+    if(e.target.files && e.target.files[0]) handleUploadedFile(e.target.files[0]);
+  };
+}
+
+async function handleUploadedFile(file) {
+  busy("Reading file…", 15);
+  try {
+    var ext = (file.name || "").split(".").pop().toLowerCase();
+    if(ext === "xlsx") {
+      var buf = await file.arrayBuffer();
+      parsedImportRows = await parseXlsxWorkbook(buf);
+    } else {
+      var txt = await file.text();
+      parsedImportRows = parseCsvText(txt);
+    }
+    if(!parsedImportRows || !parsedImportRows.length) {
+      flashMsg("No readable rows found in " + file.name);
+      return;
+    }
+    showColumnMapper(parsedImportRows);
+  } catch(e) {
+    flashMsg("Could not read file: " + (e.message || "Invalid format"));
+  } finally {
+    notBusy();
+  }
+}
+
+async function parseXlsxWorkbook(buf) {
+  if(!window.JSZip) throw new Error("JSZip not available");
+  var zip = await JSZip.loadAsync(buf);
+  var ss = [];
+  var ssFile = zip.file("xl/sharedStrings.xml");
+  if(ssFile) {
+    var ssXml = await ssFile.async("string");
+    var siMatches = ssXml.match(/<si>(.*?)<\/si>/gs) || [];
+    siMatches.forEach(function(m) {
+      var tMatches = m.match(/<t[^>]*>(.*?)<\/t>/gs) || [];
+      ss.push(tMatches.map(function(t) { return t.replace(/<[^>]+>/g, ""); }).join(""));
+    });
+  }
+  var sheetFile = zip.file("xl/worksheets/sheet1.xml") || zip.file(/xl\/worksheets\/sheet\d+\.xml/[0]);
+  if(!sheetFile) throw new Error("No worksheet sheet1.xml found in workbook");
+  var sXml = await sheetFile.async("string");
+  var rows = [];
+  var rowMatches = sXml.match(/<row[^>]*>(.*?)<\/row>/gs) || [];
+  rowMatches.forEach(function(r) {
+    var cells = [];
+    var cellMatches = r.match(/<c\s+r="([A-Z]+)(\d+)"([^>]*)>(.*?)<\/c>/gs) || [];
+    cellMatches.forEach(function(c) {
+      var rm = c.match(/r="([A-Z]+)(\d+)"/);
+      var colLetters = rm ? rm[1] : "A";
+      var colIdx = 0;
+      for(var ci = 0; ci < colLetters.length; ci++) colIdx = colIdx * 26 + (colLetters.charCodeAt(ci) - 64);
+      colIdx -= 1;
+      var isStr = c.indexOf('t="s"') >= 0, isInline = c.indexOf('t="inlineStr"') >= 0, val = "";
+      if(isInline) {
+        var tm = c.match(/<t[^>]*>(.*?)<\/t>/);
+        val = tm ? tm[1] : "";
+      } else {
+        var vm = c.match(/<v>(.*?)<\/v>/);
+        if(vm) val = isStr ? (ss[+vm[1]] || "") : vm[1];
+      }
+      cells[colIdx] = val.trim();
+    });
+    for(var i = 0; i < cells.length; i++) if(cells[i] === undefined) cells[i] = "";
+    if(cells.some(function(v) { return v !== ""; })) rows.push(cells);
+  });
+  return rows;
+}
+
+function parseCsvText(txt) {
+  var lines = txt.split(/\r?\n/).map(function(l){ return l.trim(); }).filter(Boolean);
+  return lines.map(function(l) {
+    var p = l.indexOf("\t") >= 0 ? l.split("\t") : l.indexOf(";") >= 0 ? l.split(";") : l.split(",");
+    return p.map(function(s) { return s.trim().replace(/^["']|["']$/g, ""); });
+  });
+}
+
+function showColumnMapper(rows) {
+  var header = rows[0] || [];
+  var sampleRows = rows.slice(1, 4);
+  var flds = ["cm_name", "cm_len", "cm_wid", "cm_hgt", "cm_wgt", "cm_qty", "cm_upc", "cm_ctl"];
+  var autoDetect = {
+    cm_name: /name|sku|item|desc|product/i,
+    cm_len: /len|l\b|length/i,
+    cm_wid: /wid|w\b|width/i,
+    cm_hgt: /hgt|h\b|height/i,
+    cm_wgt: /wgt|wt|weight|mass/i,
+    cm_qty: /qty|quantity|count|pieces|pcs/i,
+    cm_upc: /unit|upc|per/i,
+    cm_ctl: /crush|top|stack|ctl/i
+  };
+
+  flds.forEach(function(fid) {
+    var sel = $(fid);
+    if(!sel) return;
+    sel.innerHTML = '<option value="-1">(Skip / None)</option>' + header.map(function(h, idx) {
+      return '<option value="' + idx + '">' + esc(h || ("Column " + (idx + 1))) + '</option>';
+    }).join("");
+    // Auto-select match
+    var regex = autoDetect[fid];
+    var matchedIdx = -1;
+    for(var ci = 0; ci < header.length; ci++) {
+      if(regex && regex.test(header[ci])) { matchedIdx = ci; break; }
+    }
+    if(matchedIdx < 0) {
+      // Default fallback by positional sequence if numeric
+      var defOrder = { cm_name: 0, cm_len: 1, cm_wid: 2, cm_hgt: 3, cm_wgt: 4, cm_qty: 5, cm_upc: 6 };
+      if(defOrder[fid] != null && defOrder[fid] < header.length) matchedIdx = defOrder[fid];
+    }
+    sel.value = String(matchedIdx);
+  });
+
+  // Render preview table
+  var pt = $("colprevtab");
+  if(pt) {
+    var pH = '<tr>' + header.map(function(h){ return '<th>' + esc(h || "") + '</th>'; }).join("") + '</tr>';
+    sampleRows.forEach(function(sr) {
+      pH += '<tr>' + header.map(function(_, ci){ return '<td>' + esc(sr[ci] || "") + '</td>'; }).join("") + '</tr>';
+    });
+    pt.innerHTML = pH;
+  }
+
+  if($("colmapmodal")) $("colmapmodal").classList.add("on");
+}
+
+if($("colmapcancel")) {
+  $("colmapcancel").onclick = function() { if($("colmapmodal")) $("colmapmodal").classList.remove("on"); };
+}
+
+if($("colmapapply")) {
+  $("colmapapply").onclick = function() {
+    var ni = +$("cm_name").value, li = +$("cm_len").value, wi = +$("cm_wid").value, hi = +$("cm_hgt").value;
+    var ki = +$("cm_wgt").value, qi = +$("cm_qty").value, ui = +$("cm_upc").value, ci = +$("cm_ctl").value;
+    if(li < 0 || wi < 0 || hi < 0) {
+      flashMsg("Length, width and height column mappings are required.");
+      return;
+    }
+    pushUndo();
+    var added = 0;
+    var dataRows = parsedImportRows.slice(1);
+    dataRows.forEach(function(row) {
+      var n = ni >= 0 ? row[ni] : "Cargo";
+      var l = +row[li], w = +row[wi], h = +row[hi];
+      var k = ki >= 0 ? +row[ki] : 10;
+      var q = qi >= 0 ? Math.floor(+row[qi]) : 1;
+      var upc = ui >= 0 && row[ui] !== "" ? String(Math.floor(+row[ui])) : "";
+      var ctl = ci >= 0 && row[ci] !== "" ? String(+row[ci]) : "";
+      if(l > 0 && w > 0 && h > 0 && q > 0) {
+        addRow(n, nf(l, 2), nf(w, 2), nf(h, 2), nf(Math.max(0, k || 0), 2), String(q), null, null, upc, null, null, null, ctl);
+        added++;
+      }
+    });
+    if($("colmapmodal")) $("colmapmodal").classList.remove("on");
+    chips(); preview(); if(R) markStale();
+    flashMsg("Imported " + added + " cargo lines from file.", true);
+  };
+}
+
+// --- Download Excel Cargo Template ---
+async function downloadCargoTemplate() {
+  var H = function(v){ return { v: v, s: 1 }; }, X = function(v){ return { v: v, s: 2 }; };
+  var templateRows = [
+    [H("SKU / Item Name"), H("Length (" + du + ")"), H("Width (" + du + ")"), H("Height (" + du + ")"), H("Weight Each (" + wu + ")"), H("Quantity"), H("Units per Carton"), H("Max Top Load (" + wu + ")")],
+    [X("Carton A - Apparel"), {v: 40, s: 2}, {v: 30, s: 2}, {v: 25, s: 2}, {v: 12, s: 2}, {v: 150, s: 2}, {v: 10, s: 2}, {v: 100, s: 2}],
+    [X("Carton B - Electronics"), {v: 50, s: 2}, {v: 40, s: 2}, {v: 35, s: 2}, {v: 22, s: 2}, {v: 80, s: 2}, {v: 4, s: 2}, {v: 150, s: 2}],
+    [X("Carton C - Fragile Glass"), {v: 30, s: 2}, {v: 30, s: 2}, {v: 30, s: 2}, {v: 8, s: 2}, {v: 40, s: 2}, {v: 1, s: 2}, {v: 25, s: 2}]
+  ];
+  var s1 = { name: "Cargo Template", rows: templateRows, w: [26, 14, 14, 14, 16, 12, 16, 18], m: [] };
+  var buf = await makeXlsx([s1]);
+  await saveFile("Cargo_Import_Template.xlsx", buf, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+}
+window.downloadCargoTemplate = downloadCargoTemplate;
+if($("xlstempl")) {
+  $("xlstempl").onclick = downloadCargoTemplate;
+}
+
+// --- Two-Tier Pallet Builder ---
+if($("palbtn")) {
+  $("palbtn").onclick = function() {
+    var ps = $("pal_src");
+    if(!ps) return;
+    var opts = [];
+    CG.forEach(function(g, i) {
+      var n = cval(i, "n") || ("Cargo " + (i + 1)), l = cnum(i, "l"), w = cnum(i, "w"), h = cnum(i, "h"), q = cnum(i, "q");
+      if(l > 0 && w > 0 && h > 0 && q > 0 && !g.x) {
+        opts.push('<option value="' + i + '">' + esc(n) + ' (' + l + '×' + w + '×' + h + ' ' + du + ', ' + q + ' pcs)</option>');
+      }
+    });
+    if(!opts.length) {
+      flashMsg("Enter valid cartons in the cargo table first.");
+      return;
+    }
+    ps.innerHTML = opts.join("");
+    document.querySelectorAll(".pal_u").forEach(function(e){ e.textContent = du; });
+    document.querySelectorAll(".pal_wu").forEach(function(e){ e.textContent = wu; });
+    calcPalletPreview();
+    if($("palmodal")) $("palmodal").classList.add("on");
+  };
+}
+
+function calcPalletPreview() {
+  var pi = +$("pal_src").value, ptype = $("pal_type").value;
+  if(isNaN(pi) || !CG[pi]) return;
+  var cl = cnum(pi, "l") * df(), cw = cnum(pi, "w") * df(), ch = cnum(pi, "h") * df(), cwt = cnum(pi, "k") * wf(), qty = Math.floor(cnum(pi, "q"));
+  if(cl <= 0.1 || cw <= 0.1 || ch <= 0.1 || qty <= 0) {
+    $("palres").innerHTML = "<span class=\"note\">Select a valid cargo item with positive dimensions and quantity.</span>";
+    return;
+  }
+  // Base pallet specs (cm and kg)
+  var pallets = {
+    eur1: { name: "EUR 1 Pallet", l: 120, w: 80, baseH: 14.4, tare: 25, maxPayload: 1000 },
+    gma:  { name: "US GMA Pallet", l: 121.9, w: 101.6, baseH: 14.0, tare: 20, maxPayload: 1000 },
+    eur2: { name: "EUR 2 Pallet", l: 120, w: 100, baseH: 14.4, tare: 30, maxPayload: 1250 }
+  };
+  var base = pallets[ptype] || pallets.eur1;
+  var maxH = Math.max(50, (+$("pal_maxh").value || 180) * df());
+  var maxW = Math.max(100, (+$("pal_maxw").value || 1000) * wf());
+  var ovh = Math.max(0, Math.min(5 * df(), (+$("pal_ovh").value || 0) * df()));
+
+  var effL = base.l + 2 * ovh;
+  var effW = base.w + 2 * ovh;
+
+  // 1. Column Grid (Parallel)
+  var cntA = Math.floor(effL / cl) * Math.floor(effW / cw);
+  // 2. Column Grid (Turned)
+  var cntB = Math.floor(effL / cw) * Math.floor(effW / cl);
+  // 3. Block Interlock Pattern
+  var bestBlock = 0;
+  for (var k = 1; cl > 0 && k * cl <= effL; k++) {
+    var remL = effL - k * cl;
+    var b1 = k * Math.floor(effW / cw);
+    var b2 = Math.floor(remL / cw) * Math.floor(effW / cl);
+    if (b1 + b2 > bestBlock) bestBlock = b1 + b2;
+  }
+  for (var k = 1; cw > 0 && k * cw <= effL; k++) {
+    var remL = effL - k * cw;
+    var b1 = k * Math.floor(effW / cl);
+    var b2 = Math.floor(remL / cl) * Math.floor(effW / cw);
+    if (b1 + b2 > bestBlock) bestBlock = b1 + b2;
+  }
+  // 4. Spiral Pinwheel Pattern
+  var pinwheelCnt = 0;
+  if (effL >= cl + cw && effW >= cl + cw) {
+    var voidL = Math.max(0, cl - cw), voidW = Math.max(0, cl - cw);
+    var centerFit = (voidL >= cw && voidW >= cl) ? 1 : ((voidL >= cw && voidW >= cw) ? Math.floor(voidL / cw) * Math.floor(voidW / cw) : 0);
+    var spiralCore = 4 + centerFit;
+    var remX = effL - (cl + cw), remY = effW - (cl + cw);
+    var extraX = Math.floor(remX / cw) * Math.floor(effW / cl);
+    var extraY = Math.floor(remY / cl) * Math.floor((cl + cw) / cw);
+    pinwheelCnt = spiralCore + extraX + extraY;
+  }
+
+  var patterns = [
+    { name: "Column Grid (Parallel)", cnt: cntA },
+    { name: "Column Grid (Turned)", cnt: cntB },
+    { name: "Block Interlock", cnt: bestBlock },
+    { name: "Spiral Pinwheel", cnt: pinwheelCnt }
+  ];
+  patterns.sort(function(a, b) { return b.cnt - a.cnt; });
+  var bestPat = patterns[0];
+  var perLayer = bestPat.cnt;
+
+  if(perLayer <= 0) {
+    $("palres").innerHTML = '<b style="color:var(--bad)">Carton size exceeds base pallet dimensions (including overhang).</b>';
+    return;
+  }
+  var availH = maxH - base.baseH;
+  var maxLayers = Math.max(1, Math.floor(availH / ch));
+  var cartonsPerPallet = perLayer * maxLayers;
+
+  // Weight check against maxW and base.maxPayload
+  var allowedPayload = Math.min(maxW - base.tare, base.maxPayload || 1250);
+  while(cartonsPerPallet * cwt > allowedPayload && maxLayers > 1) {
+    maxLayers--;
+    cartonsPerPallet = perLayer * maxLayers;
+  }
+
+  var numPallets = Math.floor(qty / cartonsPerPallet);
+  var looseRemainder = qty % cartonsPerPallet;
+  var totalPalletH = base.baseH + maxLayers * ch;
+  var palletGrossKg = base.tare + cartonsPerPallet * cwt;
+
+  // Actual unit footprint with overhang
+  var effUnitL = Math.min(effL, base.l + (ovh > 0 ? ovh * 2 : 0));
+  var effUnitW = Math.min(effW, base.w + (ovh > 0 ? ovh * 2 : 0));
+
+  window._lastPalletCalc = {
+    pi: pi, base: base, ptype: ptype,
+    pattern: bestPat.name,
+    numPallets: numPallets, looseRemainder: looseRemainder,
+    cartonsPerPallet: cartonsPerPallet,
+    pl: effUnitL, pw: effUnitW, ph: totalPalletH,
+    grossKg: palletGrossKg
+  };
+
+  $("palres").innerHTML = '<b>' + esc(base.name) + ' Optimization (' + esc(bestPat.name) + '):</b><br>' +
+    '• <b>' + perLayer + '</b> cartons per layer (' + esc(bestPat.name) + ') × <b>' + maxLayers + '</b> layers = <b>' + cartonsPerPallet + '</b> cartons/pallet<br>' +
+    '• Unit Footprint: <b>' + fm(effUnitL / df(), 1) + ' × ' + fm(effUnitW / df(), 1) + ' × ' + fm(totalPalletH / df(), 1) + ' ' + du + '</b>' + (ovh > 0 ? ' (incl. ' + fm(ovh / df(), 1) + ' ' + du + ' overhang)' : '') + '<br>' +
+    '• Unit Gross Weight: <b>' + fm(palletGrossKg / wf(), 1) + ' ' + wu + '</b> (including ' + fm(base.tare / wf(), 1) + ' ' + wu + ' pallet base)<br>' +
+    '• Total Load Split: <b>' + numPallets + ' full pallet(s)</b>' + (looseRemainder ? ' + <b>' + looseRemainder + '</b> loose cartons' : '');
+}
+
+if($("pal_src")) $("pal_src").onchange = calcPalletPreview;
+if($("pal_type")) $("pal_type").onchange = calcPalletPreview;
+if($("pal_maxh")) $("pal_maxh").oninput = calcPalletPreview;
+if($("pal_maxw")) $("pal_maxw").oninput = calcPalletPreview;
+if($("pal_ovh")) $("pal_ovh").oninput = calcPalletPreview;
+
+if($("palcancel")) {
+  $("palcancel").onclick = function() { if($("palmodal")) $("palmodal").classList.remove("on"); };
+}
+
+if($("palapply")) {
+  $("palapply").onclick = function() {
+    var c = window._lastPalletCalc;
+    if(!c || c.numPallets <= 0) {
+      flashMsg("Unable to create pallets — check quantity and pallet limits.");
+      return;
+    }
+    pushUndo();
+    var origName = cval(c.pi, "n") || "Cargo";
+    // Adjust original line quantity to loose remainder or clear if 0
+    if(c.looseRemainder > 0) {
+      cin(c.pi, "q").value = String(c.looseRemainder);
+      cin(c.pi, "n").value = origName + " (Loose)";
+    } else {
+      clearCargo(c.pi);
+    }
+    // Add pallet unit load
+    var palName = "Pallet: " + origName + " (" + c.cartonsPerPallet + " pcs/plt)";
+    addRow(
+      palName,
+      nf(c.pl / df(), 2),
+      nf(c.pw / df(), 2),
+      nf(c.ph / df(), 2),
+      nf(c.grossKg / wf(), 2),
+      String(c.numPallets),
+      null, null, String(c.cartonsPerPallet)
+    );
+    if($("palmodal")) $("palmodal").classList.remove("on");
+    chips(); preview(); if(R) markStale();
+    flashMsg("Created " + c.numPallets + " standard pallet unit(s).", true);
+  };
+}
+
 labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();updateUndo();show(0);
 })();
 </script></body></html>
