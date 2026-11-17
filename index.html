@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="format-detection" content="telephone=no"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>3D Load Calculator - MobileFit</title>
-<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="MobileFit"><meta name="theme-color" content="#1f6f78">
-<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%223D%20Load%20Calculator%20-%20MobileFit%22%2C%22short_name%22%3A%22MobileFit%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f7f9fa%22%2C%22theme_color%22%3A%22%231f6f78%22%2C%22description%22%3A%22Offline%203D%20Container%20and%20Truck%20Load%20Calculator%22%7D">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="MobileFit"><meta name="theme-color" content="#0b0f12">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%223D%20Load%20Calculator%20-%20MobileFit%22%2C%22short_name%22%3A%22MobileFit%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f7f9fa%22%2C%22theme_color%22%3A%22%230b0f12%22%2C%22description%22%3A%22Offline%203D%20Container%20and%20Truck%20Load%20Calculator%22%7D">
 <script>/* jsPDF 2.5.1 (MIT) - embedded for offline use; licence notice is kept inside the library header */
 /** @license
  *
@@ -603,6 +603,9 @@ button.tile:not(.on) svg{opacity:.4}button.tile.mix{border-color:var(--accent);b
   --ok:#1f8a5f; --amb:#b8791f; --bad:#b3261e; --chart:#3f6f9e; --view:#f3f6f8;
   --mf-top:#123b47; --mf-top-2:#0e303a; --mf-top-mute:#9fc3cb;
   --mf-navh:58px; --mf-r:14px; --mf-gap:8px;
+  --mf-edge:6px; --mf-edge-color:#0b0f12;
+  --mf-top-inset:max(env(safe-area-inset-top,0px),8px);
+  --mf-bot-inset:max(env(safe-area-inset-bottom,0px),10px);
 }
 :root[data-theme="dark"]{
   --bg:#0e171d; --panel:#16222a; --ink:#e6eef2; --mute:#9babb5;
@@ -622,18 +625,29 @@ button.tile:not(.on) svg{opacity:.4}button.tile.mix{border-color:var(--accent);b
 html.mf, html.mf body{height:100%}
 html.mf *{box-sizing:border-box}
 html.mf body{
-  margin:0;overflow:hidden;background:#dfe6ea;color:var(--ink);
+  margin:0;overflow:hidden;background:var(--mf-edge-color);color:var(--ink);
   font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   -webkit-text-size-adjust:100%;
 }
+/* Installed (standalone) apps draw edge-to-edge; Android can report a zero
+   top inset while the status bar still overlaps. Reserve a real status strip.
+   Touch devices get the same strip in a browser tab, so a phone never clips. */
+@media (pointer:coarse){
+  html.mf{--mf-top-inset:max(env(safe-area-inset-top,0px),30px)}
+}
+html.mf.mf-installed{--mf-top-inset:max(env(safe-area-inset-top,0px),30px)}
 
 /* --------------------------------------------------------------------------
-   2. PHONE FRAME — main ends where the tab bar begins. No overlap, ever.
+   2. PHONE FRAME — a hard matte edge, then the screen. main ends where the
+   floating tab bar begins. No overlap, ever.
    -------------------------------------------------------------------------- */
 html.mf main{
-  height:calc(100dvh - var(--mf-navh) - env(safe-area-inset-bottom,0px));
-  max-width:540px;margin:0 auto;padding:0 10px 0;
+  height:calc(var(--mf-vh,100dvh) - var(--mf-top-inset) - var(--mf-bot-inset) - var(--mf-navh) - var(--mf-edge));
+  width:calc(100% - (2 * var(--mf-edge)));
+  max-width:540px;margin:var(--mf-top-inset) auto 0;padding:0 10px 0;
   display:flex;flex-direction:column;overflow:hidden;background:var(--bg);
+  border-radius:18px;
+  box-shadow:0 0 0 1px rgba(255,255,255,.06),0 10px 28px rgba(0,0,0,.35);
 }
 html.mf #savebanner{flex:none;margin:0 -10px 6px;border-radius:0}
 html.mf #savebanner span{font-size:11px;line-height:1.25}
@@ -642,7 +656,7 @@ html.mf #savebanner span{font-size:11px;line-height:1.25}
 html.mf #hdr{
   flex:none;position:relative;top:auto;z-index:30;
   display:flex;align-items:center;gap:4px;
-  margin:0 -10px var(--mf-gap);padding:7px 10px 8px;
+  margin:0 -10px var(--mf-gap);padding:9px 10px 10px;
   background:var(--mf-top);background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.04) 0 3px,transparent 3px 9px);
   border:0;border-radius:0 0 16px 16px;box-shadow:0 6px 16px rgba(13,31,43,.18);
   color:#fff;
@@ -662,12 +676,12 @@ html.mf #hdr button.thm:active{background:rgba(255,255,255,.22)}
 
 /* ---- bottom tab bar ----------------------------------------------------- */
 html.mf nav#steps{
-  position:fixed;left:50%;bottom:0;transform:translateX(-50%);
-  width:min(100%,560px);height:calc(var(--mf-navh) + env(safe-area-inset-bottom,0px));
-  margin:0;padding:5px 8px calc(5px + env(safe-area-inset-bottom,0px));
+  position:fixed;left:50%;bottom:var(--mf-bot-inset);transform:translateX(-50%);
+  width:min(calc(100% - (2 * var(--mf-edge))),540px);height:var(--mf-navh);
+  margin:0;padding:5px 8px;
   display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;
-  background:var(--panel);border:1px solid var(--line);border-bottom:0;
-  border-radius:16px 16px 0 0;box-shadow:0 -8px 24px rgba(13,31,43,.10);
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:16px;box-shadow:0 8px 24px rgba(13,31,43,.18);
   z-index:120;
 }
 html.mf nav#steps button{
@@ -686,7 +700,16 @@ html.mf nav#steps button.on{
 html.mf nav#steps button:active{transform:scale(.97)}
 
 /* toasts must clear the bar */
-html.mf #toast{bottom:calc(var(--mf-navh) + env(safe-area-inset-bottom,0px) + 10px);z-index:500}
+html.mf #toast{bottom:calc(var(--mf-bot-inset) + var(--mf-navh) + var(--mf-edge) + 10px);z-index:500}
+
+/* dialogs and progress overlays stay inside the matte frame */
+html.mf .prog{
+  left:50%;right:auto;transform:translateX(-50%);
+  width:min(calc(100% - (2 * var(--mf-edge))),540px);
+  top:var(--mf-top-inset);bottom:var(--mf-bot-inset);
+  border-radius:18px;overflow:hidden;
+}
+html.mf .prog .box{max-width:calc(100vw - 60px)}
 
 /* --------------------------------------------------------------------------
    3. SHARED SCREEN PIECES
@@ -709,7 +732,12 @@ html.mf #p2>.card>h2,
 html.mf #p3>.card>h2{display:none}
 html.mf #p1>.card>h2{display:none}
 
-html.mf .mf-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-bottom:8px}
+html.mf .mf-scroll{
+  flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;padding-bottom:20px;
+  -webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 16px),transparent);
+  mask-image:linear-gradient(to bottom,#000 calc(100% - 16px),transparent);
+}
 html.mf .mf-fill{flex:1;min-height:0;display:flex;flex-direction:column}
 
 html.mf .mf-dock{flex:none;display:flex;gap:7px;padding:4px 0 2px;margin-top:auto}
@@ -797,6 +825,7 @@ html.mf #cbmtot table.tot{display:block;width:100%;border-collapse:separate;bord
 html.mf #cbmtot .tot tbody{display:block}
 html.mf #cbmtot .tot th{display:none}
 html.mf #cbmtot .tot tr:last-child{display:flex;gap:4px}
+html.mf #cbmtot .tot tr:last-child td:last-child{flex:1.35}
 html.mf #cbmtot .tot td{
   flex:1;border:0;border-radius:10px;background:color-mix(in srgb,var(--ink) 5%,var(--bg));
   padding:5px 4px;text-align:center;font-size:9.5px;line-height:1.25;color:var(--mute);
@@ -807,7 +836,11 @@ html.mf #preview b{color:var(--ink)}
 html.mf #preview .bar{height:5px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:4px}
 html.mf #preview .bar i{display:block;height:100%;background:var(--ok)}
 
-html.mf #mf-lines{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:1px 0 2px}
+html.mf #mf-lines{
+  flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:1px 0 20px;
+  -webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 16px),transparent);
+  mask-image:linear-gradient(to bottom,#000 calc(100% - 16px),transparent);
+}
 html.mf #p1>.card>.mf-row{flex:none;min-height:42px;margin-top:2px;border-bottom:0}
 html.mf .mf-line{
   display:flex;align-items:center;gap:8px;background:var(--panel);
@@ -920,10 +953,49 @@ html.mf .mf-dview{display:none}
 html.mf .mf-dview.on{display:block}
 html.mf #mf-s-details .scroll{overflow-x:auto;margin:0 0 8px!important}
 html.mf #mf-s-details .plan{min-width:0;width:100%;font-size:10.5px}
-html.mf #mf-s-details .plan th,html.mf #mf-s-details .plan td{padding:4px 5px}
+html.mf #mf-s-details .plan th,html.mf #mf-s-details .plan td{padding:3px 4px;line-height:1.2}
+html.mf #mf-s-details .plan{font-size:10px}
 html.mf #sumbar{position:static;margin:0 0 8px;font-size:10.5px;padding:6px 8px;box-shadow:none}
 html.mf #balalert{margin:0 0 8px;font-size:10.5px}
+
+/* Wide result tables: the shell measures overflow and adds .mf-stack, which
+   turns each row into a labelled card. Every value stays visible. */
+html.mf #mf-s-details table.mf-stack{display:block;width:100%;min-width:0;border:0}
+html.mf #mf-s-details table.mf-stack thead,
+html.mf #mf-s-details table.mf-stack tbody{display:block}
+html.mf #mf-s-details table.mf-stack tr{
+  display:block;border:1px solid var(--line);border-radius:12px;background:var(--panel);
+  padding:6px 9px;margin:0 0 6px;
+}
+html.mf #mf-s-details table.mf-stack tr.mf-head{display:none}
+html.mf #mf-s-details table.mf-stack td{
+  display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;
+  gap:1px 10px;border:0;padding:2px 0;font-size:11px;text-align:right;
+}
+html.mf #mf-s-details table.mf-stack td::before{
+  content:attr(data-label);font-weight:600;color:var(--mute);
+  text-align:left;font-size:10.5px;flex:0 1 auto;
+}
+html.mf #mf-s-details table.mf-stack td[data-label="#"]{display:none}
+html.mf #mf-s-details table.mf-stack td:not([data-label]){display:block;text-align:left}
+html.mf #mf-s-details table.mf-stack td:not([data-label])::before{content:none}
+html.mf #mf-s-details table.mf-stack td.mf-key{
+  display:block;font-weight:800;font-size:12px;color:var(--ink);text-align:left;
+  border-bottom:1px solid var(--line);padding-bottom:4px;margin-bottom:3px;
+}
+html.mf #mf-s-details table.mf-stack td.mf-key::before{content:none}
+html.mf #mf-s-details table.mf-stack td>*{margin-left:auto}
 html.mf #vw .row:last-of-type{display:none}
+
+/* full-screen chart keeps the same matte frame as every other screen */
+html.mf #vw.full{
+  position:fixed;z-index:130;
+  left:50%;right:auto;transform:translateX(-50%);
+  width:min(calc(100% - (2 * var(--mf-edge))),540px);
+  top:var(--mf-top-inset);bottom:var(--mf-bot-inset);
+  border-radius:18px;overflow:auto;
+  padding:8px 10px;
+}
 html.mf #stepl{font-size:10px;margin:6px 0}
 html.mf #mf-s-details .row{gap:5px;margin:0 0 6px}
 html.mf #mf-s-details .row select{min-height:34px;font-size:12px;max-width:100%}
@@ -956,12 +1028,18 @@ html.mf #empty3 svg{width:56px;height:56px;margin-bottom:6px}
 /* --------------------------------------------------------------------------
    8. BOTTOM SHEETS
    -------------------------------------------------------------------------- */
-html.mf #mf-sheetwrap{position:fixed;left:0;right:0;top:0;bottom:calc(var(--mf-navh) + env(safe-area-inset-bottom,0px));z-index:260;display:none}
+html.mf #mf-sheetwrap{
+  position:fixed;left:50%;transform:translateX(-50%);
+  width:min(calc(100% - (2 * var(--mf-edge))),540px);
+  top:var(--mf-top-inset);
+  bottom:calc(var(--mf-bot-inset) + var(--mf-navh) + var(--mf-edge));
+  z-index:260;display:none;border-radius:18px;overflow:hidden;
+}
 html.mf #mf-sheetwrap.on{display:block}
 html.mf .mf-veil{position:absolute;inset:0;background:rgba(13,31,43,.45);animation:mf-in .18s ease}
 html.mf .mf-sheet{
   position:absolute;left:50%;bottom:0;
-  transform:translateX(-50%);width:min(100%,560px);max-height:calc(100% - 10px);
+  transform:translateX(-50%);width:min(100%,540px);max-height:calc(100% - 10px);
   background:var(--panel);border:1px solid var(--line);border-bottom:0;border-radius:22px 22px 0 0;
   box-shadow:0 -12px 34px rgba(13,31,43,.28);display:flex;flex-direction:column;
   animation:mf-up .22s cubic-bezier(.2,.8,.2,1);
@@ -972,7 +1050,11 @@ html.mf .mf-sheet:before{content:"";display:block;width:36px;height:4px;border-r
 html.mf .mf-sheet-head{flex:none;display:flex;align-items:center;gap:8px;padding:2px 14px 8px;border-bottom:1px solid var(--line)}
 html.mf .mf-sheet-head h2{flex:1;margin:0;font-size:14px;line-height:1.2}
 html.mf .mf-sheet-head button{width:34px;height:34px;border:0;border-radius:9px;background:color-mix(in srgb,var(--ink) 7%,var(--bg));color:var(--ink);font-size:15px;padding:0;flex:none}
-html.mf .mf-sheet-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:10px 14px 12px}
+html.mf .mf-sheet-body{
+  flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:10px 14px 22px;
+  -webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 16px),transparent);
+  mask-image:linear-gradient(to bottom,#000 calc(100% - 16px),transparent);
+}
 html.mf .mf-view{display:none}
 html.mf .mf-view.on{display:block}
 html.mf .mf-sheet .note{font-size:10.5px;line-height:1.35}
@@ -1014,6 +1096,10 @@ html.mf #mf-s-company #repcard .row button{min-height:40px}
   html.mf #stats .stat b{font-size:12px}
   html.mf #zbar button,html.mf #rbar button{font-size:9px;padding:1px 5px}
   html.mf .mf-hero b{font-size:15px}
+}
+@media (max-width:400px){
+  html.mf #cbmtot .tot td{font-size:8.5px;padding:4px 3px}
+  html.mf #cbmtot .tot td b{font-size:13.5px}
 }
 @media (max-height:760px){
   html.mf #hdr{padding:5px 10px 6px;margin-bottom:6px}
@@ -2507,6 +2593,29 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
   D.documentElement.classList.add('mf');
   D.body.dataset.mfsub = 'proj';
 
+  /* ---- frame height + installed mode ---------------------------------- *
+   * The screen must equal the visible viewport on every phone, including
+   * when a browser toolbar collapses or an installed app draws under the
+   * status bar. Measure it instead of trusting 100vh/100dvh alone.        */
+  (function frameMetrics() {
+    var root = D.documentElement;
+    function setVH() {
+      var vv = W.visualViewport;
+      var h = Math.round(vv ? vv.height : (W.innerHeight || root.clientHeight));
+      if (h > 0) root.style.setProperty('--mf-vh', h + 'px');
+    }
+    setVH();
+    W.addEventListener('resize', setVH);
+    W.addEventListener('orientationchange', function () { setTimeout(setVH, 250); });
+    if (W.visualViewport) W.visualViewport.addEventListener('resize', setVH);
+    try {
+      var installed = W.matchMedia(
+        '(display-mode: standalone), (display-mode: fullscreen), (display-mode: minimal-ui)'
+      ).matches || W.navigator.standalone === true;
+      if (installed) root.classList.add('mf-installed');
+    } catch (e) { /* older browsers: keep the compact top inset */ }
+  })();
+
   var stepEl = $('hstep');
   function brandStep() {
     if (!stepEl) return;
@@ -2567,6 +2676,45 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
   });
 
   var openName = null, lastFocus = null;
+
+  /* ---- wide result tables: label, then stack when they cannot fit ----- *
+   * The original tables keep every value. If the sheet is narrower than
+   * the table, each row becomes a labelled card instead of clipping the
+   * right-hand columns. The decision is measured, never guessed, so a
+   * tablet keeps the plain table.                                        */
+  var fitPending = null;
+  function labelDetailTable(t) {
+    var rows = all('tr', t);
+    if (!rows.length) return;
+    var heads = all('th', rows[0]).map(function (th) { return th.textContent.trim(); });
+    if (!heads.length) return;
+    rows[0].classList.add('mf-head');
+    all('td', t).forEach(function (td) {
+      if (td.colSpan > 1) return;
+      var idx = Array.prototype.indexOf.call(td.parentNode.children, td);
+      var label = heads[idx] || '';
+      if (label) td.setAttribute('data-label', label);
+      td.classList.toggle('mf-key', label === 'Container' || label === 'Cargo line');
+    });
+  }
+  function fitDetailTables() {
+    if (openName !== 'details' || !VIEWS.details) return;
+    all('table', VIEWS.details).forEach(function (t) {
+      t.classList.remove('mf-stack');
+      var sc = closest(t, '.scroll');
+      if (!sc) return;
+      if (sc.scrollWidth > sc.clientWidth + 2) {
+        labelDetailTable(t);
+        t.classList.add('mf-stack');
+      }
+    });
+  }
+  function laterFit() {
+    if (fitPending) clearTimeout(fitPending);
+    fitPending = setTimeout(function () { fitPending = null; fitDetailTables(); }, 70);
+  }
+  on(W, 'resize', laterFit);
+
   function openSheet(name, trigger) {
     if (!VIEWS[name]) return;
     lastFocus = trigger || D.activeElement;
@@ -2576,6 +2724,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
     openName = name;
     if (name === 'cargo') refreshEditor();
     if (name === 'manage') renderRecents();
+    if (name === 'details') laterFit();
     try { sheet.focus({ preventScroll: true }); } catch (e) { }
   }
   function closeSheet() {
@@ -3093,8 +3242,11 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
       b.onclick = function () {
         all('[data-dtab]', VIEWS.details).forEach(function (x) { x.classList.toggle('on', x === b); });
         all('.mf-dview', VIEWS.details).forEach(function (v) { v.classList.toggle('on', v.dataset.dview === b.dataset.dtab); });
+        laterFit();
       };
     });
+    /* results are re-rendered by the app; re-label after every render */
+    new MutationObserver(laterFit).observe(VIEWS.details, { childList: true, subtree: true });
 
     /* Fixed-height result area that keeps the chart, stats and dock all visible. */
     if (out) {
