@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="format-detection" content="telephone=no"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>3D Load Calculator</title>
-<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="3D Load Calc"><meta name="theme-color" content="#1f6f78">
-<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%223D%20Load%20Calculator%22%2C%22short_name%22%3A%22LoadCalc%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f7f9fa%22%2C%22theme_color%22%3A%22%231f6f78%22%2C%22description%22%3A%22Offline%203D%20Container%20and%20Truck%20Load%20Calculator%22%7D">
+<title>3D Load Calculator - MobileFit</title>
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="MobileFit"><meta name="theme-color" content="#1f6f78">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%223D%20Load%20Calculator%20-%20MobileFit%22%2C%22short_name%22%3A%22MobileFit%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f7f9fa%22%2C%22theme_color%22%3A%22%231f6f78%22%2C%22description%22%3A%22Offline%203D%20Container%20and%20Truck%20Load%20Calculator%22%7D">
 <script>/* jsPDF 2.5.1 (MIT) - embedded for offline use; licence notice is kept inside the library header */
 /** @license
  *
@@ -571,330 +571,471 @@ button.tile:not(.on) svg{opacity:.4}button.tile.mix{border-color:var(--accent);b
 .pkline{gap:14px 24px}.pkinfo{flex:0 0 190px}.pkld{margin-top:14px;border-top:1px dashed var(--line);padding-top:12px}
 .pklab{display:block;font-size:.78rem;font-weight:600;margin-top:8px}.pklab select{display:block;margin-top:2px;width:100%;min-height:36px}
 @media(max-width:700px){#hname{font-size:1.05rem}#sumbar{display:none}.pkline{gap:10px}.pkinfo{flex:1 1 100%;min-width:0}.pkrow{flex-wrap:wrap}.pkld .pkrow{justify-content:center}button.tile[data-ld]{width:calc(50% - 4px);min-width:0}#csel{max-width:100%!important;width:100%}}
-
+</style><style id="mf-layer">
+/* Built from 3D_Load_Calculator_v2.html (sha256 471c001dc816). Presentation layer only. */
 /* ==========================================================================
-   MOBILE-FIT LAYER — v2 · "calm shell"
-   Additive and non-destructive. Colour, spacing and layout only.
-   No JavaScript, formula, storage key or calculation is touched.
-   Delete this block and the two <details> folds to return to the original.
+   MOBILEFIT LAYER — v1 · "eight screens, one thumb"
+   Additive presentation layer for 3D Load Calculator - MobileFit.
+
+   What it does
+   ------------
+   • Rebuilds the four workflow steps into eight phone screens:
+     Equipment, Projects, Cargo, Cargo editor, Add cargo,
+     Load plan, Load details, Export.
+   • Turns nav#steps into a fixed bottom tab bar (Projects/Cargo/Load/Export).
+   • Puts every long secondary block in a bottom sheet with its own content.
+   • Guarantees the tab bar never covers content: main is sized to the viewport
+     minus the bar, and every screen is a flex column, so docks sit above the bar.
+
+   What it does NOT do
+   -------------------
+   No formula, packing rule, storage key, export or handler is changed here.
+   All ids from the original remain in the document. This file is styling only;
+   the small navigation script is appended separately and never touches maths.
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   1. PALETTE — quiet, professional, low-saturation slate & teal.
-      Readability checked: ink on panel 14.6:1, mute on panel 4.7:1,
-      white on accent 5.6:1.
+   1. PALETTE
    -------------------------------------------------------------------------- */
 :root{
-  --bg:#f1f4f6; --panel:#ffffff; --ink:#1c2a33; --mute:#64757f;
-  --line:#e4e9ee; --accent:#2f6f76; --accent2:#255a61;
-  --sig:#9a6b35; --bad:#a9453c; --ok:#3c7a5e; --chart:#4a7fae; --view:#f3f6f8;
-  --on-accent:#ffffff;
+  --bg:#e9eef1; --panel:#ffffff; --ink:#0d1f2b; --mute:#5d6b78;
+  --line:#dde5ea; --accent:#0f6e7a; --accent2:#0b5560; --on-accent:#ffffff;
+  --ok:#1f8a5f; --amb:#b8791f; --bad:#b3261e; --chart:#3f6f9e; --view:#f3f6f8;
+  --mf-top:#123b47; --mf-top-2:#0e303a; --mf-top-mute:#9fc3cb;
+  --mf-navh:58px; --mf-r:14px; --mf-gap:8px;
+}
+:root[data-theme="dark"]{
+  --bg:#0e171d; --panel:#16222a; --ink:#e6eef2; --mute:#9babb5;
+  --line:#263842; --accent:#6fb4ba; --accent2:#8acbd0; --on-accent:#08161a;
+  --ok:#5fb98a; --amb:#d9a55a; --bad:#e08a80; --chart:#7fb0dd; --view:#0b141a;
+  --mf-top:#0b2b34; --mf-top-2:#08222a; --mf-top-mute:#8fb6bf;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --bg:#111a20; --panel:#18242b; --ink:#e2eaef; --mute:#93a5b0;
-    --line:#27353f; --accent:#6fb4ba; --accent2:#86c6cb;
-    --sig:#d9a55a; --bad:#e08a80; --ok:#5fb98a; --chart:#7fb0dd; --view:#0f171c;
-    --on-accent:#0c1418;
+    --bg:#0e171d; --panel:#16222a; --ink:#e6eef2; --mute:#9babb5;
+    --line:#263842; --accent:#6fb4ba; --accent2:#8acbd0; --on-accent:#08161a;
+    --ok:#5fb98a; --amb:#d9a55a; --bad:#e08a80; --chart:#7fb0dd; --view:#0b141a;
+    --mf-top:#0b2b34; --mf-top-2:#08222a; --mf-top-mute:#8fb6bf;
   }
 }
-:root[data-theme="dark"]{
-  --bg:#111a20; --panel:#18242b; --ink:#e2eaef; --mute:#93a5b0;
-  --line:#27353f; --accent:#6fb4ba; --accent2:#86c6cb;
-  --sig:#d9a55a; --bad:#e08a80; --ok:#5fb98a; --chart:#7fb0dd; --view:#0f171c;
-  --on-accent:#0c1418;
-}
 
-/* Anything that sits ON the accent colour must use the readable foreground
-   for that theme. White on the light-teal dark-mode accent is only 2:1. */
-button.primary,
-.cgt thead th,
-.tot th,
-.hlp:hover,.hlp:focus-visible,.hlp.on,
-.tile .tk{color:var(--on-accent)}
-/* the duplicate / delete chips sit ON the cargo header, same rule */
-.cgt thead th .cx,
-.cgt thead th .cd{color:var(--on-accent);
-  border-color:color-mix(in srgb,var(--on-accent) 70%,transparent)}
-
-/* --------------------------------------------------------------------------
-   2. FOLD ROWS — the two long sections become one-line disclosures.
-      Native <details>, no JavaScript. Everything inside still works.
-   -------------------------------------------------------------------------- */
-details.mfd{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:0 12px}
-details.mfd>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;
-  min-height:46px;font-weight:650;font-size:13.5px;color:var(--ink)}
-details.mfd>summary::-webkit-details-marker{display:none}
-details.mfd>summary::after{content:"";width:7px;height:7px;margin-left:auto;flex:none;
-  border-right:1.6px solid var(--mute);border-bottom:1.6px solid var(--mute);
-  transform:rotate(45deg) translateY(-2px);transition:transform .18s ease}
-details.mfd[open]>summary::after{transform:rotate(225deg) translateY(-2px)}
-details.mfd[open]>summary{border-bottom:1px solid var(--line);margin-bottom:10px}
-details.mfd>.mfd-x{display:none}
-
-/* --------------------------------------------------------------------------
-   3. THE PHONE SHELL — every screen sized to one 6.7" viewport
-   -------------------------------------------------------------------------- */
-@media (max-width:700px){
-
-  html{overflow-x:hidden}
-  body{font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-  main{padding:6px 10px calc(10px + env(safe-area-inset-bottom,0px))}
-
-  /* ---- app bar ---------------------------------------------------------- */
-  #hdr{height:50px;padding:4px;margin:0 0 7px;gap:2px;border-radius:14px;
-       border:1px solid var(--line);background:var(--panel);box-shadow:none}
-  #hdr button.navb,#hdr button.thm{width:34px;height:34px;min-height:34px;padding:0;
-       border:0;background:transparent;color:var(--mute);font-size:1rem}
-  #hdr button.navb{font-size:1.5rem;line-height:1;color:var(--accent)}
-  #htitle{text-align:left;padding:0 2px}
-  .hstep{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;
-         font-weight:600;color:var(--mute);line-height:1.3}
-  #hname{font-size:16px;font-weight:650;line-height:1.25;margin:0;
-         letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-
-  /* ---- step tabs as a segmented control --------------------------------- */
-  nav#steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;
-       padding:3px;margin:0 0 9px;background:color-mix(in srgb,var(--ink) 5%,var(--panel));
-       border:1px solid var(--line);border-radius:12px}
-  nav#steps button{min-height:36px;padding:4px 2px;border:0;border-radius:9px;
-       background:transparent;color:var(--mute);font-size:12.5px;font-weight:600;
-       letter-spacing:-.01em;transition:background .15s,color .15s}
-  nav#steps button.on{background:var(--panel);color:var(--ink);font-weight:700;
-       box-shadow:0 1px 3px rgba(16,24,32,.10);border:0}
-
-  /* ---- cards and type --------------------------------------------------- */
-  .card{padding:12px;border-radius:14px;margin-bottom:9px;box-shadow:none;
-        border:1px solid var(--line)}
-  .card>h2{font-size:11px;text-transform:uppercase;letter-spacing:.08em;
-        color:var(--mute);font-weight:700;margin:0 0 9px}
-  .note{font-size:12.5px;line-height:1.45}
-  label{font-size:12px;font-weight:600;letter-spacing:.005em;margin-bottom:4px}
-  input,select,textarea{min-height:42px;border-radius:10px;padding:7px 10px;
-        font-size:16px;background:var(--panel)}
-  select{padding-right:26px}
-  button{border-radius:10px;text-wrap:balance}
-  button.primary{min-height:44px;font-weight:650;letter-spacing:.005em;color:var(--on-accent)}
-  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-  #custeq.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .row{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:stretch;margin-top:9px}
-  .row>.note{grid-column:1/-1;margin:0}
-  .row>button{width:100%}
-  .navrow{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;margin:10px 0 0}
-  .navrow button{min-height:46px;padding:8px;font-size:13.5px;flex:none}
-  .navrow button.primary{grid-column:auto}
-  #p0 .navrow{grid-template-columns:1fr}
-
-  /* ---- STEP 1 · Setup --------------------------------------------------- */
-  #p0 .card{padding:9px 11px;margin-bottom:7px}
-  #p0 .card>h2{margin-bottom:6px}
-  #p0 .note{margin:3px 0 0;font-size:10.5px;line-height:1.32}
-  #p0 .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  #p0 .card>.grid:not(#custeq)>div:first-child{grid-column:1/-1}
-  #p0 #custeq.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  #p0 .grid input,#p0 .grid select{font-size:14px;min-height:40px;padding:6px 8px}
-  #p0 .row{margin-top:8px}
-  #p0 .row>button{font-size:14px;padding:8px 10px}
-  details.card>summary{font-size:12.5px;font-weight:650;min-height:22px}
-  details.card{padding:10px 12px;margin-bottom:9px}
-
-  /* ---- STEP 2 · Cargo --------------------------------------------------- */
-  #p1 .card{padding:9px 10px 10px}
-  #p1 .card>h2{margin-bottom:7px}
-  .swipehint{display:none}
-  #rows{overflow:visible}
-  .cgt{min-width:0;table-layout:fixed;margin-bottom:6px}
-  .cgt th,.cgt td{padding:2px;border-color:var(--line)}
-  .cgt thead th{font-size:11px;padding:5px 2px;letter-spacing:-.01em}
-  .cgt tbody th{width:30%;font-size:10.5px;padding:2px 5px;font-weight:600}
-  .cgt tbody th:first-child,.cgt thead th:first-child{width:30%;min-width:0;box-shadow:none}
-  .cgt input,.cgt select{min-height:27px;font-size:12.5px;padding:1px 3px;border-radius:6px}
-  .cgt input[type=color]{height:26px;min-width:0;padding:1px}
-  .cgt .cb2{font-size:10px;line-height:1.2}
-  .cgt .cx,.cgt .cd{min-height:22px;min-width:22px;padding:0 4px;font-size:10px;line-height:1}
-  .cgt .colact{gap:2px;margin:0}
-  .tot{margin:5px 0 6px}
-  .tot th{font-size:10.5px;padding:4px 2px;letter-spacing:.02em}
-  .tot td{font-size:11px;padding:3px 2px}
-  #preview{margin-top:6px;padding:5px 9px;font-size:11px;border-radius:10px}
-  #preview .bar{height:4px;margin-top:3px}
-  #p1 .row{grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
-  #p1 .row>button{min-height:34px;font-size:10.5px;padding:2px 2px;line-height:1.15}
-  #p1 .row>.note{font-size:10.5px}
-  #p1 .card>p.note{font-size:10.5px;line-height:1.3;margin:4px 0 0;
-       display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
-  #p1 .swipehint{display:none}
-  #packcard{margin-top:0}
-
-  /* ---- STEP 3 · 3D View ------------------------------------------------ */
-  #p2 .card{padding:9px 11px}
-  #p2 .stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:8px}
-  .stat{padding:4px 8px;min-height:0;border-radius:10px;background:var(--panel)}
-  .stat b{font-size:16px;line-height:1.15;margin-bottom:1px;letter-spacing:-.02em}
-  .stat span{font-size:11px;line-height:1.25}
-  .bar{height:5px;margin-top:4px}
-  #vw .row{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin:0 0 6px}
-  #vw .row>label{margin:0;font-size:12px}
-  #csel{min-height:38px;font-size:14px}
-  #cv,#gl{height:138px;min-height:0;aspect-ratio:auto;border-radius:10px}
-  #glabels .gl{font-size:9px;padding:1px 4px;border-radius:4px}
-  #glabels .glt{font-size:11px}#glabels .glh{font-size:10px}
-  #zbar{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;margin:7px 0 0}
-  #zbar>#zfit{grid-column:span 4}
-  #zbar>#zrst,#zbar>#zfull{grid-column:span 3}
-  #zbar>#gmode,#zbar>#gedit{grid-column:span 3}
-  #zbar button{min-width:0;min-height:32px;font-size:11px;padding:3px 2px}
-  #zbar .note{grid-column:1/-1;font-size:10.5px;line-height:1.3;margin:1px 0 0}
-  #vw #rbar.row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin:6px 0 0}
-  #vw #rbar>button,#vw #rbar>.chk{min-height:30px;min-width:0;font-size:10px;padding:2px 1px;width:100%}
-  #vw #rbar>#rl,#vw #rbar>#rr{font-size:12.5px;letter-spacing:.02em}
-  #vw #rbar>.chk{justify-content:center;gap:3px;margin:0}
-  #vw #rbar>.chk input{width:14px;height:14px;min-height:14px}
-  #vw .row>input[type=range]{flex:1 1 72px;min-width:0;max-width:100%!important;min-height:24px}
-  #vw .row>.chk{min-height:30px;font-size:11px}
-  #p2 #out>p.note{font-size:10.5px;line-height:1.3;margin:5px 0 0;
-       display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-  #zbar .note{display:none}
-  #plancard{margin-top:9px;padding:0 12px}
-  #plancard>summary{min-height:40px;font-size:12.5px}
-
-  /* ---- STEP 4 · Export ------------------------------------------------- */
-  #p3 .card{padding:12px}
-  #p3 .row{grid-template-columns:1fr 1fr}
-  #p3 #out3>.row>select{grid-column:1/-1;width:100%!important}
-  #p3 #out3>.row>button{font-size:13.5px}
-  #p3 details.card>summary{font-size:12.5px}
-  #p3 .colprevtab,input#rep_ship{font-size:14px}
-
-  /* ---- control matrix: one tidy 3-column grid for view + camera -------- */
-  #zbar{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:5px}
-  #vw #rbar.row{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px}
-  #zbar button,#vw #rbar>button,#vw #rbar>.chk{width:100%;min-width:0}
-  #vw #rbar.row{border-top:1px solid var(--line);padding-top:5px;margin-top:5px!important}
-
-  /* ---- step 4: rows must not stretch to their tallest neighbour -------- */
-  #p3 .row{align-items:start;grid-auto-rows:min-content}
-  #p3 .row>button{min-height:44px}
-
-  /* ---- native control accents ----------------------------------------- */
-  input[type=range]{accent-color:var(--accent)}
-  input[type=checkbox],input[type=radio]{accent-color:var(--accent)}
-  ::selection{background:color-mix(in srgb,var(--accent) 22%,transparent)}
-
-  /* ---- long helper copy: hide rather than clip mid-sentence ----------- */
-  #p1 .card>p.note{display:none}
-  #p2 #out>p.note{display:none}
-
-  /* ---- global touch hygiene -------------------------------------------- */
-  button,a,input,select,textarea,[role="button"]{-webkit-tap-highlight-color:transparent}
-  .hlp{width:22px;height:22px;position:relative}
-  .hlp::after{content:"";position:absolute;inset:-9px;border-radius:50%}
-  input,select,textarea{scroll-margin:80px}
-  *{scrollbar-width:thin}
-  ::-webkit-scrollbar{height:6px;width:6px}
-  ::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+html.mf, html.mf body{height:100%}
+html.mf *{box-sizing:border-box}
+html.mf body{
+  margin:0;overflow:hidden;background:#dfe6ea;color:var(--ink);
+  font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  -webkit-text-size-adjust:100%;
 }
 
 /* --------------------------------------------------------------------------
-   4. SMALLER PHONES (6.1" class, ≤410px wide)
-      A second, tighter pass. Nothing is hidden that the user needs to act
-      on; only helper paragraphs and decoration lose height.
+   2. PHONE FRAME — main ends where the tab bar begins. No overlap, ever.
+   -------------------------------------------------------------------------- */
+html.mf main{
+  height:calc(100dvh - var(--mf-navh) - env(safe-area-inset-bottom,0px));
+  max-width:540px;margin:0 auto;padding:0 10px 0;
+  display:flex;flex-direction:column;overflow:hidden;background:var(--bg);
+}
+html.mf #savebanner{flex:none;margin:0 -10px 6px;border-radius:0}
+html.mf #savebanner span{font-size:11px;line-height:1.25}
+
+/* ---- app bar ------------------------------------------------------------ */
+html.mf #hdr{
+  flex:none;position:relative;top:auto;z-index:30;
+  display:flex;align-items:center;gap:4px;
+  margin:0 -10px var(--mf-gap);padding:7px 10px 8px;
+  background:var(--mf-top);background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.04) 0 3px,transparent 3px 9px);
+  border:0;border-radius:0 0 16px 16px;box-shadow:0 6px 16px rgba(13,31,43,.18);
+  color:#fff;
+}
+html.mf #htitle{flex:1;min-width:0;text-align:left;padding:0 2px}
+html.mf #hstep{font-size:9.5px;line-height:1.2;letter-spacing:.09em;text-transform:uppercase;color:var(--mf-top-mute);font-weight:700}
+html.mf #hname{font-size:16px;line-height:1.2;color:#fff;margin:1px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.mf #hdr button.navb,
+html.mf #hdr button.thm{
+  width:34px;height:34px;min-height:34px;padding:0;flex:none;
+  border:0;border-radius:10px;background:rgba(255,255,255,.10);
+  color:#fff;font-size:1.35rem;line-height:1;
+}
+html.mf #hdr button.thm{font-size:1rem;color:var(--mf-top-mute)}
+html.mf #hdr button.navb:active,
+html.mf #hdr button.thm:active{background:rgba(255,255,255,.22)}
+
+/* ---- bottom tab bar ----------------------------------------------------- */
+html.mf nav#steps{
+  position:fixed;left:50%;bottom:0;transform:translateX(-50%);
+  width:min(100%,560px);height:calc(var(--mf-navh) + env(safe-area-inset-bottom,0px));
+  margin:0;padding:5px 8px calc(5px + env(safe-area-inset-bottom,0px));
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;
+  background:var(--panel);border:1px solid var(--line);border-bottom:0;
+  border-radius:16px 16px 0 0;box-shadow:0 -8px 24px rgba(13,31,43,.10);
+  z-index:120;
+}
+html.mf nav#steps button{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  min-height:46px;padding:2px 1px;border:0;border-radius:10px;background:transparent;
+  color:var(--mute);font:inherit;font-size:10.5px;font-weight:650;letter-spacing:.01em;
+  white-space:nowrap;overflow:hidden;
+}
+html.mf nav#steps button svg{
+  width:21px;height:21px;flex:none;stroke:currentColor;fill:none;
+  stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;
+}
+html.mf nav#steps button.on{
+  color:var(--accent);background:color-mix(in srgb,var(--accent) 9%,transparent);
+}
+html.mf nav#steps button:active{transform:scale(.97)}
+
+/* toasts must clear the bar */
+html.mf #toast{bottom:calc(var(--mf-navh) + env(safe-area-inset-bottom,0px) + 10px);z-index:500}
+
+/* --------------------------------------------------------------------------
+   3. SHARED SCREEN PIECES
+   -------------------------------------------------------------------------- */
+html.mf .pg.on{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;padding-bottom:2px}
+html.mf .pg .card{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--mf-r);
+  padding:10px 12px;margin:0 0 var(--mf-gap);box-shadow:0 1px 2px rgba(13,31,43,.05);
+}
+html.mf .pg .card>h2{font-size:12px;margin:0 0 6px;color:var(--mute);text-transform:uppercase;letter-spacing:.07em}
+html.mf .pg .card>p.note{font-size:10.5px;line-height:1.3;margin:4px 0 0}
+html.mf .pg .navrow{display:none!important}
+html.mf #p0 #lrcard{display:none}
+html.mf #empty,html.mf #empty3{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+}
+html.mf .pg .note{font-size:10.5px}
+html.mf .pg .swipehint{display:none!important}
+html.mf #p2>.card>h2,
+html.mf #p3>.card>h2{display:none}
+html.mf #p1>.card>h2{display:none}
+
+html.mf .mf-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-bottom:8px}
+html.mf .mf-fill{flex:1;min-height:0;display:flex;flex-direction:column}
+
+html.mf .mf-dock{flex:none;display:flex;gap:7px;padding:4px 0 2px;margin-top:auto}
+html.mf #mf-proj>.mf-dock,html.mf #mf-eq>.mf-dock{position:relative;padding-top:9px;margin-top:2px}
+html.mf #mf-proj>.mf-dock::before,html.mf #mf-eq>.mf-dock::before{
+  content:"";position:absolute;left:0;right:0;top:0;height:1px;background:var(--line);
+}
+html.mf .mf-dock button{
+  flex:1;min-height:46px;padding:6px 8px;border-radius:13px;font:inherit;
+  font-size:13px;font-weight:750;border:1px solid var(--line);background:var(--panel);color:var(--ink);
+}
+html.mf .mf-dock button.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+html.mf .mf-dock button.slim{flex:0 0 46px;font-size:17px;padding:0}
+html.mf .mf-dock button:active{transform:scale(.985)}
+
+html.mf .mf-seg{display:grid;grid-template-columns:1fr 1fr;gap:3px;flex:none;margin-bottom:var(--mf-gap);padding:3px;border-radius:12px;background:color-mix(in srgb,var(--ink) 8%,var(--bg))}
+html.mf .mf-seg button{min-height:36px;border:0;border-radius:9px;background:transparent;color:var(--mute);font:inherit;font-size:12.5px;font-weight:700}
+html.mf .mf-seg button.on{background:var(--panel);color:var(--ink);box-shadow:0 1px 3px rgba(13,31,43,.14)}
+
+/* rows that open a sheet */
+html.mf .mf-row{display:flex;align-items:center;gap:8px;width:100%;min-height:46px;padding:7px 2px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);font:inherit;text-align:left}
+html.mf .mf-row:last-child{border-bottom:0}
+html.mf .mf-row .t{flex:1;min-width:0}
+html.mf .mf-row .t b{display:block;font-size:12.5px;font-weight:700}
+html.mf .mf-row .t small{display:block;font-size:10.5px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.mf .mf-row .v{font-size:11px;font-weight:700;color:var(--accent);white-space:nowrap}
+html.mf .mf-row .chev{color:var(--mute);font-size:16px;line-height:1}
+
+/* chips / segmented controls built from the real selects */
+html.mf .mf-chips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:2px 0 5px}
+html.mf .mf-chip{
+  border:1.5px solid var(--line);background:var(--panel);color:var(--ink);
+  border-radius:11px;padding:6px 8px;font:inherit;font-size:11.5px;font-weight:700;line-height:1.2;
+  text-align:left;min-height:46px;display:flex;flex-direction:column;justify-content:center;overflow:hidden;
+}
+html.mf .mf-chip span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+html.mf .mf-chip small{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;font-size:9.5px;font-weight:500;color:var(--mute);margin-top:2px}
+html.mf .mf-chip.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 11%,var(--panel))}
+html.mf .mf-seg2{display:flex;gap:2px;padding:2px;border-radius:10px;background:color-mix(in srgb,var(--ink) 8%,var(--bg));margin:2px 0 0}
+html.mf .mf-seg2 button{flex:1;min-height:32px;border:0;border-radius:8px;background:transparent;color:var(--mute);font:inherit;font-size:11px;font-weight:700}
+html.mf .mf-seg2 button.on{background:var(--panel);color:var(--ink);box-shadow:0 1px 3px rgba(13,31,43,.14)}
+html.mf .mf-sr{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* --------------------------------------------------------------------------
+   4. STEP 1 · PROJECTS + EQUIPMENT
+   -------------------------------------------------------------------------- */
+html.mf #mf-proj,html.mf #mf-eq{display:none;flex:1;min-height:0;flex-direction:column}
+html.mf body[data-mfsub="proj"] #mf-proj{display:flex}
+html.mf body[data-mfsub="eq"] #mf-eq{display:flex}
+
+html.mf .mf-hero{
+  background:linear-gradient(135deg,var(--mf-top),var(--mf-top-2));color:#fff;
+  border:0;border-radius:var(--mf-r);padding:12px 14px;margin-bottom:var(--mf-gap);
+  position:relative;overflow:hidden;
+}
+html.mf .mf-hero small{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--mf-top-mute);font-weight:700}
+html.mf .mf-hero b{display:block;font-size:16px;margin:2px 0 1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.mf .mf-hero span{font-size:11px;color:#cfe3e8}
+html.mf .mf-hero .go{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:10px;border:0;background:rgba(255,255,255,.14);color:#fff;font-size:17px}
+
+html.mf .mf-recents{display:flex;flex-direction:column;gap:6px}
+html.mf .mf-recent{
+  display:flex;align-items:center;gap:9px;width:100%;padding:8px 2px;border:0;border-bottom:1px solid var(--line);
+  background:transparent;color:var(--ink);font:inherit;text-align:left;
+}
+html.mf .mf-recent:last-child{border-bottom:0}
+html.mf .mf-recent .ico{width:30px;height:30px;border-radius:9px;flex:none;background:color-mix(in srgb,var(--accent) 10%,var(--panel));color:var(--accent);display:grid;place-items:center;font-size:14px}
+html.mf .mf-recent .t{flex:1;min-width:0}
+html.mf .mf-recent .t b{display:block;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.mf .mf-recent .t small{display:block;font-size:10.5px;color:var(--mute)}
+html.mf .mf-recent .when{font-size:9.5px;color:var(--mute);white-space:nowrap}
+
+html.mf .mf-kv{display:flex;justify-content:space-between;gap:10px;padding:4px 0;font-size:11px;border-bottom:1px solid var(--line)}
+html.mf .mf-kv:last-child{border-bottom:0}
+html.mf .mf-kv b{font-variant-numeric:tabular-nums}
+html.mf #p0 .row{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+html.mf #p0 .row button{width:100%}
+
+/* --------------------------------------------------------------------------
+   5. STEP 2 · CARGO LIST + EDITOR
+   -------------------------------------------------------------------------- */
+html.mf #p1>.card{display:flex;flex-direction:column;flex:1;min-height:0;padding:8px;margin:0}
+html.mf #mf-cargo-top{flex:none;margin-bottom:6px}
+html.mf #cbmtot table.tot{display:block;width:100%;border-collapse:separate;border-spacing:0;margin:0}
+html.mf #cbmtot .tot tbody{display:block}
+html.mf #cbmtot .tot th{display:none}
+html.mf #cbmtot .tot tr:last-child{display:flex;gap:4px}
+html.mf #cbmtot .tot td{
+  flex:1;border:0;border-radius:10px;background:color-mix(in srgb,var(--ink) 5%,var(--bg));
+  padding:5px 4px;text-align:center;font-size:9.5px;line-height:1.25;color:var(--mute);
+}
+html.mf #cbmtot .tot td b{display:block;font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums}
+html.mf #preview{font-size:10px;line-height:1.3;color:var(--mute);margin-top:5px}
+html.mf #preview b{color:var(--ink)}
+html.mf #preview .bar{height:5px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:4px}
+html.mf #preview .bar i{display:block;height:100%;background:var(--ok)}
+
+html.mf #mf-lines{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:1px 0 2px}
+html.mf #p1>.card>.mf-row{flex:none;min-height:42px;margin-top:2px;border-bottom:0}
+html.mf .mf-line{
+  display:flex;align-items:center;gap:8px;background:var(--panel);
+  border:1px solid var(--line);border-radius:12px;padding:7px 8px;margin-bottom:6px;cursor:pointer;
+}
+html.mf .mf-line:active{transform:scale(.995)}
+html.mf .mf-dot{width:24px;height:24px;border-radius:8px;flex:none;border:1px solid rgba(13,31,43,.14);background:var(--line)}
+html.mf .mf-line .t{flex:1;min-width:0}
+html.mf .mf-line .t b{display:block;font-size:12.5px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.mf .mf-line .t small{display:block;font-size:10px;line-height:1.3;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.mf .mf-line .q{font-size:14px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;min-width:26px;text-align:right}
+html.mf .mf-line .ic{width:30px;height:30px;flex:none;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--mute);font-size:12px;padding:0}
+html.mf .mf-line .ic:active{background:var(--bg)}
+html.mf .mf-empty{text-align:center;color:var(--mute);font-size:11.5px;padding:18px 8px;border:1px dashed var(--line);border-radius:12px}
+
+html.mf #p1 .row{display:none!important}
+html.mf #p1>.card>.note{display:none}
+html.mf #msg{font-size:10.5px;margin:4px 0 0}
+
+/* editor: one real column of the existing table at a time */
+html.mf #mf-s-cargo #rows{overflow:visible}
+html.mf #mf-s-cargo table.cgt{min-width:0;width:100%;border-collapse:collapse;margin:0 0 8px}
+html.mf #mf-s-cargo table.cgt.mf-t-off{display:none}
+html.mf #mf-s-cargo table.cgt thead tr{display:block}
+html.mf #mf-s-cargo table.cgt thead th{border:0;padding:2px 0 8px;background:transparent;color:var(--ink)}
+html.mf #mf-s-cargo table.cgt thead th:first-child{display:none}
+html.mf #mf-s-cargo table.cgt thead th{font-size:13px;text-align:left}
+html.mf #mf-s-cargo table.cgt thead{display:none}
+html.mf #mf-s-cargo table.cgt tbody tr{display:grid;grid-template-columns:minmax(86px,38%) 1fr;align-items:center;gap:8px;border-bottom:1px solid var(--line);padding:3px 0}
+html.mf #mf-s-cargo table.cgt tbody tr:last-child,
+html.mf #mf-s-cargo table.cgt tbody tr:nth-last-child(2){display:none}
+html.mf #mf-s-cargo table.cgt tbody th{position:static;width:auto;border:0;background:transparent;box-shadow:none;text-align:left;font-size:11px;line-height:1.25;color:var(--mute);padding:4px 0}
+html.mf #mf-s-cargo table.cgt tbody td{border:0;padding:2px 0;text-align:left}
+html.mf #mf-s-cargo table.cgt tbody td input:not([type=number]):not([type=color]){text-align:left}
+html.mf #mf-s-cargo table.cgt tbody td input[type=number]{text-align:right}
+html.mf #mf-s-cargo table.cgt tbody td input[type=number],
+html.mf #mf-s-cargo table.cgt tbody td input:not([type]){
+  width:100%;min-height:38px;border:1px solid var(--line);border-radius:9px;padding:4px 8px;background:var(--panel);color:var(--ink);font:inherit;font-size:16px;
+}
+html.mf #mf-s-cargo table.cgt tbody td input[type=color]{width:44px;height:32px;padding:2px;border:1px solid var(--line);border-radius:9px;background:var(--panel)}
+html.mf #mf-s-cargo table.cgt.mf-c0 tr>*:nth-child(n+2):not(:nth-child(2)),
+html.mf #mf-s-cargo table.cgt.mf-c1 tr>*:nth-child(n+2):not(:nth-child(3)),
+html.mf #mf-s-cargo table.cgt.mf-c2 tr>*:nth-child(n+2):not(:nth-child(4)){display:none}
+html.mf .mf-linechips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+html.mf .mf-linechips button{min-width:38px;min-height:32px;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--mute);font:inherit;font-size:11px;font-weight:700;padding:2px 7px}
+html.mf .mf-linechips button.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 11%,var(--panel));color:var(--ink)}
+
+/* add-cargo sheet */
+html.mf .mf-row .ico{
+  width:28px;height:28px;border-radius:8px;flex:none;display:grid;place-items:center;
+  background:color-mix(in srgb,var(--accent) 10%,var(--panel));color:var(--accent);font-size:13px;
+}
+html.mf #mf-s-add #xldrop,
+html.mf #mf-s-add #csvbox{margin:10px 0 0;padding:10px}
+html.mf #mf-s-add #xldrop b{display:block;font-size:11.5px;line-height:1.3}
+html.mf #mf-s-add #csvtxt{width:100%;min-height:88px;font-size:13px}
+html.mf .mf-flat{border:0;padding:0;margin:10px 0 0;background:transparent;box-shadow:none}
+html.mf .mf-flat>h2{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--mute);margin:0 0 5px}
+html.mf .mf-flat .row{display:flex;flex-direction:column;gap:6px;margin:6px 0}
+html.mf .mf-flat .row select,
+html.mf .mf-flat .row button{width:100%;min-height:40px}
+html.mf .mf-flat .chips{display:flex;flex-wrap:wrap;gap:5px}
+
+/* --------------------------------------------------------------------------
+   6. STEP 3 · LOAD PLAN + DETAILS
+   -------------------------------------------------------------------------- */
+html.mf #p2>.card{display:flex;flex-direction:column;flex:1;min-height:0;padding:7px;margin:0}
+html.mf #out{position:relative;flex:1 1 auto;min-height:0;overflow:hidden}
+html.mf #out>p.note{display:none!important}
+html.mf .mf-out-inner{
+  position:absolute;inset:0;display:flex;flex-direction:column;gap:6px;overflow:hidden;
+}
+html.mf .mf-out-inner>#stale2{flex:none;order:0}
+html.mf .mf-out-inner>#vw{flex:1 1 auto;min-height:0;order:1;display:flex;flex-direction:column;border-radius:12px;overflow:hidden;background:var(--view);border:1px solid var(--line)}
+html.mf .mf-out-inner>#stats{flex:none;order:2}
+
+html.mf #vw{position:relative}
+html.mf #vw>#cv{display:block;width:100%!important;height:auto!important;aspect-ratio:4/3;background:var(--view);margin:auto 0;flex:none}
+html.mf #vw>#glwrap{margin:auto 0;flex:none}
+html.mf #vw>div.row:first-child{flex:none;margin:0 0 2px;padding:0 5px}
+html.mf #vw>div.row:first-child label{display:none}
+html.mf #csel{min-height:36px;font-size:12.5px;max-width:100%!important;width:100%}
+html.mf #vw>#zbar,html.mf #vw>#rbar,html.mf #vw>#ginfo,html.mf #vw>#geditbar{flex:none}
+html.mf #vw.glmode>#cv{display:none}
+html.mf #gl{width:100%;height:auto;aspect-ratio:1400/640;min-height:0;border:0;border-radius:0}
+html.mf #glabels .gl{font-size:9px;padding:1px 4px}
+html.mf #ginfo{font-size:10px;margin:3px 0;padding:5px 7px}
+html.mf #vw>#geditbar{margin:3px 0}
+html.mf #geditbar .note{font-size:9.5px;line-height:1.25}
+html.mf #zbar{gap:3px;margin:4px 0 0;padding:0 4px}
+html.mf #zbar button,#rbar button{min-width:0;min-height:30px;font-size:10px;padding:2px 7px;border-radius:8px}
+html.mf #zbar .note{display:none}
+html.mf #rbar{gap:3px;margin:3px 0 0;padding:0 4px 4px;flex-wrap:wrap}
+html.mf #rbar button{min-height:29px;font-size:9.5px;padding:2px 6px}
+html.mf #rbar label.chk{font-size:9px;gap:4px}
+html.mf #rbar .chk input{width:14px;height:14px}
+html.mf #vw>div.row:last-of-type{display:none!important}
+
+html.mf #stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin:0}
+html.mf #stats .stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 8px;text-align:center;font-size:10px;line-height:1.25;color:var(--mute)}
+html.mf #stats .stat b{display:block;font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums}
+html.mf #empty{padding:10px}
+html.mf #empty svg{width:56px;height:56px;margin-bottom:6px}
+
+/* details tabs */
+html.mf .mf-tabs{display:flex;gap:3px;padding:3px;background:color-mix(in srgb,var(--ink) 7%,var(--bg));border-radius:11px;margin-bottom:8px}
+html.mf .mf-tabs button{flex:1;min-height:34px;border:0;border-radius:8px;background:transparent;color:var(--mute);font:inherit;font-size:11px;font-weight:700;padding:2px}
+html.mf .mf-tabs button.on{background:var(--panel);color:var(--ink);box-shadow:0 1px 3px rgba(13,31,43,.14)}
+html.mf .mf-dview{display:none}
+html.mf .mf-dview.on{display:block}
+html.mf #mf-s-details .scroll{overflow-x:auto;margin:0 0 8px!important}
+html.mf #mf-s-details .plan{min-width:0;width:100%;font-size:10.5px}
+html.mf #mf-s-details .plan th,html.mf #mf-s-details .plan td{padding:4px 5px}
+html.mf #sumbar{position:static;margin:0 0 8px;font-size:10.5px;padding:6px 8px;box-shadow:none}
+html.mf #balalert{margin:0 0 8px;font-size:10.5px}
+html.mf #vw .row:last-of-type{display:none}
+html.mf #stepl{font-size:10px;margin:6px 0}
+html.mf #mf-s-details .row{gap:5px;margin:0 0 6px}
+html.mf #mf-s-details .row select{min-height:34px;font-size:12px;max-width:100%}
+html.mf #mf-s-details .row button{min-height:34px;font-size:12px}
+
+/* --------------------------------------------------------------------------
+   7. STEP 4 · EXPORT
+   -------------------------------------------------------------------------- */
+html.mf #p3>.card{display:flex;flex-direction:column;flex:0 0 auto;min-height:0;padding:8px;margin:0 0 6px}
+html.mf #out3{position:relative;flex:0 0 auto;min-height:0;margin-bottom:0}
+html.mf #out3>p.note{display:none!important}
+html.mf .mf-out3-inner{display:flex;flex-direction:column;overscroll-behavior:contain;padding:1px 1px 4px}
+html.mf .mf-gcol{display:flex;flex-direction:column;gap:6px}
+html.mf .mf-gcol select{min-height:40px;font-size:12px;width:100%}
+html.mf .mf-gcol #pdf{min-height:46px;width:100%}
+html.mf .mf-gcol #xls,html.mf .mf-gcol #pkg,html.mf .mf-gcol #dat{width:100%;min-height:42px;font-size:12px;padding:4px 6px}
+html.mf #pmsg{font-size:10px;margin:4px 0 0}
+html.mf #eqs{font-size:10px;line-height:1.35;color:var(--mute);margin:2px 0 6px}
+html.mf #stale3{margin:0 0 7px;font-size:10.5px;padding:6px 8px}
+html.mf #stale3 button{min-height:34px;font-size:11px}
+html.mf .mf-status{display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:11px;background:color-mix(in srgb,var(--ok) 10%,var(--panel));border:1px solid color-mix(in srgb,var(--ok) 40%,var(--line));font-size:11px;font-weight:700;color:var(--ink);margin-bottom:7px}
+html.mf .mf-status .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);flex:none}
+html.mf .mf-status.warn{background:color-mix(in srgb,var(--amb) 12%,var(--panel));border-color:color-mix(in srgb,var(--amb) 45%,var(--line))}
+html.mf .mf-status.warn .dot{background:var(--amb)}
+html.mf .mf-group{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px;margin-bottom:7px}
+html.mf .mf-group>h3{margin:0 0 5px;font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--mute)}
+html.mf #empty3{padding:10px}
+html.mf #empty3 svg{width:56px;height:56px;margin-bottom:6px}
+
+/* --------------------------------------------------------------------------
+   8. BOTTOM SHEETS
+   -------------------------------------------------------------------------- */
+html.mf #mf-sheetwrap{position:fixed;left:0;right:0;top:0;bottom:calc(var(--mf-navh) + env(safe-area-inset-bottom,0px));z-index:260;display:none}
+html.mf #mf-sheetwrap.on{display:block}
+html.mf .mf-veil{position:absolute;inset:0;background:rgba(13,31,43,.45);animation:mf-in .18s ease}
+html.mf .mf-sheet{
+  position:absolute;left:50%;bottom:0;
+  transform:translateX(-50%);width:min(100%,560px);max-height:calc(100% - 10px);
+  background:var(--panel);border:1px solid var(--line);border-bottom:0;border-radius:22px 22px 0 0;
+  box-shadow:0 -12px 34px rgba(13,31,43,.28);display:flex;flex-direction:column;
+  animation:mf-up .22s cubic-bezier(.2,.8,.2,1);
+}
+@keyframes mf-up{from{transform:translate(-50%,26px);opacity:.5}to{transform:translate(-50%,0);opacity:1}}
+@keyframes mf-in{from{opacity:0}to{opacity:1}}
+html.mf .mf-sheet:before{content:"";display:block;width:36px;height:4px;border-radius:3px;background:var(--line);margin:7px auto 3px;flex:none}
+html.mf .mf-sheet-head{flex:none;display:flex;align-items:center;gap:8px;padding:2px 14px 8px;border-bottom:1px solid var(--line)}
+html.mf .mf-sheet-head h2{flex:1;margin:0;font-size:14px;line-height:1.2}
+html.mf .mf-sheet-head button{width:34px;height:34px;border:0;border-radius:9px;background:color-mix(in srgb,var(--ink) 7%,var(--bg));color:var(--ink);font-size:15px;padding:0;flex:none}
+html.mf .mf-sheet-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:10px 14px 12px}
+html.mf .mf-view{display:none}
+html.mf .mf-view.on{display:block}
+html.mf .mf-sheet .note{font-size:10.5px;line-height:1.35}
+html.mf .mf-sheet h3{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--mute);margin:10px 0 5px}
+html.mf .mf-sheet #lrcard{display:none}
+html.mf .mf-sheet .lrg{margin-bottom:9px}
+html.mf .mf-sheet .lrg h3{margin:0 0 4px}
+html.mf .mf-sheet .grid.lr{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+html.mf .mf-sheet .fld{border:0;padding:0;margin:0}
+html.mf .mf-sheet .fld .fh{display:flex;align-items:center;gap:3px;min-height:16px}
+html.mf .mf-sheet .fld label{font-size:10.5px;line-height:1.2;color:var(--mute);font-weight:600}
+html.mf .mf-sheet .fld select,
+html.mf .mf-sheet .fld input{width:100%;min-height:36px;font-size:13px;margin-top:2px;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--ink);padding:3px 7px}
+html.mf .mf-sheet .fld input[type=checkbox]{min-height:0;width:16px;height:16px;margin:0}
+html.mf .mf-sheet #packcard{border:0;padding:0;margin:0;box-shadow:none;background:transparent}
+html.mf .mf-sheet #packcard>h2{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--mute)}
+html.mf .mf-sheet #packui .tile{min-height:44px}
+html.mf .mf-sheet .mf-linechips{margin-bottom:8px}
+html.mf .mf-sheet .mf-dock{padding-top:8px}
+html.mf #mf-s-manage #sp,
+html.mf #mf-s-company #repcard{border:0;margin:0;padding:0;box-shadow:none;background:transparent}
+html.mf #mf-s-manage #sp>summary,
+html.mf #mf-s-company #repcard>summary{display:none}
+html.mf #mf-s-manage #sp>.grid,
+html.mf #mf-s-company #repcard>.grid{display:grid;grid-template-columns:1fr;gap:7px}
+html.mf #mf-s-manage #sp .row,
+html.mf #mf-s-company #repcard .row{margin-top:8px;gap:6px}
+html.mf #mf-s-manage #sp .row button{flex:1 1 calc(50% - 3px);min-height:40px;font-size:11.5px}
+html.mf #mf-s-company #repcard .row button{min-height:40px}
+
+/* --------------------------------------------------------------------------
+   9. SMALL / SHORT SCREENS
    -------------------------------------------------------------------------- */
 @media (max-width:410px){
-  main{padding:5px 8px calc(8px + env(safe-area-inset-bottom,0px))}
-  #hdr{height:46px;margin-bottom:6px;padding:3px}
-  #hdr button.navb,#hdr button.thm{width:32px;height:32px;min-height:32px}
-  .hstep{font-size:10px}
-  #hname{font-size:15px}
-  nav#steps{padding:2px;gap:2px;margin-bottom:7px}
-  nav#steps button{min-height:33px;font-size:11.5px}
-  .card{padding:9px 10px;border-radius:13px;margin-bottom:7px}
-  .card>h2{margin-bottom:6px;font-size:10.5px}
-  label{font-size:11.5px;margin-bottom:3px}
-  input,select,textarea{min-height:38px;padding:6px 9px}
-  .note{font-size:11px;line-height:1.35}
-  .row{gap:6px;margin-top:7px}
-  .navrow{margin-top:8px;gap:6px}
-  .navrow button{min-height:42px;font-size:12.5px;padding:6px}
-
-  /* Step 1 */
-  #p0 .card{padding:9px 10px}
-  #p0 .card>h2{margin-bottom:6px}
-  #p0 .grid{gap:6px}
-  #p0 .grid input,#p0 .grid select{min-height:36px;font-size:13px;padding:5px 5px}
-  #p0 .note{font-size:10.5px;line-height:1.3;margin:3px 0 0}
-  #p0 #pamsg{display:none}
-  details.card{padding:8px 10px}
-  details.card>summary{font-size:12px;min-height:22px}
-
-  /* Step 2 */
-  #p1 .card{padding:8px 9px 9px}
-  #p1 .card>h2{margin-bottom:6px}
-  .cgt thead th{font-size:10.5px;padding:4px 2px}
-  .cgt tbody th{font-size:10px;padding:1px 4px;width:29%}
-  .cgt input,.cgt select{min-height:25px;font-size:12px;padding:0 2px}
-  .cgt input[type=color]{height:23px}
-  .cgt .cx,.cgt .cd{min-height:20px;min-width:20px;padding:0 4px;font-size:9.5px}
-  .cgt th,.cgt td{padding:1px}
-  .tot th{font-size:10px;padding:3px 1px}
-  .tot td{font-size:10.5px;padding:2px 1px}
-  #preview{margin-top:5px;padding:4px 8px;font-size:10.5px}
-  #preview .bar{display:none}
-  #p1 .row{gap:5px;margin-top:6px}
-  #p1 .row>button{min-height:30px;font-size:10px;padding:2px 1px}
-  #p1 .card>p.note{display:none}
-  #p1 .row>.note{display:none}
-  #packcard{margin-bottom:7px}
-
-  /* Step 3 */
-  #p2 .card{padding:8px 9px}
-  #p2 .stats{gap:5px;margin-bottom:7px}
-  .stat{padding:5px 6px;border-radius:9px}
-  .stat b{font-size:14px}
-  .stat span{font-size:9px}
-  .bar{height:4px;margin-top:3px}
-  #csel{min-height:34px;font-size:13px}
-  #cv,#gl{height:112px}
-  #zbar{gap:4px;margin-top:6px}
-  #zbar button{min-height:30px;font-size:9.5px}
-  #vw #rbar.row{gap:4px}
-  #vw #rbar>button,#vw #rbar>.chk{min-height:28px;font-size:9.5px}
-  #vw .row>label{font-size:11px}
-  #vw .row{gap:4px;margin-bottom:5px}
-  #p2 #out>p.note{-webkit-line-clamp:1;font-size:10px;margin-top:4px}
-  #plancard>summary{min-height:38px;font-size:12px}
+  html.mf #hname{font-size:14.5px}
+  html.mf #hstep{font-size:9px}
+  html.mf #hdr button.navb,html.mf #hdr button.thm{width:31px;height:31px;min-height:31px}
+  html.mf .mf-dock button{min-height:44px;font-size:12.5px}
+  html.mf #stats .stat b{font-size:12px}
+  html.mf #zbar button,html.mf #rbar button{font-size:9px;padding:1px 5px}
+  html.mf .mf-hero b{font-size:15px}
+}
+@media (max-height:760px){
+  html.mf #hdr{padding:5px 10px 6px;margin-bottom:6px}
+  html.mf #hname{font-size:14px}
+  html.mf .pg .card{padding:8px 10px;margin-bottom:6px}
+  html.mf .mf-dock button{min-height:42px}
+  html.mf #gl{aspect-ratio:2.3/1}
+  html.mf #vw>#cv{aspect-ratio:2.3/1}
+  html.mf #stats .stat{padding:4px 3px}
+  html.mf #stats .stat b{font-size:12px}
+  html.mf .mf-line{padding:5px 7px;margin-bottom:5px}
+  html.mf .mf-recent{padding:6px 2px}
+  html.mf .mf-seg button{min-height:33px}
+}
+@media (min-width:701px){
+  html.mf body{background:#dfe6ea}
+  html.mf main{box-shadow:0 0 0 1px rgba(13,31,43,.06)}
+  html.mf nav#steps{border-radius:16px 16px 0 0}
 }
 
-/* --------------------------------------------------------------------------
-   5. SHORT SCREENS (≤790px tall, e.g. 360×740 Android)
-      Final pass: helper copy yields, artwork shrinks, nothing actionable goes.
-   -------------------------------------------------------------------------- */
-@media (max-height:822px){
-  .card{margin-bottom:6px}
-  nav#steps button{min-height:32px}
-  #p0 .card>p.note{display:none}
-  #p0 .card{padding:8px 9px}
-  #p0 .card>h2,#p1 .card>h2,#p2 .card>h2{margin-bottom:5px}
-  #p0 .row{margin-top:6px}
-  #p1 #preview{display:none}
-  .cgt input,.cgt select{min-height:23px}
-  #p1 .row>button{min-height:28px}
-  #p2 .stats{margin-bottom:6px}
-  #cv,#gl{height:60px}
-  #zbar button{min-height:23px}
-  #vw #rbar>button,#vw #rbar>.chk{min-height:24px}
-  #p2 .stat{padding:3px 6px}
-  #p2 .stats{gap:4px}
-  #p2 .card{padding:7px 8px}
-  #vw #rbar.row{padding-top:5px;margin-top:5px!important;gap:4px}
-  #zbar{gap:4px;margin-top:5px}
-  #vw #rbar>button,#vw #rbar>.chk{min-height:26px}
-  #p2 #out>p.note{display:none}
-  #plancard>summary{min-height:34px}
-  .navrow button{min-height:40px}
-}
-
-</style></head>
+</style>
+</head>
 <body><main><div class="stalebar" id="savebanner" role="alert"><span>Warning: your work could NOT be saved on this device (browser storage is full or blocked). Use Save Inputs (.json) on Step 1 to download a backup now.</span></div>
 <header id="hdr"><button class="navb" id="hback" type="button" aria-label="Previous page">‹</button><div id="htitle"><div class="hstep" id="hstep">Step 1 of 4</div><h1 id="hname">Select Equipment and Cargo</h1></div><button class="thm" id="theme" type="button" aria-label="Toggle color theme" title="Toggle light/dark theme">◐</button><button class="navb" id="hnext" type="button" aria-label="Next page">›</button></header>
 <nav id="steps" aria-label="Workflow steps"><button type="button" data-p="0" class="on">1. Setup</button><button type="button" data-p="1">2. Cargo</button><button type="button" data-p="2">3. 3D View</button><button type="button" data-p="3">4. Export</button></nav>
@@ -944,7 +1085,7 @@ details.mfd>.mfd-x{display:none}
 <div id="csvbox"><label for="csvtxt">Paste rows from Excel or CSV: Name, Length, Width, Height, Weight, Qty, Units/Carton (optional)</label><textarea id="csvtxt" placeholder="Carton A, 40, 30, 25, 12, 120, 6&#10;Pallet B, 120, 100, 110, 320, 8, 1"></textarea><div class="row" style="margin-top:8px"><button class="primary sm" id="csvgo" type="button">Import Pasted Rows</button><button class="sm" id="csvclr" type="button">Close</button><span class="note" id="csvmsg"></span></div></div>
 <p class="note" style="margin:8px 0 0">The packing allowance (Loading Rules, default 5 mm) is added to each carton dimension for CBM and fit calculations.</p>
 <p class="note warn" id="msg" style="margin:8px 0 0"></p></div>
-<details class="card mfd" id="packcard"><summary><span>Packing Conditions</span><span class="hlp" tabindex="0" role="button" aria-label="Help: Packing conditions" data-t="Packing conditions" data-w="Tick every way a carton is allowed to sit in the container. The picture shows the carton as it would be placed, with the size along the container length x width x height. The word TOP marks the carton’s own top face. Stacking on Top: Blocked means nothing may be put on top of it. Stacking Underneath: Blocked means it must stay on the floor." data-u="Leave the default (the two Upright pictures ticked). It is always safe. Tick more pictures only if the goods can be laid down or stood on end, and block Stacking on Top for fragile goods.">?</span></summary><p class="note" style="margin:0 0 6px">Tick the ways each carton may be placed. Tap a picture to switch it on or off.</p><div id="packui"></div></details>
+<div class="card" id="packcard"><h2>Packing Conditions <span class="hlp" tabindex="0" role="button" aria-label="Help: Packing conditions" data-t="Packing conditions" data-w="Tick every way a carton is allowed to sit in the container. The picture shows the carton as it would be placed, with the size along the container length x width x height. The word TOP marks the carton’s own top face. Stacking on Top: Blocked means nothing may be put on top of it. Stacking Underneath: Blocked means it must stay on the floor." data-u="Leave the default (the two Upright pictures ticked). It is always safe. Tick more pictures only if the goods can be laid down or stood on end, and block Stacking on Top for fragile goods.">?</span></h2><p class="note" style="margin:0 0 6px">Tick the ways each carton may be placed. Tap a picture to switch it on or off.</p><div id="packui"></div></div>
 <div class="navrow"><button type="button" data-go="0">‹ Back: Setup</button><button class="primary" id="calc" type="button">Calculate &amp; View 3D Load ›</button></div></section>
 
 <section class="pg" id="p2"><div class="card"><h2>Results</h2><div id="empty" class="empty"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M6 26 32 12l26 14v22L32 62 6 48z"/><path d="M6 26l26 14 26-14M32 40v22"/><path d="M19 19l26 14"/></svg>Calculate a load plan first.</div>
@@ -956,7 +1097,7 @@ details.mfd>.mfd-x{display:none}
 <div id="rbar" class="row" style="margin:0 0 8px;gap:8px"><button type="button" data-v="340,28">Isometric</button><button type="button" data-v="0,90">Top</button><button type="button" data-v="0,0">Side</button><button type="button" data-v="270,15">Door end</button><button type="button" data-v="90,15">Front end</button><button type="button" id="rl" aria-label="Rotate left 90 degrees">⟲ 90°</button><button type="button" id="rr" aria-label="Rotate right 90 degrees">⟳ 90°</button><label class="chk"><input id="auto" type="checkbox"> Auto-rotate</label><button type="button" id="zmode">Drag: Rotate</button></div>
 <div class="row"><label for="yaw" style="margin:0">Rotate view</label><input id="yaw" type="range" min="0" max="360" step="any" value="340" style="max-width:150px"><label for="tilt" style="margin:0">Tilt</label><input id="tilt" type="range" min="0" max="90" step="any" value="28" style="max-width:110px"><label class="chk"><input id="step" type="checkbox"> Progressive loading</label>
 <span id="sc" style="display:none;gap:8px;align-items:center;flex-wrap:wrap"><select id="smode" style="width:auto"><option value="row">By row</option><option value="layer">By layer</option><option value="piece">By carton</option></select><select id="spd" style="width:auto" aria-label="Speed"><option value="3000">Speed: very slow</option><option value="1800" selected>Speed: slow</option><option value="1000">Speed: normal</option><option value="500">Speed: fast</option><option value="150">Speed: very fast</option></select><button id="prev" type="button" aria-label="Previous">‹</button><button id="play" type="button">Play</button><button id="next" type="button" aria-label="Next">›</button><input id="stepr" type="range" min="1" max="1" value="1" style="max-width:220px" aria-label="Loading step"></span></div><p class="note" id="stepl" style="margin:6px 0 0"></p></div>
-<p class="note">Tap any carton in 3D view to inspect its SKU, orientation and position, or enable Move Cartons to drag/rotate boxes. Switch to 2D View for face arrows (⊙ = top face toward you) and printed carton side dimensions. Loading runs from Front Wall to Door Side.</p><details class="mfd" id="plancard"><summary><span>Container loading plan</span></summary><div class="scroll" style="margin-top:10px"><table class="plan" id="ctab"></table></div><div class="scroll" style="margin-top:14px"><table class="plan" id="cgtab"></table></div><div class="scroll" style="margin-top:14px"><table class="plan" id="sum"></table></div></details></div></div><div class="navrow"><button type="button" data-go="1">‹ Back: Cargo</button><button class="primary" type="button" data-go="3">Next: Load Plan, PDF and Excel ›</button></div></section>
+<p class="note">Tap any carton in 3D view to inspect its SKU, orientation and position, or enable Move Cartons to drag/rotate boxes. Switch to 2D View for face arrows (⊙ = top face toward you) and printed carton side dimensions. Loading runs from Front Wall to Door Side.</p><div class="scroll" style="margin-top:10px"><table class="plan" id="ctab"></table></div><div class="scroll" style="margin-top:14px"><table class="plan" id="cgtab"></table></div><div class="scroll" style="margin-top:14px"><table class="plan" id="sum"></table></div></div></div><div class="navrow"><button type="button" data-go="1">‹ Back: Cargo</button><button class="primary" type="button" data-go="3">Next: Load Plan, PDF and Excel ›</button></div></section>
 
 <section class="pg" id="p3"><div class="card"><h2>Load Plan &amp; Exports</h2><div id="empty3" class="empty"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M6 26 32 12l26 14v22L32 62 6 48z"/><path d="M6 26l26 14 26-14M32 40v22"/><path d="M40 16v10M40 26l-6-4M40 26l6-4"/></svg>Calculate a load plan first.</div>
 <div id="out3" style="display:none">
@@ -2309,4 +2450,760 @@ if($("palapply")) {
 
 labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();updateUndo();show(0);
 })();
-</script></body></html>
+</script><script id="mf-shell">
+/* ==========================================================================
+   MOBILEFIT SHELL — v2
+   Navigation and presentation only.
+
+   Runs AFTER the application script. It:
+     • moves existing cards into eight phone screens,
+     • builds a bottom tab bar from the real nav buttons,
+     • opens bottom sheets that contain the real blocks,
+     • mirrors live values (cargo, saved projects) into readable cards.
+
+   It never computes a load, never writes the app's storage keys, and never
+   calls an internal calculation function. Every action is a click on the
+   original control, so the original behaviour does the work.
+   ========================================================================== */
+(function () {
+  'use strict';
+
+  var D = document, W = window;
+  if (W.__mobileFitShell) return;
+  W.__mobileFitShell = true;
+
+  var $ = function (id) { return D.getElementById(id); };
+  var all = function (sel, root) { return Array.prototype.slice.call((root || D).querySelectorAll(sel)); };
+  function mk(tag, cls, text) {
+    var e = D.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function move(node, parent) { if (node && parent) parent.appendChild(node); return node; }
+  function on(node, ev, fn) { if (node) node.addEventListener(ev, fn); }
+  function fire(node, ev) { if (node) node.dispatchEvent(new Event(ev, { bubbles: true })); }
+  function closest(node, sel) { return node && node.closest ? node.closest(sel) : null; }
+
+  var ICONS = {
+    projects: 'M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z',
+    cargo: 'M21 8l-9-5-9 5 9 5 9-5v8l-9 5-9-5V8',
+    load: 'M12 2l9 5v10l-9 5-9-5V7zM12 12l9-5M12 12v10M12 12L3 7',
+    export: 'M12 3v12m0 0l-4-4m4 4l4-4M4 17v3h16v-3'
+  };
+  function tabIcon(name) {
+    var s = D.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    s.setAttribute('viewBox', '0 0 24 24');
+    s.setAttribute('aria-hidden', 'true');
+    var p = D.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('d', ICONS[name]);
+    s.appendChild(p);
+    return s;
+  }
+
+  /* ------------------------------------------------------------------ *
+   * 1. CHROME
+   * ------------------------------------------------------------------ */
+  D.documentElement.classList.add('mf');
+  D.body.dataset.mfsub = 'proj';
+
+  var stepEl = $('hstep');
+  function brandStep() {
+    if (!stepEl) return;
+    var t = stepEl.textContent || '';
+    if (t.indexOf('3D Load Calculator') !== -1) stepEl.textContent = t.replace('3D Load Calculator', 'MobileFit');
+  }
+  brandStep();
+  if (stepEl) new MutationObserver(brandStep).observe(stepEl, { childList: true, subtree: true, characterData: true });
+
+  var TABS = ['Projects', 'Cargo', 'Load', 'Export'];
+  all('#steps button').forEach(function (b, i) {
+    b.textContent = '';
+    b.appendChild(tabIcon(['projects', 'cargo', 'load', 'export'][i]));
+    b.appendChild(mk('span', '', TABS[i]));
+    b.setAttribute('aria-label', TABS[i]);
+    b.dataset.mfTab = String(i);
+  });
+  function markTabs() {
+    all('#steps button').forEach(function (b) {
+      b.setAttribute('aria-current', b.classList.contains('on') ? 'page' : 'false');
+    });
+  }
+  markTabs();
+  if ($('steps')) new MutationObserver(markTabs).observe($('steps'), { subtree: true, attributes: true, attributeFilter: ['class'] });
+
+  /* ------------------------------------------------------------------ *
+   * 2. SHEET FRAME
+   * ------------------------------------------------------------------ */
+  var WRAP = mk('div'); WRAP.id = 'mf-sheetwrap';
+  var head = mk('div', 'mf-sheet-head');
+  var h2 = mk('h2', '', 'Details'); h2.id = 'mf-sheet-title';
+  var closeBtn = mk('button', '', '✕'); closeBtn.type = 'button';
+  closeBtn.setAttribute('aria-label', 'Close'); closeBtn.setAttribute('data-mf-close', '');
+  head.appendChild(h2); head.appendChild(closeBtn);
+  var bodyEl = mk('div', 'mf-sheet-body'); bodyEl.id = 'mf-sheet-body';
+  var sheet = mk('section', 'mf-sheet'); sheet.id = 'mf-sheet';
+  sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true');
+  sheet.setAttribute('aria-labelledby', 'mf-sheet-title');
+  sheet.tabIndex = -1;
+  sheet.appendChild(head); sheet.appendChild(bodyEl);
+  var veil = mk('div', 'mf-veil'); veil.setAttribute('data-mf-close', '');
+  WRAP.appendChild(veil); WRAP.appendChild(sheet);
+  D.body.appendChild(WRAP);
+
+  var VIEWS = {}, TITLES = {
+    rules: 'Loading rules',
+    chassis: 'Chassis & balance',
+    add: 'Add cargo',
+    manage: 'Saved projects',
+    cargo: 'Edit cargo line',
+    pack: 'Packing conditions',
+    details: 'Load details',
+    company: 'Company & shipping header'
+  };
+  ['rules', 'chassis', 'add', 'manage', 'cargo', 'pack', 'details', 'company'].forEach(function (n) {
+    var v = mk('div', 'mf-view'); v.id = 'mf-s-' + n; v.dataset.view = n;
+    bodyEl.appendChild(v); VIEWS[n] = v;
+  });
+
+  var openName = null, lastFocus = null;
+  function openSheet(name, trigger) {
+    if (!VIEWS[name]) return;
+    lastFocus = trigger || D.activeElement;
+    all('.mf-view', bodyEl).forEach(function (v) { v.classList.toggle('on', v === VIEWS[name]); });
+    h2.textContent = TITLES[name] || 'Details';
+    WRAP.classList.add('on');
+    openName = name;
+    if (name === 'cargo') refreshEditor();
+    if (name === 'manage') renderRecents();
+    try { sheet.focus({ preventScroll: true }); } catch (e) { }
+  }
+  function closeSheet() {
+    if (!openName) return;
+    WRAP.classList.remove('on');
+    openName = null;
+    if (lastFocus && lastFocus.focus) { try { lastFocus.focus({ preventScroll: true }); } catch (e) { } }
+  }
+  on(WRAP, 'click', function (e) {
+    if (closest(e.target, '[data-mf-close]')) closeSheet();
+  });
+  on(D, 'keydown', function (e) {
+    if (e.key === 'Escape' && openName && !D.querySelector('.prog.on')) closeSheet();
+  }, true);
+  on(D, 'click', function (e) {
+    var b = closest(e.target, '[data-mf-sheet]');
+    if (b) openSheet(b.getAttribute('data-mf-sheet'), b);
+  });
+
+  /* ------------------------------------------------------------------ *
+   * 3. MOVE THE REAL BLOCKS INTO THEIR SCREENS / SHEETS
+   * ------------------------------------------------------------------ */
+  /* 3a. Loading rules split: packing / stacking / limits vs chassis / balance. */
+  var lr = $('lrcard');
+  if (lr) {
+    var note = lr.querySelector(':scope > p.note');
+    var groups = all(':scope > .lrg', lr);
+    if (note) move(note, VIEWS.rules);
+    [0, 1, 2].forEach(function (i) { if (groups[i]) move(groups[i], VIEWS.rules); });
+    [3, 4].forEach(function (i) { if (groups[i]) move(groups[i], VIEWS.chassis); });
+  }
+
+  move($('sp'), VIEWS.manage);
+  if ($('sp')) $('sp').open = true;
+  move($('repcard'), VIEWS.company);
+  if ($('repcard')) $('repcard').open = true;
+  move($('rows'), VIEWS.cargo);
+  move($('packcard'), VIEWS.pack);
+
+  /* 3b. Step 1 shell: Projects + Equipment. */
+  var p0 = $('p0');
+  var seg = mk('div', 'mf-seg'); seg.id = 'mf-seg';
+  var segP = mk('button', 'on', 'Projects'); segP.type = 'button'; segP.dataset.sub = 'proj';
+  var segE = mk('button', '', 'Equipment'); segE.type = 'button'; segE.dataset.sub = 'eq';
+  seg.appendChild(segP); seg.appendChild(segE);
+  var proj = mk('div'); proj.id = 'mf-proj';
+  var eqWrap = mk('div'); eqWrap.id = 'mf-eq';
+  p0.insertBefore(seg, p0.firstChild);
+  p0.insertBefore(proj, seg.nextSibling);
+  p0.insertBefore(eqWrap, proj.nextSibling);
+
+  var cardProject = closest($('pn'), '.card');
+  var cardFiles = closest($('copen'), '.card');
+  var cardEq = closest($('eq'), '.card');
+  var cardPresets = closest($('padd'), '.card');
+
+  /* ------------------------------------------------------------------ *
+   * 4. PROJECTS — saved calculations (read-only mirror)
+   * ------------------------------------------------------------------ */
+  var PK = 'loadcalc.projects';
+  function store() {
+    try { return JSON.parse(localStorage.getItem(PK) || '{}') || {}; } catch (e) { return {}; }
+  }
+  function when(ts) {
+    if (!ts) return '';
+    var s = (Date.now() - ts) / 1000;
+    if (s < 60) return 'just now';
+    if (s < 3600) return Math.round(s / 60) + ' min ago';
+    if (s < 86400) return Math.round(s / 3600) + ' h ago';
+    if (s < 172800) return 'yesterday';
+    try { return new Date(ts).toLocaleDateString(undefined, { day: 'numeric', month: 'short' }); } catch (e) { return ''; }
+  }
+  function items() {
+    var P = store();
+    return Object.keys(P).map(function (k) {
+      return { name: k, sum: P[k].sum || '', ts: +P[k].ts || 0 };
+    }).sort(function (a, b) { return b.ts - a.ts; }).slice(0, 8);
+  }
+  function openSaved(name) {
+    var pl = $('pl');
+    if (!pl) return;
+    var found = false;
+    for (var i = 0; i < pl.options.length; i++) if (pl.options[i].value === name) { found = true; break; }
+    if (!found) {
+      var o = D.createElement('option');
+      o.value = name; o.textContent = name;
+      pl.appendChild(o);
+    }
+    pl.value = name;
+    fire(pl, 'change');
+    var b = $('prec');
+    if (b) b.click();
+    if (openName === 'manage') closeSheet();
+  }
+
+  var hero = mk('div', 'mf-hero'); hero.id = 'mf-hero';
+  var projScroll = mk('div', 'mf-scroll'); projScroll.id = 'mf-proj-scroll';
+  var recents = mk('div', 'card'); recents.id = 'mf-recentcard';
+  recents.appendChild(mk('h2', '', 'Saved calculations'));
+  var list = mk('div', 'mf-recents'); list.id = 'mf-recents';
+  recents.appendChild(list);
+  var manage = mk('button', 'mf-row'); manage.type = 'button'; manage.setAttribute('data-mf-sheet', 'manage');
+  manage.innerHTML = '<span class="t"><b>Manage saved projects</b><small>Save · load inputs · delete</small></span><span class="chev">›</span>';
+  recents.appendChild(manage);
+
+  function renderRecents() {
+    if (!list) return;
+    var rows = items();
+    var sig = rows.map(function (r) { return r.name + '|' + r.ts; }).join(';');
+    if (list.dataset.sig !== sig) {
+      list.dataset.sig = sig;
+      list.textContent = '';
+      if (!rows.length) {
+        list.appendChild(mk('div', 'mf-empty', 'No saved calculations yet. Your work is saved on this device each time you calculate.'));
+      }
+      rows.forEach(function (r, i) {
+        var b = mk('button', 'mf-recent'); b.type = 'button';
+        b.appendChild(mk('span', 'ico', i === 0 ? '★' : '▤'));
+        var t = mk('span', 't');
+        t.appendChild(mk('b', '', r.name));
+        t.appendChild(mk('small', '', r.sum || 'Saved calculation'));
+        b.appendChild(t);
+        b.appendChild(mk('span', 'when', when(r.ts)));
+        b.onclick = function () { openSaved(r.name); };
+        list.appendChild(b);
+      });
+    }
+    hero.textContent = '';
+    hero.appendChild(mk('small', '', 'Continue where you left off'));
+    if (rows.length) {
+      hero.appendChild(mk('b', '', rows[0].name));
+      hero.appendChild(mk('span', '', rows[0].sum || 'Saved calculation'));
+      var go = mk('button', 'go', '›'); go.type = 'button';
+      go.setAttribute('aria-label', 'Open ' + rows[0].name);
+      go.onclick = function () { openSaved(rows[0].name); };
+      hero.appendChild(go);
+    } else {
+      hero.appendChild(mk('b', '', 'Start with equipment'));
+      hero.appendChild(mk('span', '', 'Choose a container, add cargo, calculate.'));
+      var go2 = mk('button', 'go', '›'); go2.type = 'button';
+      go2.setAttribute('aria-label', 'Open equipment');
+      go2.onclick = function () { setSub('eq'); };
+      hero.appendChild(go2);
+    }
+  }
+
+  /* ------------------------------------------------------------------ *
+   * 5. SUB-SCREENS (Projects / Equipment)
+   * ------------------------------------------------------------------ */
+  function subName() {
+    var hn = $('hname'), p0e = $('p0');
+    if (!hn || !p0e || !p0e.classList.contains('on')) return;
+    var want = D.body.dataset.mfsub === 'eq' ? 'Equipment' : 'Projects';
+    if (hn.textContent !== want) hn.textContent = want;
+  }
+  function setSub(s) {
+    D.body.dataset.mfsub = s;
+    all('#mf-seg button').forEach(function (b) { b.classList.toggle('on', b.dataset.sub === s); });
+    subName();
+    if (s === 'proj') renderRecents();
+  }
+  all('#mf-seg button').forEach(function (b) {
+    b.addEventListener('click', function () { setSub(b.dataset.sub); });
+  });
+  if ($('hname')) new MutationObserver(function () {
+    if ($('p0') && $('p0').classList.contains('on')) subName(); else fitName();
+  }).observe($('hname'), { childList: true, subtree: true, characterData: true });
+
+  var TITLES_BY_APP = {
+    'Enter Cargo Data': 'Cargo',
+    'Results': 'Load plan',
+    'Load Plan & Exports': 'Export'
+  };
+  function fitName() {
+    var hn = $('hname');
+    if (!hn) return;
+    var t = (hn.textContent || '').trim();
+    if (TITLES_BY_APP[t]) hn.textContent = TITLES_BY_APP[t];
+  }
+
+  /* ---- projects ---- */
+  (function buildProjects() {
+    if (!proj) return;
+    proj.appendChild(hero);
+    proj.appendChild(projScroll);
+    move(cardProject, projScroll);
+    projScroll.appendChild(recents);
+    move(cardFiles, projScroll);
+    var dock = mk('div', 'mf-dock');
+    var fresh = mk('button', '', '↺ Start new calculation'); fresh.type = 'button';
+    fresh.onclick = function () { var n = $('newcalc'); if (n) n.click(); };
+    dock.appendChild(fresh);
+    proj.appendChild(dock);
+  })();
+
+  /* ---- equipment ---- */
+  (function buildEquipment() {
+    if (!eqWrap) return;
+    var eq = $('eq');
+    var eqScroll = mk('div', 'mf-scroll'); eqScroll.id = 'mf-eq-scroll';
+    eqWrap.appendChild(eqScroll);
+    if (cardEq) eqScroll.appendChild(cardEq);
+
+    var grid = eq ? closest(eq, '.grid') : null;
+    var chips = mk('div', 'mf-chips'); chips.id = 'mf-eqchips';
+    var units = mk('div'); units.id = 'mf-units';
+    if (grid && grid.parentNode) {
+      grid.parentNode.insertBefore(chips, grid);
+      grid.parentNode.insertBefore(units, grid.nextSibling);
+      grid.classList.add('mf-sr');
+    }
+
+    function renderEq() {
+      if (!eq) return;
+      chips.textContent = '';
+      Array.prototype.forEach.call(eq.options, function (o, i) {
+        var b = mk('button', 'mf-chip' + (i === eq.selectedIndex ? ' on' : ''));
+        b.type = 'button';
+        var bits = (o.textContent || '').split(/\s+[—–]\s+/);
+        b.appendChild(mk('span', '', (bits[0] || '').trim()));
+        if (bits[1]) b.appendChild(mk('small', '', bits[1].trim()));
+        b.onclick = function () {
+          eq.value = o.value;
+          fire(eq, 'change');
+          renderEq();
+        };
+        chips.appendChild(b);
+      });
+    }
+    renderEq();
+    on(eq, 'change', renderEq);
+
+    function seg2(sel, label) {
+      var wrap = mk('div');
+      var kv = mk('div', 'mf-kv');
+      kv.appendChild(mk('span', '', label));
+      wrap.appendChild(kv);
+      var box = mk('div', 'mf-seg2');
+      Array.prototype.forEach.call(sel.options, function (o, i) {
+        var b = mk('button', i === sel.selectedIndex ? 'on' : '', o.textContent);
+        b.type = 'button';
+        b.onclick = function () {
+          sel.value = o.value;
+          fire(sel, 'change');
+          all('button', box).forEach(function (x, k) { x.classList.toggle('on', k === i); });
+        };
+        box.appendChild(b);
+      });
+      wrap.appendChild(box);
+      return wrap;
+    }
+    if ($('du')) units.appendChild(seg2($('du'), 'Dimensions'));
+    if ($('wu')) units.appendChild(seg2($('wu'), 'Weight'));
+    if ($('custeq')) units.appendChild($('custeq'));
+
+    var rows = mk('div'); rows.id = 'mf-eqrows';
+    var r1 = mk('button', 'mf-row'); r1.type = 'button'; r1.setAttribute('data-mf-sheet', 'rules');
+    r1.innerHTML = '<span class="t"><b>Loading rules</b><small>Packing · stacking · limits</small></span><span class="v">Safe defaults</span><span class="chev">›</span>';
+    var r2 = mk('button', 'mf-row'); r2.type = 'button'; r2.setAttribute('data-mf-sheet', 'chassis');
+    r2.innerHTML = '<span class="t"><b>Chassis and axle checks</b><small>Vehicle dynamics · LIFO · balance</small></span><span class="v">Standard</span><span class="chev">›</span>';
+    rows.appendChild(r1); rows.appendChild(r2);
+    var rowsCard = mk('div', 'card');
+    rowsCard.appendChild(mk('h2', '', 'Rules and checks'));
+    rowsCard.appendChild(rows);
+    eqScroll.appendChild(rowsCard);
+
+    var dock = mk('div', 'mf-dock');
+    var next = mk('button', 'primary', 'Next: Add cargo ›'); next.type = 'button';
+    next.onclick = function () { var t = D.querySelector('#steps button[data-p="1"]'); if (t) t.click(); };
+    dock.appendChild(next);
+    eqWrap.appendChild(dock);
+  })();
+
+  /* ------------------------------------------------------------------ *
+   * 6. CARGO SCREEN
+   * ------------------------------------------------------------------ */
+  var p1 = $('p1');
+  var cargoTop = mk('div'); cargoTop.id = 'mf-cargo-top';
+  var lineList = mk('div'); lineList.id = 'mf-lines';
+  if (p1) {
+    var cargoCard = p1.querySelector(':scope > .card');
+    move($('cbmtot'), cargoTop);
+    move($('preview'), cargoTop);
+    move($('msg'), cargoTop);
+    cargoCard.appendChild(cargoTop);
+    cargoCard.appendChild(lineList);
+
+    /* the real action row stays in the document; proxies live in the Add sheet. */
+    var actRow = all('#p1 .row').filter(function (r) { return $('add') && r.contains($('add')); })[0];
+    if (actRow) actRow.classList.add('mf-sr');
+
+    var packRow = mk('button', 'mf-row'); packRow.type = 'button';
+    packRow.setAttribute('data-mf-sheet', 'pack');
+    packRow.innerHTML = '<span class="t"><b>Packing conditions</b><small>Allowed placements · stacking · loading order</small></span><span class="v">Tap to edit</span><span class="chev">›</span>';
+    cargoCard.appendChild(packRow);
+
+    var cargoDock = mk('div', 'mf-dock'); cargoDock.id = 'mf-cargo-dock';
+    var addBtn = mk('button', '', '＋ Add cargo'); addBtn.type = 'button';
+    addBtn.setAttribute('data-mf-sheet', 'add');
+    cargoDock.appendChild(addBtn);
+    var calc = $('calc');
+    if (calc) {
+      calc.classList.add('primary');
+      calc.setAttribute('aria-label', 'Calculate and view 3D load');
+      calc.textContent = 'Calculate ›';
+      cargoDock.appendChild(calc);
+    }
+    cargoCard.appendChild(cargoDock);
+  }
+
+  /* ---- Add cargo sheet ---- */
+  (function buildAdd() {
+    var v = VIEWS.add;
+    if (!v) return;
+    var acts = [
+      ['add', '＋', 'New cargo line', 'Adds three editable lines'],
+      ['dup', '⧉', 'Duplicate last line', 'Copy the last used line'],
+      ['dropbtn', '▦', 'Import Excel / CSV', 'Map columns from a file'],
+      ['csvtog', '✎', 'Paste rows', 'Paste from a spreadsheet'],
+      ['palbtn', '▤', 'Palletize cargo', 'EUR 1 · US GMA · EUR 2'],
+      ['xlstempl', '⬇', 'Download template', 'Sample import workbook']
+    ];
+    acts.forEach(function (r) {
+      var b = mk('button', 'mf-row'); b.type = 'button'; b.dataset.act = r[0];
+      b.innerHTML = '<span class="ico">' + r[1] + '</span>' +
+        '<span class="t"><b>' + r[2] + '</b><small>' + r[3] + '</small></span><span class="chev">›</span>';
+      v.appendChild(b);
+    });
+    v.appendChild(mk('p', 'note', 'Each press of New cargo line adds three editable cargo lines.'));
+
+    if (cardPresets) { cardPresets.classList.add('mf-flat'); v.appendChild(cardPresets); }
+    move($('xldrop'), v);
+    move($('csvbox'), v);
+
+    v.addEventListener('click', function (e) {
+      var b = closest(e.target, '[data-act]');
+      if (!b) return;
+      var t = $(b.dataset.act);
+      if (t) t.click();
+      if (b.dataset.act === 'add' || b.dataset.act === 'dup') {
+        closeSheet();
+        setTimeout(renderLines, 120);
+      }
+      if (b.dataset.act === 'csvtog') setTimeout(function () {
+        if ($('csvbox')) $('csvbox').scrollIntoView({ block: 'nearest' });
+      }, 60);
+    });
+  })();
+
+  /* ---- live line cards ---- */
+  function lineIds() {
+    var seen = {}, out = [];
+    all('#rows [data-i]').forEach(function (e) {
+      var i = +e.getAttribute('data-i');
+      if (!isNaN(i) && !seen[i]) { seen[i] = 1; out.push(i); }
+    });
+    return out.sort(function (a, b) { return a - b; });
+  }
+  function cvalOf(i, k) {
+    var e = D.querySelector('#rows [data-i="' + i + '"][data-k="' + k + '"]');
+    return e ? e.value : '';
+  }
+  function num(v) { return v === '' || v == null ? null : String(v); }
+  function lineLabel(i, row) {
+    var name = (row.n || '').trim();
+    return name || ('Cargo ' + (i + 1));
+  }
+  function renderLines() {
+    if (!lineList) return;
+    var ids = lineIds();
+    var du = $('du') && $('du').value === 'cm' ? 'cm' : 'in';
+    var wu = $('wu') && $('wu').value === 'lb' ? 'lb' : 'kg';
+    var sig = ids.map(function (i) {
+      return [i, cvalOf(i, 'n'), cvalOf(i, 'c'), cvalOf(i, 'l'), cvalOf(i, 'w'),
+        cvalOf(i, 'h'), cvalOf(i, 'k'), cvalOf(i, 'q'), cvalOf(i, 'u')].join('~');
+    }).join(';') + '|' + du + wu;
+    if (lineList.dataset.sig === sig) return;
+    lineList.dataset.sig = sig;
+
+    var st = lineList.scrollTop;
+    lineList.textContent = '';
+    if (!ids.length) {
+      lineList.appendChild(mk('div', 'mf-empty', 'No cargo lines yet. Tap “Add cargo”.'));
+      return;
+    }
+    ids.forEach(function (i) {
+      var row = {
+        n: cvalOf(i, 'n'), c: cvalOf(i, 'c'), l: cvalOf(i, 'l'), w: cvalOf(i, 'w'),
+        h: cvalOf(i, 'h'), k: cvalOf(i, 'k'), q: cvalOf(i, 'q'), u: cvalOf(i, 'u')
+      };
+      var card = mk('div', 'mf-line');
+      card.setAttribute('role', 'button'); card.tabIndex = 0; card.dataset.line = String(i);
+      var dot = mk('span', 'mf-dot'); dot.style.background = row.c || 'var(--line)';
+      var t = mk('span', 't');
+      t.appendChild(mk('b', '', lineLabel(i, row)));
+      var empty = !(num(row.l) || num(row.w) || num(row.h) || num(row.q));
+      var dims = [row.l, row.w, row.h].filter(function (x) { return num(x); }).join(' × ');
+      var meta = empty ? 'Empty line — tap to fill'
+        : (dims ? dims + ' ' + du : 'No size') +
+          (num(row.k) ? ' · ' + row.k + ' ' + wu : '') +
+          (num(row.u) ? ' · ' + row.u + ' /ctn' : '');
+      t.appendChild(mk('small', '', meta));
+
+      var dup = mk('button', 'ic', '⧉'); dup.type = 'button';
+      dup.setAttribute('aria-label', 'Duplicate ' + lineLabel(i, row));
+      dup.onclick = function (e) {
+        e.stopPropagation();
+        var b = D.querySelector('#rows .cd[data-d="' + i + '"]');
+        if (b) b.click();
+        setTimeout(renderLines, 80);
+      };
+      var clr = mk('button', 'ic', '✕'); clr.type = 'button';
+      clr.setAttribute('aria-label', 'Clear ' + lineLabel(i, row));
+      clr.onclick = function (e) {
+        e.stopPropagation();
+        var b = D.querySelector('#rows .cx[data-x="' + i + '"]');
+        if (b) b.click();
+        setTimeout(function () { renderLines(); if (openName === 'cargo') refreshEditor(); }, 80);
+      };
+
+      card.appendChild(dot); card.appendChild(t);
+      card.appendChild(mk('span', 'q', empty ? '' : num(row.q)));
+      card.appendChild(dup); card.appendChild(clr);
+      card.onclick = function () { openEditor(i); };
+      card.onkeydown = function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openEditor(i); }
+      };
+      lineList.appendChild(card);
+    });
+    lineList.scrollTop = st;
+  }
+
+  var editLine = 0;
+  function showLine(i) {
+    var tables = all('#rows table.cgt');
+    var t = Math.floor(i / 3), c = i % 3;
+    tables.forEach(function (tb, ti) {
+      tb.classList.toggle('mf-t-off', ti !== t);
+      if (ti === t) { tb.classList.remove('mf-c0', 'mf-c1', 'mf-c2'); tb.classList.add('mf-c' + c); }
+    });
+  }
+  function refreshEditor() {
+    var ids = lineIds(), view = VIEWS.cargo;
+    if (!view) return;
+    if (!ids.length) {
+      h2.textContent = TITLES.cargo;
+      return;
+    }
+    if (ids.indexOf(editLine) === -1) editLine = ids[0];
+    var chips = view.querySelector('.mf-linechips');
+    if (!chips) {
+      chips = mk('div', 'mf-linechips');
+      view.insertBefore(chips, view.firstChild);
+    }
+    var csig = ids.join(',') + '@' + editLine;
+    if (chips.dataset.sig !== csig) {
+      chips.dataset.sig = csig;
+      chips.textContent = '';
+      ids.forEach(function (i) {
+        var b = mk('button', editLine === i ? 'on' : '', String(i + 1));
+        b.type = 'button'; b.setAttribute('aria-label', 'Cargo ' + (i + 1));
+        b.onclick = function () { editLine = i; showLine(i); refreshEditor(); };
+        chips.appendChild(b);
+      });
+    }
+    h2.textContent = 'Cargo ' + (editLine + 1);
+    showLine(editLine);
+  }
+  function openEditor(i) {
+    editLine = i;
+    openSheet('cargo');
+  }
+
+  on($('rows'), 'input', function () { schedule(); });
+  on($('rows'), 'change', function () { schedule(); });
+  ['du', 'wu'].forEach(function (id) { on($(id), 'change', function () { setTimeout(renderLines, 60); }); });
+  if ($('rows')) new MutationObserver(function () { schedule(); }).observe($('rows'), { childList: true, subtree: true });
+
+  var pending = null;
+  function schedule() {
+    if (pending) return;
+    pending = setTimeout(function () {
+      pending = null;
+      renderLines();
+      if (openName === 'cargo') refreshEditor();
+    }, 90);
+  }
+
+  /* ------------------------------------------------------------------ *
+   * 7. LOAD SCREEN
+   * ------------------------------------------------------------------ */
+  (function buildLoad() {
+    var p2 = $('p2'), out = $('out');
+    if (!p2) return;
+
+    /* Details sheet: four honest tabs over the real result tables. */
+    VIEWS.details.innerHTML = '<div class="mf-tabs" role="tablist">' +
+      '<button type="button" data-dtab="summary" class="on" role="tab">Containers</button>' +
+      '<button type="button" data-dtab="lines" role="tab">Cargo lines</button>' +
+      '<button type="button" data-dtab="balance" role="tab">Balance</button>' +
+      '<button type="button" data-dtab="playback" role="tab">Playback</button></div>' +
+      '<div class="mf-dview on" data-dview="summary"></div>' +
+      '<div class="mf-dview" data-dview="lines"></div>' +
+      '<div class="mf-dview" data-dview="balance"></div>' +
+      '<div class="mf-dview" data-dview="playback"></div>';
+    var dv = function (n) { return VIEWS.details.querySelector('[data-dview="' + n + '"]'); };
+    move($('balalert'), dv('summary'));
+    move($('sumbar'), dv('summary'));
+    move($('ctab') && $('ctab').closest('.scroll'), dv('summary'));
+    move($('sum') && $('sum').closest('.scroll'), dv('lines'));
+    move($('cgtab') && $('cgtab').closest('.scroll'), dv('balance'));
+    move($('smode') && closest($('smode'), '.row'), dv('playback'));
+    move($('stepl'), dv('playback'));
+    all('[data-dtab]', VIEWS.details).forEach(function (b) {
+      b.onclick = function () {
+        all('[data-dtab]', VIEWS.details).forEach(function (x) { x.classList.toggle('on', x === b); });
+        all('.mf-dview', VIEWS.details).forEach(function (v) { v.classList.toggle('on', v.dataset.dview === b.dataset.dtab); });
+      };
+    });
+
+    /* Fixed-height result area that keeps the chart, stats and dock all visible. */
+    if (out) {
+      var inner = mk('div', 'mf-out-inner'); inner.id = 'mf-out-inner';
+      out.appendChild(inner);
+      move($('stale2'), inner);
+      move($('vw'), inner);
+      move($('stats'), inner);
+    }
+
+    var dock = mk('div', 'mf-dock');
+    var details = mk('button', '', 'Details'); details.type = 'button';
+    details.setAttribute('data-mf-sheet', 'details');
+    var exp = mk('button', 'primary', 'Export ›'); exp.type = 'button';
+    exp.onclick = function () { var t = D.querySelector('#steps button[data-p="3"]'); if (t) t.click(); };
+    dock.appendChild(details); dock.appendChild(exp);
+    p2.appendChild(dock);
+  })();
+
+  /* ------------------------------------------------------------------ *
+   * 8. EXPORT SCREEN
+   * ------------------------------------------------------------------ */
+  (function buildExport() {
+    var p3 = $('p3'), out3 = $('out3');
+    if (!p3 || !out3) return;
+    var card = p3.querySelector(':scope > .card');
+
+    var inner = mk('div', 'mf-out3-inner'); inner.id = 'mf-out3-inner';
+    out3.appendChild(inner);
+
+    var status = mk('div', 'mf-status'); status.id = 'mf-status';
+    status.appendChild(mk('span', 'dot'));
+    status.appendChild(mk('span', '', 'Ready to export'));
+    inner.appendChild(status);
+
+    if ($('stale3')) inner.appendChild($('stale3'));
+
+    var gPdf = mk('div', 'mf-group'); gPdf.appendChild(mk('h3', '', 'PDF report'));
+    var colPdf = mk('div', 'mf-gcol');
+    if ($('pdfmode')) colPdf.appendChild($('pdfmode'));
+    if ($('pdf')) colPdf.appendChild($('pdf'));
+    gPdf.appendChild(colPdf);
+    inner.appendChild(gPdf);
+
+    var gOther = mk('div', 'mf-group'); gOther.appendChild(mk('h3', '', 'Other formats'));
+    var colOther = mk('div', 'mf-gcol');
+    if ($('xls')) colOther.appendChild($('xls'));
+    if ($('pkg')) colOther.appendChild($('pkg'));
+    if ($('dat')) colOther.appendChild($('dat'));
+    gOther.appendChild(colOther);
+    if ($('pmsg')) gOther.appendChild($('pmsg'));
+    inner.appendChild(gOther);
+
+    var company = mk('button', 'mf-row'); company.type = 'button';
+    company.setAttribute('data-mf-sheet', 'company');
+    company.innerHTML = '<span class="t"><b>Company &amp; shipping header</b><small>Shipper · consignee · B/L · seal · logo</small></span><span class="v">Edit</span><span class="chev">›</span>';
+    inner.appendChild(company);
+
+    if ($('eqs')) inner.appendChild($('eqs'));
+
+    var dock = mk('div', 'mf-dock');
+    var nc = $('newcalc');
+    if (nc) move(nc, dock);
+    p3.appendChild(dock);
+
+    function statusNow() {
+      var st = $('stale3'), sel = $('csel');
+      var stale = st && st.classList.contains('on');
+      var has = !!sel && sel.options.length > 0;
+      var txt = !has ? 'Nothing calculated yet' : (stale ? 'Inputs changed — recalculate first' : 'Ready to export');
+      var span = status.lastChild;
+      if (span && span.textContent !== txt) span.textContent = txt;
+      status.classList.toggle('warn', stale || !has);
+    }
+    statusNow();
+    if ($('stale3')) new MutationObserver(statusNow).observe($('stale3'), { attributes: true, attributeFilter: ['class', 'style'] });
+    setInterval(statusNow, 900);
+  })();
+
+  /* ------------------------------------------------------------------ *
+   * 9. NAV / REFRESH
+   * ------------------------------------------------------------------ */
+  all('#steps button').forEach(function (b, i) {
+    b.addEventListener('click', function () {
+      if (openName) closeSheet();
+      setTimeout(function () {
+        W.dispatchEvent(new Event('resize'));
+        if (i === 0) { renderRecents(); subName(); }
+        if (i === 1) renderLines();
+      }, 160);
+    });
+  });
+  ['psave', 'pdel', 'prec', 'pload'].forEach(function (id) {
+    on($(id), 'click', function () { setTimeout(renderRecents, 350); });
+  });
+  var plEl = $('pl');
+  if (plEl) new MutationObserver(function () { renderRecents(); }).observe(plEl, { childList: true });
+
+  setInterval(function () {
+    if ($('p0') && $('p0').classList.contains('on')) renderRecents();
+  }, 2000);
+  setInterval(function () {
+    if ($('p1') && $('p1').classList.contains('on')) renderLines();
+  }, 1400);
+
+  renderRecents();
+  renderLines();
+  subName();
+})();
+
+</script>
+</body></html>
