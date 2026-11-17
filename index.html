@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="format-detection" content="telephone=no"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>3D Load Calculator - MobileFit</title>
-<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="MobileFit"><meta name="theme-color" content="#0b0f12">
-<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%223D%20Load%20Calculator%20-%20MobileFit%22%2C%22short_name%22%3A%22MobileFit%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f7f9fa%22%2C%22theme_color%22%3A%22%230b0f12%22%2C%22description%22%3A%22Offline%203D%20Container%20and%20Truck%20Load%20Calculator%22%7D">
+<title>CubeFit - 3D Load Calculator</title>
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="CubeFit"><meta name="theme-color" content="#0b0f12">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22CubeFit%20-%203D%20Load%20Calculator%22%2C%22short_name%22%3A%22CubeFit%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f7f9fa%22%2C%22theme_color%22%3A%22%230b0f12%22%2C%22description%22%3A%22Offline%203D%20Container%20and%20Truck%20Load%20Calculator%22%7D">
 <script>/* jsPDF 2.5.1 (MIT) - embedded for offline use; licence notice is kept inside the library header */
 /** @license
  *
@@ -574,8 +574,8 @@ button.tile:not(.on) svg{opacity:.4}button.tile.mix{border-color:var(--accent);b
 </style><style id="mf-layer">
 /* Built from 3D_Load_Calculator_v2.html (sha256 471c001dc816). Presentation layer only. */
 /* ==========================================================================
-   MOBILEFIT LAYER — v1 · "eight screens, one thumb"
-   Additive presentation layer for 3D Load Calculator - MobileFit.
+   CUBEFIT LAYER — v1 · "eight screens, one thumb"
+   Additive presentation layer for CubeFit - 3D Load Calculator.
 
    What it does
    ------------
@@ -2538,7 +2538,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
 })();
 </script><script id="mf-shell">
 /* ==========================================================================
-   MOBILEFIT SHELL — v2
+   CUBEFIT SHELL — v2
    Navigation and presentation only.
 
    Runs AFTER the application script. It:
@@ -2555,8 +2555,8 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
   'use strict';
 
   var D = document, W = window;
-  if (W.__mobileFitShell) return;
-  W.__mobileFitShell = true;
+  if (W.__cubeFitShell) return;
+  W.__cubeFitShell = true;
 
   var $ = function (id) { return D.getElementById(id); };
   var all = function (sel, root) { return Array.prototype.slice.call((root || D).querySelectorAll(sel)); };
@@ -2620,7 +2620,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
   function brandStep() {
     if (!stepEl) return;
     var t = stepEl.textContent || '';
-    if (t.indexOf('3D Load Calculator') !== -1) stepEl.textContent = t.replace('3D Load Calculator', 'MobileFit');
+    if (t.indexOf('3D Load Calculator') !== -1) stepEl.textContent = t.replace('3D Load Calculator', 'CubeFit');
   }
   brandStep();
   if (stepEl) new MutationObserver(brandStep).observe(stepEl, { childList: true, subtree: true, characterData: true });
