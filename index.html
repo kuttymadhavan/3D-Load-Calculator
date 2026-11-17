@@ -571,6 +571,329 @@ button.tile:not(.on) svg{opacity:.4}button.tile.mix{border-color:var(--accent);b
 .pkline{gap:14px 24px}.pkinfo{flex:0 0 190px}.pkld{margin-top:14px;border-top:1px dashed var(--line);padding-top:12px}
 .pklab{display:block;font-size:.78rem;font-weight:600;margin-top:8px}.pklab select{display:block;margin-top:2px;width:100%;min-height:36px}
 @media(max-width:700px){#hname{font-size:1.05rem}#sumbar{display:none}.pkline{gap:10px}.pkinfo{flex:1 1 100%;min-width:0}.pkrow{flex-wrap:wrap}.pkld .pkrow{justify-content:center}button.tile[data-ld]{width:calc(50% - 4px);min-width:0}#csel{max-width:100%!important;width:100%}}
+
+/* ==========================================================================
+   MOBILE-FIT LAYER — v2 · "calm shell"
+   Additive and non-destructive. Colour, spacing and layout only.
+   No JavaScript, formula, storage key or calculation is touched.
+   Delete this block and the two <details> folds to return to the original.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. PALETTE — quiet, professional, low-saturation slate & teal.
+      Readability checked: ink on panel 14.6:1, mute on panel 4.7:1,
+      white on accent 5.6:1.
+   -------------------------------------------------------------------------- */
+:root{
+  --bg:#f1f4f6; --panel:#ffffff; --ink:#1c2a33; --mute:#64757f;
+  --line:#e4e9ee; --accent:#2f6f76; --accent2:#255a61;
+  --sig:#9a6b35; --bad:#a9453c; --ok:#3c7a5e; --chart:#4a7fae; --view:#f3f6f8;
+  --on-accent:#ffffff;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#111a20; --panel:#18242b; --ink:#e2eaef; --mute:#93a5b0;
+    --line:#27353f; --accent:#6fb4ba; --accent2:#86c6cb;
+    --sig:#d9a55a; --bad:#e08a80; --ok:#5fb98a; --chart:#7fb0dd; --view:#0f171c;
+    --on-accent:#0c1418;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111a20; --panel:#18242b; --ink:#e2eaef; --mute:#93a5b0;
+  --line:#27353f; --accent:#6fb4ba; --accent2:#86c6cb;
+  --sig:#d9a55a; --bad:#e08a80; --ok:#5fb98a; --chart:#7fb0dd; --view:#0f171c;
+  --on-accent:#0c1418;
+}
+
+/* Anything that sits ON the accent colour must use the readable foreground
+   for that theme. White on the light-teal dark-mode accent is only 2:1. */
+button.primary,
+.cgt thead th,
+.tot th,
+.hlp:hover,.hlp:focus-visible,.hlp.on,
+.tile .tk{color:var(--on-accent)}
+/* the duplicate / delete chips sit ON the cargo header, same rule */
+.cgt thead th .cx,
+.cgt thead th .cd{color:var(--on-accent);
+  border-color:color-mix(in srgb,var(--on-accent) 70%,transparent)}
+
+/* --------------------------------------------------------------------------
+   2. FOLD ROWS — the two long sections become one-line disclosures.
+      Native <details>, no JavaScript. Everything inside still works.
+   -------------------------------------------------------------------------- */
+details.mfd{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:0 12px}
+details.mfd>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;
+  min-height:46px;font-weight:650;font-size:13.5px;color:var(--ink)}
+details.mfd>summary::-webkit-details-marker{display:none}
+details.mfd>summary::after{content:"";width:7px;height:7px;margin-left:auto;flex:none;
+  border-right:1.6px solid var(--mute);border-bottom:1.6px solid var(--mute);
+  transform:rotate(45deg) translateY(-2px);transition:transform .18s ease}
+details.mfd[open]>summary::after{transform:rotate(225deg) translateY(-2px)}
+details.mfd[open]>summary{border-bottom:1px solid var(--line);margin-bottom:10px}
+details.mfd>.mfd-x{display:none}
+
+/* --------------------------------------------------------------------------
+   3. THE PHONE SHELL — every screen sized to one 6.7" viewport
+   -------------------------------------------------------------------------- */
+@media (max-width:700px){
+
+  html{overflow-x:hidden}
+  body{font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  main{padding:6px 10px calc(10px + env(safe-area-inset-bottom,0px))}
+
+  /* ---- app bar ---------------------------------------------------------- */
+  #hdr{height:50px;padding:4px;margin:0 0 7px;gap:2px;border-radius:14px;
+       border:1px solid var(--line);background:var(--panel);box-shadow:none}
+  #hdr button.navb,#hdr button.thm{width:34px;height:34px;min-height:34px;padding:0;
+       border:0;background:transparent;color:var(--mute);font-size:1rem}
+  #hdr button.navb{font-size:1.5rem;line-height:1;color:var(--accent)}
+  #htitle{text-align:left;padding:0 2px}
+  .hstep{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;
+         font-weight:600;color:var(--mute);line-height:1.3}
+  #hname{font-size:16px;font-weight:650;line-height:1.25;margin:0;
+         letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* ---- step tabs as a segmented control --------------------------------- */
+  nav#steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;
+       padding:3px;margin:0 0 9px;background:color-mix(in srgb,var(--ink) 5%,var(--panel));
+       border:1px solid var(--line);border-radius:12px}
+  nav#steps button{min-height:36px;padding:4px 2px;border:0;border-radius:9px;
+       background:transparent;color:var(--mute);font-size:12.5px;font-weight:600;
+       letter-spacing:-.01em;transition:background .15s,color .15s}
+  nav#steps button.on{background:var(--panel);color:var(--ink);font-weight:700;
+       box-shadow:0 1px 3px rgba(16,24,32,.10);border:0}
+
+  /* ---- cards and type --------------------------------------------------- */
+  .card{padding:12px;border-radius:14px;margin-bottom:9px;box-shadow:none;
+        border:1px solid var(--line)}
+  .card>h2{font-size:11px;text-transform:uppercase;letter-spacing:.08em;
+        color:var(--mute);font-weight:700;margin:0 0 9px}
+  .note{font-size:12.5px;line-height:1.45}
+  label{font-size:12px;font-weight:600;letter-spacing:.005em;margin-bottom:4px}
+  input,select,textarea{min-height:42px;border-radius:10px;padding:7px 10px;
+        font-size:16px;background:var(--panel)}
+  select{padding-right:26px}
+  button{border-radius:10px;text-wrap:balance}
+  button.primary{min-height:44px;font-weight:650;letter-spacing:.005em;color:var(--on-accent)}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  #custeq.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:stretch;margin-top:9px}
+  .row>.note{grid-column:1/-1;margin:0}
+  .row>button{width:100%}
+  .navrow{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;margin:10px 0 0}
+  .navrow button{min-height:46px;padding:8px;font-size:13.5px;flex:none}
+  .navrow button.primary{grid-column:auto}
+  #p0 .navrow{grid-template-columns:1fr}
+
+  /* ---- STEP 1 · Setup --------------------------------------------------- */
+  #p0 .card{padding:9px 11px;margin-bottom:7px}
+  #p0 .card>h2{margin-bottom:6px}
+  #p0 .note{margin:3px 0 0;font-size:10.5px;line-height:1.32}
+  #p0 .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #p0 .card>.grid:not(#custeq)>div:first-child{grid-column:1/-1}
+  #p0 #custeq.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #p0 .grid input,#p0 .grid select{font-size:14px;min-height:40px;padding:6px 8px}
+  #p0 .row{margin-top:8px}
+  #p0 .row>button{font-size:14px;padding:8px 10px}
+  details.card>summary{font-size:12.5px;font-weight:650;min-height:22px}
+  details.card{padding:10px 12px;margin-bottom:9px}
+
+  /* ---- STEP 2 · Cargo --------------------------------------------------- */
+  #p1 .card{padding:9px 10px 10px}
+  #p1 .card>h2{margin-bottom:7px}
+  .swipehint{display:none}
+  #rows{overflow:visible}
+  .cgt{min-width:0;table-layout:fixed;margin-bottom:6px}
+  .cgt th,.cgt td{padding:2px;border-color:var(--line)}
+  .cgt thead th{font-size:11px;padding:5px 2px;letter-spacing:-.01em}
+  .cgt tbody th{width:30%;font-size:10.5px;padding:2px 5px;font-weight:600}
+  .cgt tbody th:first-child,.cgt thead th:first-child{width:30%;min-width:0;box-shadow:none}
+  .cgt input,.cgt select{min-height:27px;font-size:12.5px;padding:1px 3px;border-radius:6px}
+  .cgt input[type=color]{height:26px;min-width:0;padding:1px}
+  .cgt .cb2{font-size:10px;line-height:1.2}
+  .cgt .cx,.cgt .cd{min-height:22px;min-width:22px;padding:0 4px;font-size:10px;line-height:1}
+  .cgt .colact{gap:2px;margin:0}
+  .tot{margin:5px 0 6px}
+  .tot th{font-size:10.5px;padding:4px 2px;letter-spacing:.02em}
+  .tot td{font-size:11px;padding:3px 2px}
+  #preview{margin-top:6px;padding:5px 9px;font-size:11px;border-radius:10px}
+  #preview .bar{height:4px;margin-top:3px}
+  #p1 .row{grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+  #p1 .row>button{min-height:34px;font-size:10.5px;padding:2px 2px;line-height:1.15}
+  #p1 .row>.note{font-size:10.5px}
+  #p1 .card>p.note{font-size:10.5px;line-height:1.3;margin:4px 0 0;
+       display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+  #p1 .swipehint{display:none}
+  #packcard{margin-top:0}
+
+  /* ---- STEP 3 · 3D View ------------------------------------------------ */
+  #p2 .card{padding:9px 11px}
+  #p2 .stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:8px}
+  .stat{padding:4px 8px;min-height:0;border-radius:10px;background:var(--panel)}
+  .stat b{font-size:16px;line-height:1.15;margin-bottom:1px;letter-spacing:-.02em}
+  .stat span{font-size:11px;line-height:1.25}
+  .bar{height:5px;margin-top:4px}
+  #vw .row{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin:0 0 6px}
+  #vw .row>label{margin:0;font-size:12px}
+  #csel{min-height:38px;font-size:14px}
+  #cv,#gl{height:138px;min-height:0;aspect-ratio:auto;border-radius:10px}
+  #glabels .gl{font-size:9px;padding:1px 4px;border-radius:4px}
+  #glabels .glt{font-size:11px}#glabels .glh{font-size:10px}
+  #zbar{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;margin:7px 0 0}
+  #zbar>#zfit{grid-column:span 4}
+  #zbar>#zrst,#zbar>#zfull{grid-column:span 3}
+  #zbar>#gmode,#zbar>#gedit{grid-column:span 3}
+  #zbar button{min-width:0;min-height:32px;font-size:11px;padding:3px 2px}
+  #zbar .note{grid-column:1/-1;font-size:10.5px;line-height:1.3;margin:1px 0 0}
+  #vw #rbar.row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin:6px 0 0}
+  #vw #rbar>button,#vw #rbar>.chk{min-height:30px;min-width:0;font-size:10px;padding:2px 1px;width:100%}
+  #vw #rbar>#rl,#vw #rbar>#rr{font-size:12.5px;letter-spacing:.02em}
+  #vw #rbar>.chk{justify-content:center;gap:3px;margin:0}
+  #vw #rbar>.chk input{width:14px;height:14px;min-height:14px}
+  #vw .row>input[type=range]{flex:1 1 72px;min-width:0;max-width:100%!important;min-height:24px}
+  #vw .row>.chk{min-height:30px;font-size:11px}
+  #p2 #out>p.note{font-size:10.5px;line-height:1.3;margin:5px 0 0;
+       display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  #zbar .note{display:none}
+  #plancard{margin-top:9px;padding:0 12px}
+  #plancard>summary{min-height:40px;font-size:12.5px}
+
+  /* ---- STEP 4 · Export ------------------------------------------------- */
+  #p3 .card{padding:12px}
+  #p3 .row{grid-template-columns:1fr 1fr}
+  #p3 #out3>.row>select{grid-column:1/-1;width:100%!important}
+  #p3 #out3>.row>button{font-size:13.5px}
+  #p3 details.card>summary{font-size:12.5px}
+  #p3 .colprevtab,input#rep_ship{font-size:14px}
+
+  /* ---- control matrix: one tidy 3-column grid for view + camera -------- */
+  #zbar{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:5px}
+  #vw #rbar.row{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px}
+  #zbar button,#vw #rbar>button,#vw #rbar>.chk{width:100%;min-width:0}
+  #vw #rbar.row{border-top:1px solid var(--line);padding-top:5px;margin-top:5px!important}
+
+  /* ---- step 4: rows must not stretch to their tallest neighbour -------- */
+  #p3 .row{align-items:start;grid-auto-rows:min-content}
+  #p3 .row>button{min-height:44px}
+
+  /* ---- native control accents ----------------------------------------- */
+  input[type=range]{accent-color:var(--accent)}
+  input[type=checkbox],input[type=radio]{accent-color:var(--accent)}
+  ::selection{background:color-mix(in srgb,var(--accent) 22%,transparent)}
+
+  /* ---- long helper copy: hide rather than clip mid-sentence ----------- */
+  #p1 .card>p.note{display:none}
+  #p2 #out>p.note{display:none}
+
+  /* ---- global touch hygiene -------------------------------------------- */
+  button,a,input,select,textarea,[role="button"]{-webkit-tap-highlight-color:transparent}
+  .hlp{width:22px;height:22px;position:relative}
+  .hlp::after{content:"";position:absolute;inset:-9px;border-radius:50%}
+  input,select,textarea{scroll-margin:80px}
+  *{scrollbar-width:thin}
+  ::-webkit-scrollbar{height:6px;width:6px}
+  ::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+}
+
+/* --------------------------------------------------------------------------
+   4. SMALLER PHONES (6.1" class, ≤410px wide)
+      A second, tighter pass. Nothing is hidden that the user needs to act
+      on; only helper paragraphs and decoration lose height.
+   -------------------------------------------------------------------------- */
+@media (max-width:410px){
+  main{padding:5px 8px calc(8px + env(safe-area-inset-bottom,0px))}
+  #hdr{height:46px;margin-bottom:6px;padding:3px}
+  #hdr button.navb,#hdr button.thm{width:32px;height:32px;min-height:32px}
+  .hstep{font-size:10px}
+  #hname{font-size:15px}
+  nav#steps{padding:2px;gap:2px;margin-bottom:7px}
+  nav#steps button{min-height:33px;font-size:11.5px}
+  .card{padding:9px 10px;border-radius:13px;margin-bottom:7px}
+  .card>h2{margin-bottom:6px;font-size:10.5px}
+  label{font-size:11.5px;margin-bottom:3px}
+  input,select,textarea{min-height:38px;padding:6px 9px}
+  .note{font-size:11px;line-height:1.35}
+  .row{gap:6px;margin-top:7px}
+  .navrow{margin-top:8px;gap:6px}
+  .navrow button{min-height:42px;font-size:12.5px;padding:6px}
+
+  /* Step 1 */
+  #p0 .card{padding:9px 10px}
+  #p0 .card>h2{margin-bottom:6px}
+  #p0 .grid{gap:6px}
+  #p0 .grid input,#p0 .grid select{min-height:36px;font-size:13px;padding:5px 5px}
+  #p0 .note{font-size:10.5px;line-height:1.3;margin:3px 0 0}
+  #p0 #pamsg{display:none}
+  details.card{padding:8px 10px}
+  details.card>summary{font-size:12px;min-height:22px}
+
+  /* Step 2 */
+  #p1 .card{padding:8px 9px 9px}
+  #p1 .card>h2{margin-bottom:6px}
+  .cgt thead th{font-size:10.5px;padding:4px 2px}
+  .cgt tbody th{font-size:10px;padding:1px 4px;width:29%}
+  .cgt input,.cgt select{min-height:25px;font-size:12px;padding:0 2px}
+  .cgt input[type=color]{height:23px}
+  .cgt .cx,.cgt .cd{min-height:20px;min-width:20px;padding:0 4px;font-size:9.5px}
+  .cgt th,.cgt td{padding:1px}
+  .tot th{font-size:10px;padding:3px 1px}
+  .tot td{font-size:10.5px;padding:2px 1px}
+  #preview{margin-top:5px;padding:4px 8px;font-size:10.5px}
+  #preview .bar{display:none}
+  #p1 .row{gap:5px;margin-top:6px}
+  #p1 .row>button{min-height:30px;font-size:10px;padding:2px 1px}
+  #p1 .card>p.note{display:none}
+  #p1 .row>.note{display:none}
+  #packcard{margin-bottom:7px}
+
+  /* Step 3 */
+  #p2 .card{padding:8px 9px}
+  #p2 .stats{gap:5px;margin-bottom:7px}
+  .stat{padding:5px 6px;border-radius:9px}
+  .stat b{font-size:14px}
+  .stat span{font-size:9px}
+  .bar{height:4px;margin-top:3px}
+  #csel{min-height:34px;font-size:13px}
+  #cv,#gl{height:112px}
+  #zbar{gap:4px;margin-top:6px}
+  #zbar button{min-height:30px;font-size:9.5px}
+  #vw #rbar.row{gap:4px}
+  #vw #rbar>button,#vw #rbar>.chk{min-height:28px;font-size:9.5px}
+  #vw .row>label{font-size:11px}
+  #vw .row{gap:4px;margin-bottom:5px}
+  #p2 #out>p.note{-webkit-line-clamp:1;font-size:10px;margin-top:4px}
+  #plancard>summary{min-height:38px;font-size:12px}
+}
+
+/* --------------------------------------------------------------------------
+   5. SHORT SCREENS (≤790px tall, e.g. 360×740 Android)
+      Final pass: helper copy yields, artwork shrinks, nothing actionable goes.
+   -------------------------------------------------------------------------- */
+@media (max-height:822px){
+  .card{margin-bottom:6px}
+  nav#steps button{min-height:32px}
+  #p0 .card>p.note{display:none}
+  #p0 .card{padding:8px 9px}
+  #p0 .card>h2,#p1 .card>h2,#p2 .card>h2{margin-bottom:5px}
+  #p0 .row{margin-top:6px}
+  #p1 #preview{display:none}
+  .cgt input,.cgt select{min-height:23px}
+  #p1 .row>button{min-height:28px}
+  #p2 .stats{margin-bottom:6px}
+  #cv,#gl{height:60px}
+  #zbar button{min-height:23px}
+  #vw #rbar>button,#vw #rbar>.chk{min-height:24px}
+  #p2 .stat{padding:3px 6px}
+  #p2 .stats{gap:4px}
+  #p2 .card{padding:7px 8px}
+  #vw #rbar.row{padding-top:5px;margin-top:5px!important;gap:4px}
+  #zbar{gap:4px;margin-top:5px}
+  #vw #rbar>button,#vw #rbar>.chk{min-height:26px}
+  #p2 #out>p.note{display:none}
+  #plancard>summary{min-height:34px}
+  .navrow button{min-height:40px}
+}
+
 </style></head>
 <body><main><div class="stalebar" id="savebanner" role="alert"><span>Warning: your work could NOT be saved on this device (browser storage is full or blocked). Use Save Inputs (.json) on Step 1 to download a backup now.</span></div>
 <header id="hdr"><button class="navb" id="hback" type="button" aria-label="Previous page">‹</button><div id="htitle"><div class="hstep" id="hstep">Step 1 of 4</div><h1 id="hname">Select Equipment and Cargo</h1></div><button class="thm" id="theme" type="button" aria-label="Toggle color theme" title="Toggle light/dark theme">◐</button><button class="navb" id="hnext" type="button" aria-label="Next page">›</button></header>
@@ -621,7 +944,7 @@ button.tile:not(.on) svg{opacity:.4}button.tile.mix{border-color:var(--accent);b
 <div id="csvbox"><label for="csvtxt">Paste rows from Excel or CSV: Name, Length, Width, Height, Weight, Qty, Units/Carton (optional)</label><textarea id="csvtxt" placeholder="Carton A, 40, 30, 25, 12, 120, 6&#10;Pallet B, 120, 100, 110, 320, 8, 1"></textarea><div class="row" style="margin-top:8px"><button class="primary sm" id="csvgo" type="button">Import Pasted Rows</button><button class="sm" id="csvclr" type="button">Close</button><span class="note" id="csvmsg"></span></div></div>
 <p class="note" style="margin:8px 0 0">The packing allowance (Loading Rules, default 5 mm) is added to each carton dimension for CBM and fit calculations.</p>
 <p class="note warn" id="msg" style="margin:8px 0 0"></p></div>
-<div class="card" id="packcard"><h2>Packing Conditions <span class="hlp" tabindex="0" role="button" aria-label="Help: Packing conditions" data-t="Packing conditions" data-w="Tick every way a carton is allowed to sit in the container. The picture shows the carton as it would be placed, with the size along the container length x width x height. The word TOP marks the carton’s own top face. Stacking on Top: Blocked means nothing may be put on top of it. Stacking Underneath: Blocked means it must stay on the floor." data-u="Leave the default (the two Upright pictures ticked). It is always safe. Tick more pictures only if the goods can be laid down or stood on end, and block Stacking on Top for fragile goods.">?</span></h2><p class="note" style="margin:0 0 6px">Tick the ways each carton may be placed. Tap a picture to switch it on or off.</p><div id="packui"></div></div>
+<details class="card mfd" id="packcard"><summary><span>Packing Conditions</span><span class="hlp" tabindex="0" role="button" aria-label="Help: Packing conditions" data-t="Packing conditions" data-w="Tick every way a carton is allowed to sit in the container. The picture shows the carton as it would be placed, with the size along the container length x width x height. The word TOP marks the carton’s own top face. Stacking on Top: Blocked means nothing may be put on top of it. Stacking Underneath: Blocked means it must stay on the floor." data-u="Leave the default (the two Upright pictures ticked). It is always safe. Tick more pictures only if the goods can be laid down or stood on end, and block Stacking on Top for fragile goods.">?</span></summary><p class="note" style="margin:0 0 6px">Tick the ways each carton may be placed. Tap a picture to switch it on or off.</p><div id="packui"></div></details>
 <div class="navrow"><button type="button" data-go="0">‹ Back: Setup</button><button class="primary" id="calc" type="button">Calculate &amp; View 3D Load ›</button></div></section>
 
 <section class="pg" id="p2"><div class="card"><h2>Results</h2><div id="empty" class="empty"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M6 26 32 12l26 14v22L32 62 6 48z"/><path d="M6 26l26 14 26-14M32 40v22"/><path d="M19 19l26 14"/></svg>Calculate a load plan first.</div>
@@ -633,7 +956,7 @@ button.tile:not(.on) svg{opacity:.4}button.tile.mix{border-color:var(--accent);b
 <div id="rbar" class="row" style="margin:0 0 8px;gap:8px"><button type="button" data-v="340,28">Isometric</button><button type="button" data-v="0,90">Top</button><button type="button" data-v="0,0">Side</button><button type="button" data-v="270,15">Door end</button><button type="button" data-v="90,15">Front end</button><button type="button" id="rl" aria-label="Rotate left 90 degrees">⟲ 90°</button><button type="button" id="rr" aria-label="Rotate right 90 degrees">⟳ 90°</button><label class="chk"><input id="auto" type="checkbox"> Auto-rotate</label><button type="button" id="zmode">Drag: Rotate</button></div>
 <div class="row"><label for="yaw" style="margin:0">Rotate view</label><input id="yaw" type="range" min="0" max="360" step="any" value="340" style="max-width:150px"><label for="tilt" style="margin:0">Tilt</label><input id="tilt" type="range" min="0" max="90" step="any" value="28" style="max-width:110px"><label class="chk"><input id="step" type="checkbox"> Progressive loading</label>
 <span id="sc" style="display:none;gap:8px;align-items:center;flex-wrap:wrap"><select id="smode" style="width:auto"><option value="row">By row</option><option value="layer">By layer</option><option value="piece">By carton</option></select><select id="spd" style="width:auto" aria-label="Speed"><option value="3000">Speed: very slow</option><option value="1800" selected>Speed: slow</option><option value="1000">Speed: normal</option><option value="500">Speed: fast</option><option value="150">Speed: very fast</option></select><button id="prev" type="button" aria-label="Previous">‹</button><button id="play" type="button">Play</button><button id="next" type="button" aria-label="Next">›</button><input id="stepr" type="range" min="1" max="1" value="1" style="max-width:220px" aria-label="Loading step"></span></div><p class="note" id="stepl" style="margin:6px 0 0"></p></div>
-<p class="note">Tap any carton in 3D view to inspect its SKU, orientation and position, or enable Move Cartons to drag/rotate boxes. Switch to 2D View for face arrows (⊙ = top face toward you) and printed carton side dimensions. Loading runs from Front Wall to Door Side.</p><div class="scroll" style="margin-top:10px"><table class="plan" id="ctab"></table></div><div class="scroll" style="margin-top:14px"><table class="plan" id="cgtab"></table></div><div class="scroll" style="margin-top:14px"><table class="plan" id="sum"></table></div></div></div><div class="navrow"><button type="button" data-go="1">‹ Back: Cargo</button><button class="primary" type="button" data-go="3">Next: Load Plan, PDF and Excel ›</button></div></section>
+<p class="note">Tap any carton in 3D view to inspect its SKU, orientation and position, or enable Move Cartons to drag/rotate boxes. Switch to 2D View for face arrows (⊙ = top face toward you) and printed carton side dimensions. Loading runs from Front Wall to Door Side.</p><details class="mfd" id="plancard"><summary><span>Container loading plan</span></summary><div class="scroll" style="margin-top:10px"><table class="plan" id="ctab"></table></div><div class="scroll" style="margin-top:14px"><table class="plan" id="cgtab"></table></div><div class="scroll" style="margin-top:14px"><table class="plan" id="sum"></table></div></details></div></div><div class="navrow"><button type="button" data-go="1">‹ Back: Cargo</button><button class="primary" type="button" data-go="3">Next: Load Plan, PDF and Excel ›</button></div></section>
 
 <section class="pg" id="p3"><div class="card"><h2>Load Plan &amp; Exports</h2><div id="empty3" class="empty"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M6 26 32 12l26 14v22L32 62 6 48z"/><path d="M6 26l26 14 26-14M32 40v22"/><path d="M40 16v10M40 26l-6-4M40 26l6-4"/></svg>Calculate a load plan first.</div>
 <div id="out3" style="display:none">
