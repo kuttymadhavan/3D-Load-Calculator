@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="format-detection" content="telephone=no"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>CubeFit - 3D Load Calculator</title>
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="CubeFit"><meta name="theme-color" content="#0b0f12">
 <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22CubeFit%20-%203D%20Load%20Calculator%22%2C%22short_name%22%3A%22CubeFit%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f7f9fa%22%2C%22theme_color%22%3A%22%230b0f12%22%2C%22description%22%3A%22Offline%203D%20Container%20and%20Truck%20Load%20Calculator%22%7D">
@@ -584,8 +584,9 @@ button.tile:not(.on) svg{opacity:.4}button.tile.mix{border-color:var(--accent);b
      Load plan, Load details, Export.
    • Turns nav#steps into a fixed bottom tab bar (Projects/Cargo/Load/Export).
    • Puts every long secondary block in a bottom sheet with its own content.
-   • Guarantees the tab bar never covers content: main is sized to the viewport
-     minus the bar, and every screen is a flex column, so docks sit above the bar.
+   • Guarantees the tab bar never covers content: main is anchored to the
+     viewport between the status strip and the bar, and every screen is a flex
+     column, so docks always sit above the bar.
 
    What it does NOT do
    -------------------
@@ -623,11 +624,18 @@ button.tile:not(.on) svg{opacity:.4}button.tile.mix{border-color:var(--accent);b
 }
 
 html.mf, html.mf body{height:100%}
+/* The canonical stylesheet pads :root by the safe areas AND the frame below is
+   inset by the same amounts, so the inset was being counted twice: the frame
+   started one status bar too low and ended one status bar too far down — under
+   the tab bar, where the action docks live. Own the safe area exactly once,
+   through --mf-top-inset / --mf-bot-inset, and clear the inherited padding. */
+html.mf, html.mf body{padding-top:0;padding-bottom:0;padding-left:0;padding-right:0}
+html.mf{overflow:hidden}
 html.mf *{box-sizing:border-box}
 html.mf body{
   margin:0;overflow:hidden;background:var(--mf-edge-color);color:var(--ink);
   font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  -webkit-text-size-adjust:100%;
+  -webkit-text-size-adjust:100%;overscroll-behavior:none;
 }
 /* Installed (standalone) apps draw edge-to-edge; Android can report a zero
    top inset while the status bar still overlaps. Reserve a real status strip.
@@ -638,13 +646,18 @@ html.mf body{
 html.mf.mf-installed{--mf-top-inset:max(env(safe-area-inset-top,0px),30px)}
 
 /* --------------------------------------------------------------------------
-   2. PHONE FRAME — a hard matte edge, then the screen. main ends where the
-   floating tab bar begins. No overlap, ever.
+   2. PHONE FRAME — a hard matte edge, then the screen.
+   The frame is anchored to the viewport: its top is pinned below the status
+   strip and its bottom is pinned above the tab bar, so it is structurally
+   impossible for a dock to hide behind the bar. No measured height is used,
+   so a stale visualViewport reading can no longer stretch the layout.
    -------------------------------------------------------------------------- */
 html.mf main{
-  height:calc(var(--mf-vh,100dvh) - var(--mf-top-inset) - var(--mf-bot-inset) - var(--mf-navh) - var(--mf-edge));
-  width:calc(100% - (2 * var(--mf-edge)));
-  max-width:540px;margin:var(--mf-top-inset) auto 0;padding:0 10px 0;
+  position:fixed;left:0;right:0;margin:0 auto;
+  width:min(calc(100% - (2 * var(--mf-edge))),540px);
+  top:calc(var(--mf-top-inset) + var(--mf-edge));
+  bottom:calc(var(--mf-bot-inset) + var(--mf-navh) + var(--mf-edge));
+  padding:0 10px;
   display:flex;flex-direction:column;overflow:hidden;background:var(--bg);
   border-radius:18px;
   box-shadow:0 0 0 1px rgba(255,255,255,.06),0 10px 28px rgba(0,0,0,.35);
@@ -702,11 +715,20 @@ html.mf nav#steps button:active{transform:scale(.97)}
 /* toasts must clear the bar */
 html.mf #toast{bottom:calc(var(--mf-bot-inset) + var(--mf-navh) + var(--mf-edge) + 10px);z-index:500}
 
+/* ---- while the keyboard is up ------------------------------------------ *
+   The keyboard owns the bottom of the screen. The tab bar steps aside and the
+   frame claims its space, so the field being typed in and the action above it
+   are never trapped under the bar and the keyboard at the same time.        */
+html.mf.mf-kbd nav#steps{opacity:0;pointer-events:none}
+html.mf.mf-kbd main{bottom:calc(var(--mf-bot-inset) + var(--mf-edge))}
+html.mf.mf-kbd #toast{bottom:calc(var(--mf-bot-inset) + var(--mf-edge) + 10px)}
+
 /* dialogs and progress overlays stay inside the matte frame */
 html.mf .prog{
   left:50%;right:auto;transform:translateX(-50%);
   width:min(calc(100% - (2 * var(--mf-edge))),540px);
-  top:var(--mf-top-inset);bottom:var(--mf-bot-inset);
+  top:calc(var(--mf-top-inset) + var(--mf-edge));
+  bottom:calc(var(--mf-bot-inset) + var(--mf-edge));
   border-radius:18px;overflow:hidden;
 }
 html.mf .prog .box{max-width:calc(100vw - 60px)}
@@ -734,7 +756,7 @@ html.mf #p1>.card>h2{display:none}
 
 html.mf .mf-scroll{
   flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
-  -webkit-overflow-scrolling:touch;padding-bottom:20px;
+  -webkit-overflow-scrolling:touch;padding-bottom:20px;scroll-padding-bottom:10px;
   -webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 16px),transparent);
   mask-image:linear-gradient(to bottom,#000 calc(100% - 16px),transparent);
 }
@@ -837,7 +859,7 @@ html.mf #preview .bar{height:5px;border-radius:4px;background:var(--line);overfl
 html.mf #preview .bar i{display:block;height:100%;background:var(--ok)}
 
 html.mf #mf-lines{
-  flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:1px 0 20px;
+  flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:1px 0 20px;scroll-padding-bottom:10px;
   -webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 16px),transparent);
   mask-image:linear-gradient(to bottom,#000 calc(100% - 16px),transparent);
 }
@@ -1004,8 +1026,8 @@ html.mf #mf-s-details .row button{min-height:34px;font-size:12px}
 /* --------------------------------------------------------------------------
    7. STEP 4 · EXPORT
    -------------------------------------------------------------------------- */
-html.mf #p3>.card{display:flex;flex-direction:column;flex:0 0 auto;min-height:0;padding:8px;margin:0 0 6px}
-html.mf #out3{position:relative;flex:0 0 auto;min-height:0;margin-bottom:0}
+html.mf #p3>.card{display:flex;flex-direction:column;flex:1;min-height:0;padding:8px;margin:0 0 6px}
+html.mf #out3{position:relative;flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;margin-bottom:0;scroll-padding-bottom:10px}
 html.mf #out3>p.note{display:none!important}
 html.mf .mf-out3-inner{display:flex;flex-direction:column;overscroll-behavior:contain;padding:1px 1px 4px}
 html.mf .mf-gcol{display:flex;flex-direction:column;gap:6px}
@@ -1051,7 +1073,7 @@ html.mf .mf-sheet-head{flex:none;display:flex;align-items:center;gap:8px;padding
 html.mf .mf-sheet-head h2{flex:1;margin:0;font-size:14px;line-height:1.2}
 html.mf .mf-sheet-head button{width:34px;height:34px;border:0;border-radius:9px;background:color-mix(in srgb,var(--ink) 7%,var(--bg));color:var(--ink);font-size:15px;padding:0;flex:none}
 html.mf .mf-sheet-body{
-  flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:10px 14px 22px;
+  flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:10px 14px 22px;scroll-padding-bottom:12px;
   -webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 16px),transparent);
   mask-image:linear-gradient(to bottom,#000 calc(100% - 16px),transparent);
 }
@@ -2593,27 +2615,88 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
   D.documentElement.classList.add('mf');
   D.body.dataset.mfsub = 'proj';
 
-  /* ---- frame height + installed mode ---------------------------------- *
-   * The screen must equal the visible viewport on every phone, including
-   * when a browser toolbar collapses or an installed app draws under the
-   * status bar. Measure it instead of trusting 100vh/100dvh alone.        */
-  (function frameMetrics() {
-    var root = D.documentElement;
-    function setVH() {
-      var vv = W.visualViewport;
-      var h = Math.round(vv ? vv.height : (W.innerHeight || root.clientHeight));
-      if (h > 0) root.style.setProperty('--mf-vh', h + 'px');
-    }
-    setVH();
-    W.addEventListener('resize', setVH);
-    W.addEventListener('orientationchange', function () { setTimeout(setVH, 250); });
-    if (W.visualViewport) W.visualViewport.addEventListener('resize', setVH);
+  /* ---- installed mode -------------------------------------------------- *
+   * The frame is anchored to the viewport in CSS, so no height is measured
+   * here. A stale visualViewport reading can no longer stretch the layout.
+   * Installed apps draw under the status bar; the platform tells us so.    */
+  (function installedMode() {
     try {
       var installed = W.matchMedia(
         '(display-mode: standalone), (display-mode: fullscreen), (display-mode: minimal-ui)'
       ).matches || W.navigator.standalone === true;
-      if (installed) root.classList.add('mf-installed');
+      if (installed) D.documentElement.classList.add('mf-installed');
     } catch (e) { /* older browsers: keep the compact top inset */ }
+  })();
+
+  /* ---- keyboards: the right layout, the right capitalisation ----------- *
+   * Text fields get the alphabet keyboard and capitalise Every Word; every
+   * numeric field gets a number pad. Nothing is edited in the canonical app:
+   * the attributes are applied to the real inputs — including the ones the
+   * app builds for each cargo line — and re-applied whenever the DOM grows. */
+  var SKIP_TYPE = {
+    hidden: 1, checkbox: 1, radio: 1, file: 1, range: 1,
+    color: 1, button: 1, submit: 1, reset: 1, image: 1
+  };
+  function hintOne(el) {
+    if (!el || (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA')) return;
+    var type = (el.getAttribute('type') || 'text').toLowerCase();
+    if (SKIP_TYPE[type]) return;
+
+    if (el.tagName === 'TEXTAREA' || type === 'text' || type === 'search' || type === 'url') {
+      if (el.id === 'csvtxt') {
+        /* pasted spreadsheet rows must never be re-capitalised */
+        el.setAttribute('autocapitalize', 'none');
+        el.setAttribute('autocorrect', 'off');
+        el.setAttribute('spellcheck', 'false');
+        return;
+      }
+      el.setAttribute('autocapitalize', 'words');
+      el.setAttribute('autocorrect', 'on');
+      el.setAttribute('spellcheck', 'true');
+      if (!el.getAttribute('inputmode')) el.setAttribute('inputmode', 'text');
+      return;
+    }
+
+    if (type === 'number' || type === 'tel') {
+      el.setAttribute('autocapitalize', 'off');
+      if (!el.getAttribute('inputmode')) el.setAttribute('inputmode', type === 'tel' ? 'tel' : 'decimal');
+    }
+  }
+  function hintInputs(root) {
+    all('input,textarea', root || D).forEach(hintOne);
+  }
+  hintInputs();
+  D.addEventListener('focusin', function (e) { hintOne(e.target); }, true);
+  var hintPending = null;
+  function scheduleHints() {
+    if (hintPending) return;
+    hintPending = setTimeout(function () { hintPending = null; hintInputs(); }, 140);
+  }
+  if (W.MutationObserver) new MutationObserver(scheduleHints).observe(D.body, { childList: true, subtree: true });
+
+  /* ---- keyboard awareness --------------------------------------------- *
+   * While a field has focus the keyboard owns the bottom of the screen: the
+   * tab bar steps aside and the frame claims the freed space, while the field
+   * is scrolled clear of the keyboard inside its own scroller.             */
+  (function keyboardFrame() {
+    var root = D.documentElement;
+    function isField(t) { return !!t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName || ''); }
+    function setKbd(on) { root.classList.toggle('mf-kbd', !!on); }
+    D.addEventListener('focusin', function (e) {
+      if (!isField(e.target)) return;
+      setKbd(true);
+      var el = e.target;
+      setTimeout(function () {
+        try { el.scrollIntoView({ block: 'center', inline: 'nearest' }); } catch (err) { }
+      }, 260);
+    }, true);
+    D.addEventListener('focusout', function () {
+      setTimeout(function () { if (!isField(D.activeElement)) setKbd(false); }, 160);
+    }, true);
+    on(W, 'pageshow', function () { setKbd(false); });
+    D.addEventListener('visibilitychange', function () {
+      if (!D.hidden) setTimeout(function () { setKbd(isField(D.activeElement)); }, 60);
+    });
   })();
 
   var stepEl = $('hstep');
