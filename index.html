@@ -607,9 +607,9 @@ button.tile:not(.on) svg{opacity:.4}button.tile.mix{border-color:var(--accent);b
   --chart:#3b82f6; --view:#f8fafc;
   --mf-top:#0e5a6a; --mf-top-2:#083b46; --mf-top-mute:#7ce3ed;
   --mf-navh:58px; --mf-r:18px; --mf-gap:8px;
-  --mf-edge:6px; --mf-edge-color:#0b0f12;
-  --mf-top-inset:max(env(safe-area-inset-top,0px),8px);
-  --mf-bot-inset:max(env(safe-area-inset-bottom,0px),10px);
+  --mf-edge:0px; --mf-edge-color:var(--bg);
+  --mf-top-inset:env(safe-area-inset-top,0px);
+  --mf-bot-inset:max(env(safe-area-inset-bottom,0px),12px);
   --select-chevron:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%230f766e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   --shadow-sm:0 2px 8px -1px rgba(11,16,32,.05),0 1px 3px rgba(11,16,32,.03);
   --shadow:0 10px 28px -4px rgba(11,16,32,.08),0 4px 10px -2px rgba(11,16,32,.04);
@@ -651,7 +651,7 @@ html.mf, html.mf body{padding-top:0;padding-bottom:0;padding-left:0;padding-righ
 html.mf{overflow:hidden}
 html.mf *{box-sizing:border-box}
 html.mf body{
-  margin:0;overflow:hidden;background:var(--mf-edge-color);color:var(--ink);
+  margin:0;overflow:hidden;background:var(--bg);color:var(--ink);
   font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   -webkit-text-size-adjust:100%;overscroll-behavior:none;
 }
@@ -678,44 +678,34 @@ html.mf textarea:focus{
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
   outline:2px solid var(--accent);outline-offset:2px;
 }
-/* Installed (standalone) apps draw edge-to-edge; Android can report a zero
-   top inset while the status bar still overlaps. Reserve a real status strip.
-   Touch devices get the same strip in a browser tab, so a phone never clips. */
-@media (pointer:coarse){
-  html.mf{--mf-top-inset:max(env(safe-area-inset-top,0px),30px)}
-}
-html.mf.mf-installed{--mf-top-inset:max(env(safe-area-inset-top,0px),30px)}
 
 /* --------------------------------------------------------------------------
-   2. PHONE FRAME — a hard matte edge, then the screen.
-   The frame is anchored to the viewport: its top is pinned below the status
-   strip and its bottom is pinned above the tab bar, so it is structurally
-   impossible for a dock to hide behind the bar. No measured height is used,
-   so a stale visualViewport reading can no longer stretch the layout.
+   2. PHONE FRAME — true edge-to-edge native viewport on mobile.
+   The frame is anchored to the viewport: its top is pinned to the screen top
+   and its bottom is pinned above the tab bar, so it is structurally
+   impossible for a dock to hide behind the bar.
    -------------------------------------------------------------------------- */
 html.mf main{
   position:fixed;left:0;right:0;margin:0 auto;
-  width:min(calc(100% - (2 * var(--mf-edge))),540px);
-  top:calc(var(--mf-top-inset) + var(--mf-edge));
-  bottom:calc(var(--mf-bot-inset) + var(--mf-navh) + var(--mf-edge));
-  padding:0 10px;
+  width:100%;max-width:100%;
+  top:0;
+  bottom:calc(var(--mf-bot-inset) + var(--mf-navh));
+  padding:0 12px;
   display:flex;flex-direction:column;overflow:hidden;background:var(--bg);
-  border-radius:20px;
-  border:1px solid var(--line);
-  box-shadow:0 0 0 1px rgba(255,255,255,.06),0 12px 36px rgba(0,0,0,.38);
+  border:none;border-radius:0;box-shadow:none;
 }
-html.mf #savebanner{flex:none;margin:0 -10px 6px;border-radius:0}
+html.mf #savebanner{flex:none;margin:0 -12px 6px;border-radius:0}
 html.mf #savebanner span{font-size:11px;line-height:1.25}
 
 /* ---- app bar ------------------------------------------------------------ */
 html.mf #hdr{
   flex:none;position:relative;top:auto;z-index:30;
   display:flex;align-items:center;gap:8px;
-  margin:0 -10px var(--mf-gap);padding:10px 14px;
+  margin:0 -12px var(--mf-gap);padding:calc(var(--mf-top-inset) + 8px) 14px 10px;
   background:color-mix(in srgb,var(--panel) 94%,transparent);
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   border:0;border-bottom:1px solid var(--line);
-  border-radius:20px 20px 0 0;
+  border-radius:0;
   box-shadow:0 1px 6px rgba(11,16,32,.04);
   color:var(--ink);
 }
@@ -761,15 +751,16 @@ html.mf #hdr button.thm:active{
 
 /* ---- bottom tab bar ----------------------------------------------------- */
 html.mf nav#steps{
-  position:fixed;left:50%;bottom:var(--mf-bot-inset);transform:translateX(-50%);
-  width:min(calc(100% - (2 * var(--mf-edge))),540px);height:var(--mf-navh);
-  margin:0;padding:5px 8px;
+  position:fixed;left:0;right:0;bottom:0;transform:none;
+  width:100%;max-width:100%;height:calc(var(--mf-navh) + var(--mf-bot-inset));
+  margin:0;padding:5px 8px calc(max(var(--mf-bot-inset),10px));
   display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;
   background:color-mix(in srgb,var(--panel) 94%,transparent);
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border:1.5px solid var(--line);
-  border-radius:18px;
-  box-shadow:var(--shadow);
+  border-top:1px solid var(--line);
+  border-left:none;border-right:none;border-bottom:none;
+  border-radius:0;
+  box-shadow:0 -4px 20px rgba(11,16,32,.08);
   z-index:120;
   transition:opacity .18s ease, transform .18s ease;
 }
@@ -798,25 +789,25 @@ html.mf nav#steps button.on svg{
 html.mf nav#steps button:active{transform:scale(.95)}
 
 /* toasts must clear the bar */
-html.mf #toast{bottom:calc(var(--mf-bot-inset) + var(--mf-navh) + var(--mf-edge) + 10px);z-index:500}
+html.mf #toast{bottom:calc(var(--mf-bot-inset) + var(--mf-navh) + 10px);z-index:500}
 
 /* ---- while the keyboard is up ------------------------------------------ *
    The keyboard owns the bottom of the screen. The tab bar steps aside and the
    frame claims its space, so the field being typed in and the action above it
    are never trapped under the bar and the keyboard at the same time.        */
 html.mf.mf-kbd nav#steps{opacity:0;pointer-events:none}
-html.mf.mf-kbd main{bottom:calc(var(--mf-bot-inset) + var(--mf-edge))}
-html.mf.mf-kbd #toast{bottom:calc(var(--mf-bot-inset) + var(--mf-edge) + 10px)}
+html.mf.mf-kbd main{bottom:var(--mf-bot-inset)}
+html.mf.mf-kbd #toast{bottom:calc(var(--mf-bot-inset) + 10px)}
 
 /* dialogs and progress overlays stay inside the matte frame */
 html.mf .prog{
-  left:50%;right:auto;transform:translateX(-50%);
-  width:min(calc(100% - (2 * var(--mf-edge))),540px);
-  top:calc(var(--mf-top-inset) + var(--mf-edge));
-  bottom:calc(var(--mf-bot-inset) + var(--mf-edge));
-  border-radius:18px;overflow:hidden;
+  left:0;right:0;transform:none;
+  width:100%;max-width:100%;
+  top:0;
+  bottom:var(--mf-bot-inset);
+  border-radius:0;overflow:hidden;
 }
-html.mf .prog .box{max-width:calc(100vw - 60px)}
+html.mf .prog .box{max-width:calc(100vw - 32px)}
 
 /* --------------------------------------------------------------------------
    3. SHARED SCREEN PIECES
@@ -1214,10 +1205,10 @@ html.mf #vw .row:last-of-type{display:none}
 /* full-screen chart keeps the same matte frame as every other screen */
 html.mf #vw.full{
   position:fixed;z-index:130;
-  left:50%;right:auto;transform:translateX(-50%);
-  width:min(calc(100% - (2 * var(--mf-edge))),540px);
-  top:var(--mf-top-inset);bottom:var(--mf-bot-inset);
-  border-radius:18px;overflow:auto;
+  left:0;right:0;transform:none;
+  width:100%;max-width:100%;
+  top:0;bottom:0;
+  border-radius:0;overflow:auto;
   padding:8px 10px;
 }
 html.mf #stepl{font-size:10px;margin:6px 0}
@@ -1282,22 +1273,22 @@ html.mf #empty3 svg{width:56px;height:56px;margin-bottom:6px}
    8. BOTTOM SHEETS
    -------------------------------------------------------------------------- */
 html.mf #mf-sheetwrap{
-  position:fixed;left:50%;transform:translateX(-50%);
-  width:min(calc(100% - (2 * var(--mf-edge))),540px);
-  top:var(--mf-top-inset);
-  bottom:calc(var(--mf-bot-inset) + var(--mf-navh) + var(--mf-edge));
-  z-index:260;display:none;border-radius:18px;overflow:hidden;
+  position:fixed;left:0;right:0;transform:none;
+  width:100%;max-width:100%;
+  top:0;
+  bottom:calc(var(--mf-bot-inset) + var(--mf-navh));
+  z-index:260;display:none;border-radius:0;overflow:hidden;
 }
 html.mf #mf-sheetwrap.on{display:block}
 html.mf .mf-veil{position:absolute;inset:0;background:rgba(13,31,43,.45);animation:mf-in .18s ease}
 html.mf .mf-sheet{
-  position:absolute;left:50%;bottom:0;
-  transform:translateX(-50%);width:min(100%,540px);max-height:calc(100% - 10px);
+  position:absolute;left:0;right:0;bottom:0;
+  transform:none;width:100%;max-width:100%;max-height:calc(100% - 10px);
   background:var(--panel);border:1.5px solid var(--line);border-bottom:0;border-radius:24px 24px 0 0;
   box-shadow:0 -12px 36px rgba(13,31,43,.28);display:flex;flex-direction:column;
   animation:mf-up .22s cubic-bezier(.2,.8,.2,1);
 }
-@keyframes mf-up{from{transform:translate(-50%,26px);opacity:.5}to{transform:translate(-50%,0);opacity:1}}
+@keyframes mf-up{from{transform:translateY(26px);opacity:.5}to{transform:translateY(0);opacity:1}}
 @keyframes mf-in{from{opacity:0}to{opacity:1}}
 html.mf .mf-sheet:before{content:"";display:block;width:38px;height:4.5px;border-radius:3px;background:var(--line);margin:8px auto 4px;flex:none}
 html.mf .mf-sheet-head{flex:none;display:flex;align-items:center;gap:8px;padding:2px 14px 8px;border-bottom:1px solid var(--line)}
@@ -1377,17 +1368,40 @@ html.mf #mf-s-company #repcard .row button{min-height:42px}
   html.mf .mf-recent{padding:6px 2px}
   html.mf .mf-seg button{min-height:33px}
 }
-@media (min-width:701px){
+@media (min-width:621px){
   html.mf body{
     background:#070a14;
-    background-image:radial-gradient(900px 520px at 15% 10%,rgba(14,90,106,.25),transparent 65%),
-                     radial-gradient(760px 420px at 85% 90%,rgba(45,212,191,.15),transparent 60%);
+    background-image:radial-gradient(1100px 650px at 50% -10%,rgba(14,90,106,0.18),transparent 70%),
+                     radial-gradient(900px 500px at 50% 105%,rgba(45,212,191,0.12),transparent 70%);
     background-repeat:no-repeat;background-attachment:fixed;
+    display:flex;align-items:center;justify-content:center;
   }
   html.mf main{
-    box-shadow:0 0 0 1px rgba(255,255,255,.08),0 24px 60px rgba(0,0,0,.60);
+    width:min(480px, calc(100vw - 32px));
+    height:min(900px, calc(100vh - 48px));
+    top:auto;bottom:auto;
+    position:relative;
+    border-radius:36px;
+    border:2px solid var(--line);
+    box-shadow:0 24px 80px rgba(0,0,0,.55),0 0 0 1px rgba(45,212,191,.15);
   }
-  html.mf nav#steps{border-radius:18px}
+  html.mf #hdr{
+    margin:0 -12px var(--mf-gap);
+    padding:14px 16px 10px;
+    border-radius:34px 34px 0 0;
+  }
+  html.mf nav#steps{
+    width:min(480px, calc(100vw - 32px));
+    left:50%;transform:translateX(-50%);
+    border-radius:0 0 34px 34px;
+    border:1px solid var(--line);
+    border-top:1px solid var(--line);
+  }
+  html.mf #mf-sheetwrap{
+    width:min(480px, calc(100vw - 32px));
+    left:50%;transform:translateX(-50%);
+    border-radius:34px;
+  }
 }
 
 </style>
@@ -3199,9 +3213,27 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
     }
   }
 
+  function isFolderSupported() {
+    return !!(W.showDirectoryPicker && W.isSecureContext !== false);
+  }
+
+  function pickMobileCloudFile(provId) {
+    if (provId) {
+      try { localStorage.setItem('cubefit_cloud_provider', provId); } catch (_) {}
+    }
+    var pload = $('pload');
+    if (pload) {
+      pload.click();
+    } else {
+      var fin = $('filein') || $('xlsin');
+      if (fin) fin.click();
+    }
+    renderCloudStorageSection();
+  }
+
   async function connectCubeFitCloudProvider(provId) {
-    if (!W.showDirectoryPicker) {
-      alert('File System Access API is not supported in this browser. Please use Chrome, Edge, or Brave.');
+    if (!isFolderSupported()) {
+      pickMobileCloudFile(provId);
       return;
     }
     try {
@@ -3240,9 +3272,9 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
 
       renderCloudStorageSection();
     } catch (err) {
-      if (err.name !== 'AbortError') {
-        console.error(err);
-        alert('Could not connect folder: ' + (err.message || err));
+      if (err && err.name !== 'AbortError') {
+        if (W.console) W.console.warn('Could not connect folder:', err);
+        if (typeof W.flashMsg === 'function') W.flashMsg('Folder selection canceled or unavailable');
       }
     }
   }
@@ -3268,13 +3300,16 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
           Object.keys(incoming).forEach(function (k) { current[k] = incoming[k]; });
           localStorage.setItem(PK, JSON.stringify(current));
           renderRecents();
-          alert('Synchronized ' + Object.keys(incoming).length + ' calculations from cloud folder.');
+          if (typeof W.flashMsg === 'function') W.flashMsg('Synchronized ' + Object.keys(incoming).length + ' calculations from cloud folder.');
+          else alert('Synchronized ' + Object.keys(incoming).length + ' calculations from cloud folder.');
         } else {
-          alert('Remote cloud file checked (up to date).');
+          if (typeof W.flashMsg === 'function') W.flashMsg('Remote cloud file checked (up to date).');
+          else alert('Remote cloud file checked (up to date).');
         }
       }
     } catch (err) {
-      alert('Reconcile check: ' + (err.message || 'No newer remote file'));
+      if (typeof W.flashMsg === 'function') W.flashMsg('Reconcile check: ' + (err.message || 'No newer remote file'));
+      else alert('Reconcile check: ' + (err.message || 'No newer remote file'));
     }
   }
 
@@ -3309,9 +3344,10 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
     var folderName = localStorage.getItem('cubefit_cloud_folder_name') || '';
     var prov = getCubeFitCloudProvider(provId);
     var isConnected = Boolean(prov && folderName);
+    var fsaOk = isFolderSupported();
 
     var statusHtml = '';
-    if (isConnected) {
+    if (isConnected && fsaOk) {
       statusHtml =
         '<div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:10px 12px; margin-bottom:8px;">' +
           '<div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">' +
@@ -3330,11 +3366,22 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
             '<button type="button" onclick="window.disconnectCubeFitCloudStorage()" style="font-size:11px; padding:3px 8px; border-radius:6px; border:none; background:transparent; color:#dc2626; font-weight:600; cursor:pointer;">Disconnect</button>' +
           '</div>' +
         '</div>';
+    } else if (prov && !fsaOk) {
+      statusHtml =
+        '<div style="background:color-mix(in srgb,var(--accent) 8%,var(--panel)); border:1.5px solid color-mix(in srgb,var(--accent) 35%,var(--line)); border-radius:10px; padding:9px 12px; margin-bottom:8px;">' +
+          '<div style="display:flex; align-items:center; gap:8px;">' +
+            '<span style="font-size:20px;">' + prov.icon + '</span>' +
+            '<div>' +
+              '<div style="font-weight:750; font-size:12px; color:var(--ink);">' + prov.name + ' Active (Mobile / Files)</div>' +
+              '<div style="font-size:10.5px; color:var(--mute); margin-top:1px;">On iPhone / iPad, load plans open and save directly via <strong>iCloud Drive &amp; Files app</strong>.</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
     } else {
       statusHtml =
         '<div style="background:var(--card-sub, #f8fafc); border:1px solid var(--line, #e2e8f0); border-radius:10px; padding:10px 12px; margin-bottom:8px;">' +
           '<div style="font-weight:700; font-size:12px; color:var(--text, #1e293b);">○ Browser Storage Only</div>' +
-          '<div style="font-size:10.5px; color:var(--mute, #64748b); margin-top:2px;">Calculations are saved inside this browser only. Connect a cloud folder for continuous auto-save across your devices.</div>' +
+          '<div style="font-size:10.5px; color:var(--mute, #64748b); margin-top:2px;">Calculations are saved inside this browser only. Connect a cloud provider or choose Files app for backup across devices.</div>' +
         '</div>';
     }
 
