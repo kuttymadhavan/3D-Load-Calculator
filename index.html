@@ -1001,6 +1001,50 @@ html.mf #preview b{color:var(--ink)}
 html.mf #preview .bar{height:5px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:4px}
 html.mf #preview .bar i{display:block;height:100%;background:var(--ok)}
 
+/* one-click excel / csv upload card */
+html.mf .mf-upload-card{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  background:color-mix(in srgb,var(--accent) 7%,var(--panel));
+  border:1.5px dashed color-mix(in srgb,var(--accent) 45%,var(--line));
+  border-radius:14px;padding:9px 12px;margin:8px 0 3px;cursor:pointer;
+  transition:all .15s ease;
+}
+html.mf .mf-upload-card:hover,
+html.mf .mf-upload-card.drag{
+  background:color-mix(in srgb,var(--accent) 14%,var(--panel));
+  border-color:var(--accent);transform:translateY(-1px);
+  box-shadow:var(--shadow-sm);
+}
+html.mf .mf-upload-card:active{transform:scale(.985)}
+html.mf .mf-uc-left{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
+html.mf .mf-uc-icon{
+  width:32px;height:32px;border-radius:10px;background:var(--accbg);color:var(--accent);
+  display:grid;place-items:center;font-size:16px;flex:none;
+}
+html.mf .mf-uc-text{min-width:0;flex:1}
+html.mf .mf-uc-text b{
+  display:block;font-size:12px;font-weight:750;color:var(--ink);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+html.mf .mf-uc-text small{
+  display:block;font-size:9.5px;color:var(--mute);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;
+}
+html.mf .mf-uc-btn{
+  flex:none;min-height:32px;padding:4px 10px;border-radius:8px;border:0;
+  background:var(--accent);color:var(--on-accent);font:inherit;font-size:11px;
+  font-weight:750;cursor:pointer;box-shadow:0 2px 6px color-mix(in srgb,var(--accent) 25%,transparent);
+  transition:transform .12s ease;
+}
+html.mf .mf-uc-btn:active{transform:scale(.92)}
+html.mf .mf-uc-subrow{display:flex;justify-content:flex-end;margin:0 0 6px;padding:0 2px}
+html.mf .mf-uc-link{
+  background:transparent;border:0;color:var(--accent);font:inherit;font-size:10px;
+  font-weight:650;cursor:pointer;padding:1px 4px;text-decoration:underline;
+  transition:opacity .15s ease;
+}
+html.mf .mf-uc-link:hover{opacity:.8}
+
 html.mf #mf-lines{
   flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:1px 0 20px;scroll-padding-bottom:10px;
   -webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 16px),transparent);
@@ -1202,6 +1246,35 @@ html.mf .mf-status.warn{background:color-mix(in srgb,var(--amb) 12%,var(--panel)
 html.mf .mf-status.warn .dot{background:var(--amb)}
 html.mf .mf-group{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px;margin-bottom:7px}
 html.mf .mf-group>h3{margin:0 0 5px;font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--mute)}
+
+/* forklift loading sheet group */
+html.mf .mf-forklift-group{
+  background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 7%,var(--panel)),var(--panel));
+  border:1.5px solid color-mix(in srgb,var(--accent) 35%,var(--line));
+  border-radius:14px;padding:12px;margin-bottom:8px;box-shadow:var(--shadow-sm);
+}
+html.mf .mf-fc-badge{
+  display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--accent);background:var(--accbg);
+  padding:2px 8px;border-radius:99px;border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);
+  margin-bottom:5px;
+}
+html.mf #mf-btn-forklift{
+  width:100%;min-height:46px;background:var(--accent);color:var(--on-accent);
+  border:1.5px solid var(--accent);border-radius:12px;font:inherit;font-size:13px;
+  font-weight:800;box-shadow:0 3px 12px color-mix(in srgb,var(--accent) 30%,transparent);
+  cursor:pointer;transition:transform .12s ease,box-shadow .15s ease;
+}
+html.mf #mf-btn-forklift:active{transform:scale(.98)}
+
+/* column mapping modal enhancements */
+html.mf #colmapmodal .box{
+  background:var(--panel);border:1.5px solid var(--line);border-radius:18px;
+  box-shadow:var(--shadow);padding:14px;max-width:min(500px,calc(100vw - 32px));
+  max-height:85vh;overflow-y:auto;
+}
+html.mf #colmapfields select{width:100%;min-height:38px;font-size:12px;margin-top:2px}
+html.mf #colmapfields label{font-size:11px;font-weight:650;color:var(--mute)}
 html.mf #empty3{padding:10px}
 html.mf #empty3 svg{width:56px;height:56px;margin-bottom:6px}
 
@@ -3078,6 +3151,208 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
     if (openName === 'manage') closeSheet();
   }
 
+  /* ------------------------------------------------------------------ *
+   * CLOUD STORAGE & SYNC (Google Drive, OneDrive, Dropbox, iCloud, Local)
+   * ------------------------------------------------------------------ */
+  var CUBEFIT_CLOUD_PROVIDERS = [
+    { id: 'gdrive', name: 'Google Drive', hint: 'Google Drive > My Drive or streamed folder', icon: '🔵' },
+    { id: 'onedrive', name: 'OneDrive', hint: 'OneDrive folder or SharePoint synced drive', icon: '🔷' },
+    { id: 'dropbox', name: 'Dropbox', hint: 'Dropbox synced personal or team folder', icon: '📦' },
+    { id: 'icloud', name: 'iCloud Drive', hint: 'iCloud Drive (Finder sidebar or Files app)', icon: '☁️' },
+    { id: 'local', name: 'Local Drive', hint: 'Local Documents or corporate network drive', icon: '📁' }
+  ];
+
+  var cubeFitDirHandle = null;
+  var _cubeFitCloudTimer = null;
+
+  function getCubeFitCloudProvider(id) {
+    for (var i = 0; i < CUBEFIT_CLOUD_PROVIDERS.length; i++) {
+      if (CUBEFIT_CLOUD_PROVIDERS[i].id === id) return CUBEFIT_CLOUD_PROVIDERS[i];
+    }
+    return null;
+  }
+
+  function scheduleCubeFitCloudSync() {
+    if (!cubeFitDirHandle) return;
+    if (_cubeFitCloudTimer) clearTimeout(_cubeFitCloudTimer);
+    _cubeFitCloudTimer = setTimeout(function () {
+      flushCubeFitCloudSync();
+    }, 300);
+  }
+
+  async function flushCubeFitCloudSync() {
+    if (!cubeFitDirHandle) return;
+    try {
+      var P = store();
+      var fileHandle = await cubeFitDirHandle.getFileHandle('cubefit_load_plans.json', { create: true });
+      var writable = await fileHandle.createWritable();
+      var payload = JSON.stringify({
+        version: 2,
+        exportedAt: new Date().toISOString(),
+        generator: 'CubeFit - 3D Load Calculator',
+        projects: P
+      }, null, 2);
+      await writable.write(payload);
+      await writable.close();
+    } catch (err) {
+      console.warn('CubeFit Cloud Sync write error:', err);
+    }
+  }
+
+  async function connectCubeFitCloudProvider(provId) {
+    if (!W.showDirectoryPicker) {
+      alert('File System Access API is not supported in this browser. Please use Chrome, Edge, or Brave.');
+      return;
+    }
+    try {
+      var dirHandle = await W.showDirectoryPicker({ mode: 'readwrite' });
+      cubeFitDirHandle = dirHandle;
+      var folderName = dirHandle.name || 'Synced Folder';
+      localStorage.setItem('cubefit_cloud_provider', provId);
+      localStorage.setItem('cubefit_cloud_folder_name', folderName);
+
+      try {
+        var fileHandle = await dirHandle.getFileHandle('cubefit_load_plans.json');
+        var file = await fileHandle.getFile();
+        var text = await file.text();
+        if (text && text.trim().length > 10) {
+          var parsed = JSON.parse(text);
+          var incoming = parsed.projects || parsed.data || parsed;
+          if (incoming && typeof incoming === 'object' && Object.keys(incoming).length > 0) {
+            var confirmed = confirm('Found existing CubeFit load plans (' + Object.keys(incoming).length + ' calculations) in ' + folderName + '.\n\nClick OK to load projects from this cloud folder, or Cancel to overwrite cloud folder with your current local projects.');
+            if (confirmed) {
+              var current = store();
+              Object.keys(incoming).forEach(function (k) { current[k] = incoming[k]; });
+              localStorage.setItem(PK, JSON.stringify(current));
+              renderRecents();
+            } else {
+              await flushCubeFitCloudSync();
+            }
+          } else {
+            await flushCubeFitCloudSync();
+          }
+        } else {
+          await flushCubeFitCloudSync();
+        }
+      } catch (e) {
+        await flushCubeFitCloudSync();
+      }
+
+      renderCloudStorageSection();
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        console.error(err);
+        alert('Could not connect folder: ' + (err.message || err));
+      }
+    }
+  }
+
+  function disconnectCubeFitCloudStorage() {
+    cubeFitDirHandle = null;
+    localStorage.removeItem('cubefit_cloud_provider');
+    localStorage.removeItem('cubefit_cloud_folder_name');
+    renderCloudStorageSection();
+  }
+
+  async function reconcileCubeFitCloudStorage() {
+    if (!cubeFitDirHandle) return;
+    try {
+      var fileHandle = await cubeFitDirHandle.getFileHandle('cubefit_load_plans.json');
+      var file = await fileHandle.getFile();
+      var text = await file.text();
+      if (text) {
+        var parsed = JSON.parse(text);
+        var incoming = parsed.projects || parsed.data || parsed;
+        if (incoming && typeof incoming === 'object' && Object.keys(incoming).length > 0) {
+          var current = store();
+          Object.keys(incoming).forEach(function (k) { current[k] = incoming[k]; });
+          localStorage.setItem(PK, JSON.stringify(current));
+          renderRecents();
+          alert('Synchronized ' + Object.keys(incoming).length + ' calculations from cloud folder.');
+        } else {
+          alert('Remote cloud file checked (up to date).');
+        }
+      }
+    } catch (err) {
+      alert('Reconcile check: ' + (err.message || 'No newer remote file'));
+    }
+  }
+
+  function renderCubeFitCloudGrid(activeProvId) {
+    return '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(70px, 1fr)); gap:4px; margin:6px 0 10px;">' +
+      CUBEFIT_CLOUD_PROVIDERS.map(function (p) {
+        var isActive = activeProvId === p.id;
+        var shortName = p.id === 'gdrive' ? 'Google Drive' : (p.id === 'onedrive' ? 'OneDrive' : (p.id === 'dropbox' ? 'Dropbox' : (p.id === 'icloud' ? 'iCloud' : 'Local Drive')));
+        var shortHint = p.id === 'gdrive' ? 'My Drive' : (p.id === 'onedrive' ? 'Sync folder' : (p.id === 'dropbox' ? 'Team/Personal' : (p.id === 'icloud' ? 'Finder/Files' : 'Local/LAN')));
+        return '<div onclick="window.connectCubeFitCloudProvider(\x27' + p.id + '\x27)" ' +
+          'style="display:flex; flex-direction:column; justify-content:space-between; padding:5px 2px 4px; border-radius:6px; border:1px solid ' + (isActive ? '#2563eb' : 'var(--line, #e2e8f0)') + '; background:' + (isActive ? '#eff6ff' : 'var(--card-sub, #f8fafc)') + '; cursor:pointer; text-align:center; min-height:64px; box-sizing:border-box; transition:all 0.15s ease;">' +
+            '<div>' +
+              '<div style="font-size:15px; line-height:1.1; margin-bottom:1px;">' + p.icon + '</div>' +
+              '<div style="font-weight:700; font-size:10px; line-height:1.15; color:' + (isActive ? '#1d4ed8' : 'var(--text, #1e293b)') + '; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + shortName + '</div>' +
+              '<div style="font-size:8.5px; color:var(--mute, #64748b); line-height:1.1; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + shortHint + '</div>' +
+            '</div>' +
+            '<div style="margin-top:2px;">' +
+              '<span style="display:inline-block; font-size:8.5px; font-weight:600; padding:1px 4px; border-radius:3px; ' + (isActive ? 'background:#2563eb; color:#ffffff;' : 'background:rgba(0,0,0,0.06); color:var(--mute, #475569);') + '">' +
+                (isActive ? '✓ Active' : 'Connect') +
+              '</span>' +
+            '</div>' +
+          '</div>';
+      }).join('') +
+    '</div>';
+  }
+
+  var cloudBox = mk('div', 'mf-cloud-box'); cloudBox.id = 'mf-cloud-box';
+
+  function renderCloudStorageSection() {
+    if (!cloudBox) return;
+    var provId = localStorage.getItem('cubefit_cloud_provider') || '';
+    var folderName = localStorage.getItem('cubefit_cloud_folder_name') || '';
+    var prov = getCubeFitCloudProvider(provId);
+    var isConnected = Boolean(prov && folderName);
+
+    var statusHtml = '';
+    if (isConnected) {
+      statusHtml =
+        '<div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:10px 12px; margin-bottom:8px;">' +
+          '<div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">' +
+            '<div style="display:flex; align-items:center; gap:8px;">' +
+              '<span style="font-size:20px;">' + prov.icon + '</span>' +
+              '<div>' +
+                '<div style="font-weight:700; font-size:12px; color:#1e3a8a;">' + prov.name + ' Connected</div>' +
+                '<div style="font-size:10px; color:#3b82f6;">Folder: <strong>' + folderName + '</strong> &bull; <code>cubefit_load_plans.json</code></div>' +
+              '</div>' +
+            '</div>' +
+            '<span style="display:inline-block; font-size:9px; font-weight:700; padding:2px 7px; border-radius:12px; background:#dcfce7; color:#15803d; border:1px solid #86efac;">300ms Auto-Save</span>' +
+          '</div>' +
+          '<div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">' +
+            '<button type="button" onclick="window.reconcileCubeFitCloudStorage()" style="font-size:11px; padding:3px 8px; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; font-weight:600; cursor:pointer;">⚡ Check Updates / Reconcile</button>' +
+            '<button type="button" onclick="window.connectCubeFitCloudProvider(\x27' + provId + '\x27)" style="font-size:11px; padding:3px 8px; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; font-weight:600; cursor:pointer;">Choose Another Folder</button>' +
+            '<button type="button" onclick="window.disconnectCubeFitCloudStorage()" style="font-size:11px; padding:3px 8px; border-radius:6px; border:none; background:transparent; color:#dc2626; font-weight:600; cursor:pointer;">Disconnect</button>' +
+          '</div>' +
+        '</div>';
+    } else {
+      statusHtml =
+        '<div style="background:var(--card-sub, #f8fafc); border:1px solid var(--line, #e2e8f0); border-radius:10px; padding:10px 12px; margin-bottom:8px;">' +
+          '<div style="font-weight:700; font-size:12px; color:var(--text, #1e293b);">○ Browser Storage Only</div>' +
+          '<div style="font-size:10.5px; color:var(--mute, #64748b); margin-top:2px;">Calculations are saved inside this browser only. Connect a cloud folder for continuous auto-save across your devices.</div>' +
+        '</div>';
+    }
+
+    var gridHtml =
+      '<div>' +
+        '<div style="font-size:11.5px; font-weight:700; color:var(--text, #1e293b); margin:4px 0 2px;">Cloud Storage Providers</div>' +
+        '<div style="font-size:10px; color:var(--mute, #64748b); margin-bottom:6px;">Select your cloud storage service for automatic background syncing:</div>' +
+        renderCubeFitCloudGrid(provId) +
+      '</div>';
+
+    cloudBox.innerHTML = statusHtml + gridHtml;
+  }
+
+  W.connectCubeFitCloudProvider = connectCubeFitCloudProvider;
+  W.disconnectCubeFitCloudStorage = disconnectCubeFitCloudStorage;
+  W.reconcileCubeFitCloudStorage = reconcileCubeFitCloudStorage;
+  W.renderCubeFitCloudSection = renderCloudStorageSection;
+
   var hero = mk('div', 'mf-hero'); hero.id = 'mf-hero';
   var projScroll = mk('div', 'mf-scroll'); projScroll.id = 'mf-proj-scroll';
   var recents = mk('div', 'card'); recents.id = 'mf-recentcard';
@@ -3177,6 +3452,12 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
     move(cardProject, projScroll);
     projScroll.appendChild(recents);
     move(cardFiles, projScroll);
+    if (cardFiles) {
+      var rowEl = cardFiles.querySelector('.row');
+      if (rowEl) cardFiles.insertBefore(cloudBox, rowEl);
+      else cardFiles.appendChild(cloudBox);
+      renderCloudStorageSection();
+    }
     var dock = mk('div', 'mf-dock');
     var fresh = mk('button', '', '↺ Start new calculation'); fresh.type = 'button';
     fresh.onclick = function () { var n = $('newcalc'); if (n) n.click(); };
@@ -3274,6 +3555,77 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
     move($('preview'), cargoTop);
     move($('msg'), cargoTop);
     cargoCard.appendChild(cargoTop);
+
+    var uploadCard = mk('div', 'mf-upload-card');
+    uploadCard.id = 'mf-upload-card';
+    uploadCard.setAttribute('role', 'button');
+    uploadCard.setAttribute('tabindex', '0');
+    uploadCard.setAttribute('aria-label', 'Upload Packing List in Excel or CSV format');
+    uploadCard.innerHTML = '<div class="mf-uc-left">' +
+      '<div class="mf-uc-icon">📂</div>' +
+      '<div class="mf-uc-text">' +
+        '<b>Upload Packing List (.xlsx / .csv)</b>' +
+        '<small>Auto-detects Length, Width, Height, Weight &amp; Quantity</small>' +
+      '</div>' +
+    '</div>' +
+    '<button type="button" class="mf-uc-btn" id="mf-uc-btn">Upload</button>';
+
+    var templLink = mk('div', 'mf-uc-subrow');
+    templLink.innerHTML = '<button type="button" class="mf-uc-link" id="mf-uc-template">⬇ Download Sample Excel Packing List Template</button>';
+
+    uploadCard.onclick = function (e) {
+      if (e.target && e.target.id === 'mf-uc-template') return;
+      var xlsin = $('xlsin');
+      if (xlsin) xlsin.click();
+    };
+    uploadCard.onkeydown = function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        var xlsin = $('xlsin');
+        if (xlsin) xlsin.click();
+      }
+    };
+
+    uploadCard.ondragover = function (e) {
+      e.preventDefault();
+      uploadCard.classList.add('drag');
+    };
+    uploadCard.ondragleave = function () {
+      uploadCard.classList.remove('drag');
+    };
+    uploadCard.ondrop = function (e) {
+      e.preventDefault();
+      uploadCard.classList.remove('drag');
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+        var file = e.dataTransfer.files[0];
+        try {
+          var dt = new DataTransfer();
+          dt.items.add(file);
+          var xlsin = $('xlsin');
+          if (xlsin) {
+            xlsin.files = dt.files;
+            fire(xlsin, 'change');
+          }
+        } catch (err) {
+          if ($('xlsin')) $('xlsin').click();
+        }
+      }
+    };
+
+    var tmplBtn = templLink.querySelector('#mf-uc-template');
+    if (tmplBtn) {
+      tmplBtn.onclick = function (e) {
+        e.stopPropagation();
+        if (typeof W.downloadCargoTemplate === 'function') {
+          W.downloadCargoTemplate();
+        } else if ($('xlstempl')) {
+          $('xlstempl').click();
+        }
+      };
+    }
+
+    cargoCard.appendChild(uploadCard);
+    cargoCard.appendChild(templLink);
     cargoCard.appendChild(lineList);
 
     /* the real action row stays in the document; proxies live in the Add sheet. */
@@ -3567,15 +3919,322 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
     var dock = mk('div', 'mf-dock');
     var details = mk('button', '', 'Details'); details.type = 'button';
     details.setAttribute('data-mf-sheet', 'details');
+    var fklBtn = mk('button', '', '🚜 Forklift PDF'); fklBtn.type = 'button';
+    fklBtn.title = 'Generate 1-page Forklift Operator Loading Sheet';
+    fklBtn.onclick = function () { generateForkliftPdf(); };
     var exp = mk('button', 'primary', 'Export ›'); exp.type = 'button';
     exp.onclick = function () { var t = D.querySelector('#steps button[data-p="3"]'); if (t) t.click(); };
-    dock.appendChild(details); dock.appendChild(exp);
+    dock.appendChild(details); dock.appendChild(fklBtn); dock.appendChild(exp);
     p2.appendChild(dock);
   })();
 
   /* ------------------------------------------------------------------ *
-   * 8. EXPORT SCREEN
+   * 8. FORKLIFT OPERATOR PDF & EXPORT SCREEN
    * ------------------------------------------------------------------ */
+  function generateForkliftPdf(targetIndex) {
+    if (!W.jspdf || !W.jspdf.jsPDF) {
+      if (typeof W.flashMsg === 'function') W.flashMsg('PDF library not ready');
+      else alert('PDF library not ready');
+      return;
+    }
+    if (!W.R || !W.R.loads || !W.R.loads.length) {
+      if (typeof W.flashMsg === 'function') W.flashMsg('Please calculate a load plan first.');
+      else alert('Please calculate a load plan first.');
+      return;
+    }
+
+    var csel = $('csel');
+    var si = (targetIndex != null) ? targetIndex : (+csel.value || 0);
+    if (si < 0 || si >= W.R.loads.length) si = 0;
+    var L = W.R.loads[si];
+    var C = L.C;
+    var du = W.R.du || 'cm';
+    var wu = W.R.wu || 'kg';
+    var f = (du === 'in') ? 2.54 : 1;
+    var wf2 = (wu === 'kg') ? 1 : 0.45359237;
+
+    var cbmStuffed = (L.vol / 1e6);
+    var contVol = (C.l * C.w * C.h) / 1e6;
+    var volPct = contVol > 0 ? (cbmStuffed / contVol * 100) : 0;
+    var wtStuffed = (L.wt / wf2);
+    var payloadLimit = (C.p / wf2);
+    var wtPct = payloadLimit > 0 ? (wtStuffed / payloadLimit * 100) : 0;
+    var totalCartons = L.P.length;
+
+    var c = D.createElement('canvas');
+    c.width = 1400;
+    c.height = 520;
+    var hasImg = false, imgData = null;
+    try {
+      if (typeof W.draw === 'function') {
+        var prevC = W.R.C, prevP = W.R.P;
+        W.R.C = C;
+        W.R.P = L.P;
+        W.draw(c, 335, true);
+        W.R.C = prevC;
+        W.R.P = prevP;
+        imgData = c.toDataURL('image/jpeg', 0.92);
+        hasImg = true;
+      } else if ($('gl')) {
+        imgData = $('gl').toDataURL('image/jpeg', 0.92);
+        hasImg = true;
+      }
+    } catch (err) {
+      if (W.console) W.console.warn('Snapshot render failed:', err);
+    }
+
+    var doc = new W.jspdf.jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+
+    function t(str, x, y, opt) {
+      if (typeof W.PDF_T === 'function') W.PDF_T(doc, str, x, y, opt);
+      else doc.text(String(str == null ? '' : str), x, y, opt);
+    }
+
+    /* Top Accent Line */
+    doc.setFillColor(14, 90, 106);
+    doc.rect(14, 10, 182, 1.2, 'F');
+
+    /* Header */
+    doc.setFontSize(13);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(14, 90, 106);
+    t('FORKLIFT OPERATOR LOADING SHEET', 14, 16.5);
+
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(71, 85, 105);
+    var projName = ($('pn') && $('pn').value.trim()) || 'CubeFit Load Plan';
+    var stampStr = (typeof W.stamp === 'function' ? W.stamp() : new Date().toLocaleDateString());
+    t(projName + ' · Cont ' + (si + 1) + ' of ' + W.R.loads.length + ' (' + C.name + ') · ' + stampStr, 14, 21.5);
+
+    doc.setFontSize(7.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(16, 185, 129);
+    t('STRICT 1-PAGE DOCK MANIFEST', 196, 16.5, { align: 'right' });
+
+    /* KPI Bar - 3 Cards */
+    /* Box 1: Volume */
+    doc.setFillColor(245, 247, 252);
+    doc.setDrawColor(226, 232, 240);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(14, 24.5, 58, 14.5, 1.5, 1.5, 'FD');
+    doc.setFontSize(6.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(100, 116, 139);
+    t('VOLUME UTILIZATION', 17, 28.5);
+    doc.setFontSize(9.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(14, 90, 106);
+    t(cbmStuffed.toFixed(2) + ' / ' + contVol.toFixed(2) + ' m³', 17, 33.5);
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(16, 185, 129);
+    t(volPct.toFixed(1) + '% Stuffed', 17, 37.5);
+
+    /* Box 2: Payload */
+    doc.roundedRect(76, 24.5, 58, 14.5, 1.5, 1.5, 'FD');
+    doc.setFontSize(6.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(100, 116, 139);
+    t('PAYLOAD WEIGHT', 79, 28.5);
+    doc.setFontSize(9.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(14, 90, 106);
+    t(Math.round(wtStuffed).toLocaleString() + ' / ' + Math.round(payloadLimit).toLocaleString() + ' ' + wu, 79, 33.5);
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(wtPct > 100 ? 220 : 16, wtPct > 100 ? 38 : 185, wtPct > 100 ? 38 : 129);
+    t(wtPct.toFixed(1) + '% of Payload' + (wtPct > 100 ? ' (EXCEEDED!)' : ' (Safe)'), 79, 37.5);
+
+    /* Box 3: Total Cartons */
+    doc.roundedRect(138, 24.5, 58, 14.5, 1.5, 1.5, 'FD');
+    doc.setFontSize(6.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(100, 116, 139);
+    t('TOTAL CARGO PIECES', 141, 28.5);
+    doc.setFontSize(9.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(14, 90, 106);
+    t(totalCartons.toLocaleString() + ' Cartons Loaded', 141, 33.5);
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(71, 85, 105);
+    t('Dim: ' + (C.l / f).toFixed(0) + '×' + (C.w / f).toFixed(0) + '×' + (C.h / f).toFixed(0) + ' ' + du, 141, 37.5);
+
+    /* 3D Snapshot */
+    doc.setDrawColor(203, 213, 225);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(14, 41, 182, 48, 1.5, 1.5, 'D');
+    if (hasImg) {
+      try {
+        doc.addImage(imgData, 'JPEG', 14.5, 41.5, 181, 47, undefined, 'FAST');
+      } catch (_) {}
+    }
+
+    /* Directional Badges on snapshot */
+    doc.setFillColor(14, 90, 106);
+    doc.roundedRect(16, 42.5, 40, 4.5, 1, 1, 'F');
+    doc.setFontSize(6);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(255, 255, 255);
+    t('◀ 1. NOSE (FRONT WALL)', 18, 45.8);
+
+    doc.setFillColor(30, 41, 59);
+    doc.roundedRect(84, 42.5, 36, 4.5, 1, 1, 'F');
+    doc.setFontSize(6);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(255, 255, 255);
+    t('▲ 2. MID-SECTION', 88, 45.8);
+
+    doc.setFillColor(16, 185, 129);
+    doc.roundedRect(150, 42.5, 44, 4.5, 1, 1, 'F');
+    doc.setFontSize(6);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(255, 255, 255);
+    t('3. DOOR END (TAIL) ▶', 153, 45.8);
+
+    /* Step-by-Step Loading Sequence */
+    var L1 = C.l / 3, L2 = 2 * C.l / 3;
+    var zones = [
+      { name: 'STAGE 1: NOSE (FRONT WALL) — LOAD FIRST', sub: 'Depth: 0% to 33% from front bulkhead', items: {}, count: 0, wt: 0 },
+      { name: 'STAGE 2: MID-SECTION — LOAD SECOND', sub: 'Depth: 33% to 66% along container length', items: {}, count: 0, wt: 0 },
+      { name: 'STAGE 3: TAIL (DOOR END) — LOAD LAST', sub: 'Depth: 66% to 100% at container doors', items: {}, count: 0, wt: 0 }
+    ];
+
+    L.P.forEach(function (b) {
+      var cx = b.x + b.l / 2;
+      var zi = cx < L1 ? 0 : (cx < L2 ? 1 : 2);
+      var tid = b.t ? (b.t.id || b.t.name) : 'cargo';
+      if (!zones[zi].items[tid]) {
+        zones[zi].items[tid] = { t: b.t, count: 0, wt: 0, l: b.l, w: b.w, h: b.h, up: b.up };
+      }
+      zones[zi].items[tid].count++;
+      zones[zi].items[tid].wt += ((b.t && b.t.kg) ? b.t.kg : 0);
+      zones[zi].count++;
+      zones[zi].wt += ((b.t && b.t.kg) ? b.t.kg : 0);
+    });
+
+    var curY = 91.5;
+
+    zones.forEach(function (z, zi) {
+      /* Stage Header Banner */
+      doc.setFillColor(zi === 0 ? 240 : (zi === 1 ? 248 : 254), zi === 0 ? 253 : (zi === 1 ? 250 : 242), zi === 0 ? 250 : (zi === 1 ? 252 : 242));
+      doc.setDrawColor(zi === 0 ? 45 : (zi === 1 ? 203 : 252), zi === 0 ? 212 : (zi === 1 ? 213 : 165), zi === 0 ? 191 : (zi === 1 ? 225 : 165));
+      doc.roundedRect(14, curY, 182, 5, 1, 1, 'FD');
+
+      doc.setFontSize(6.8);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(zi === 0 ? 14 : (zi === 1 ? 30 : 185), zi === 0 ? 90 : (zi === 1 ? 41 : 28), zi === 0 ? 106 : (zi === 1 ? 59 : 28));
+      t(z.name, 16, curY + 3.6);
+
+      doc.setFontSize(6.5);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(71, 85, 105);
+      t(z.count + ' ctns · ' + Math.round(z.wt / wf2).toLocaleString() + ' ' + wu, 194, curY + 3.6, { align: 'right' });
+      curY += 5.8;
+
+      /* Table column headers */
+      doc.setFontSize(5.8);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(100, 116, 139);
+      t('CARGO DESCRIPTION', 16, curY + 2.8);
+      t('DIMENSIONS (' + du.toUpperCase() + ')', 82, curY + 2.8);
+      t('COUNT', 134, curY + 2.8, { align: 'right' });
+      t('TOTAL ' + wu.toUpperCase(), 162, curY + 2.8, { align: 'right' });
+      t('ORIENTATION', 170, curY + 2.8);
+
+      doc.setDrawColor(226, 232, 240);
+      doc.line(14, curY + 3.8, 196, curY + 3.8);
+      curY += 4.5;
+
+      var itemKeys = Object.keys(z.items);
+      if (itemKeys.length === 0) {
+        doc.setFontSize(6.2);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(148, 163, 184);
+        t('(No cargo loaded in this zone)', 16, curY + 3);
+        curY += 4.2;
+      } else {
+        itemKeys.forEach(function (k) {
+          if (curY > 240) return; /* safety guard to prevent page overflow */
+          var it = z.items[k];
+          var tObj = it.t || {};
+          var name = (tObj.name || k || 'Carton').slice(0, 38);
+          var dims = ((tObj.l || it.l) / f).toFixed(1) + '×' + ((tObj.w || it.w) / f).toFixed(1) + '×' + ((tObj.h || it.h) / f).toFixed(1);
+          var orient = it.up === 1 ? 'Vertical' : (it.up === 2 ? 'Flat/Side' : 'Upright');
+
+          doc.setFontSize(6.5);
+          doc.setFont('helvetica', 'normal');
+          doc.setTextColor(30, 41, 59);
+          t(name, 16, curY + 2.8);
+          t(dims, 82, curY + 2.8);
+
+          doc.setFont('helvetica', 'bold');
+          t(String(it.count), 134, curY + 2.8, { align: 'right' });
+          t(Math.round(it.wt / wf2).toLocaleString(), 162, curY + 2.8, { align: 'right' });
+
+          doc.setFont('helvetica', 'normal');
+          doc.setTextColor(71, 85, 105);
+          t(orient, 170, curY + 2.8);
+
+          curY += 4.0;
+        });
+      }
+      curY += 1.5;
+    });
+
+    /* Dock Sign-Off Strip */
+    var signY = 247;
+    doc.setFillColor(248, 250, 252);
+    doc.setDrawColor(203, 213, 225);
+    doc.roundedRect(14, signY, 182, 33, 1.5, 1.5, 'FD');
+
+    doc.setFillColor(241, 245, 249);
+    doc.rect(14, signY, 182, 5, 'F');
+    doc.setFontSize(6.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(71, 85, 105);
+    t('WAREHOUSE DOCK VERIFICATION & SIGN-OFF (MANDATORY BEFORE DISPATCH)', 16, signY + 3.6);
+
+    /* 4 Columns for Sign-off */
+    var cols = [
+      { x: 16, title: '1. FORKLIFT OPERATOR', line1: 'Name: ____________________', line2: 'Sign: ____________________', line3: 'Time: ______ Date: _______' },
+      { x: 61, title: '2. QC / DOCK SUPERVISOR', line1: 'Name: ____________________', line2: 'Sign: ____________________', line3: '[ ] Inspected Zero Damage' },
+      { x: 106, title: '3. CONTAINER / SECURITY', line1: 'Cont #: __________________', line2: 'Seal #: __________________', line3: '[ ] Seal Verified & Locked' },
+      { x: 151, title: '4. HAULIER / TRUCK DRIVER', line1: 'Plate #: _________________', line2: 'Driver: __________________', line3: 'Sign: ____________________' }
+    ];
+
+    cols.forEach(function (col, idx) {
+      if (idx > 0) {
+        doc.setDrawColor(226, 232, 240);
+        doc.line(col.x - 2, signY + 5, col.x - 2, signY + 33);
+      }
+      doc.setFontSize(6);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(14, 90, 106);
+      t(col.title, col.x, signY + 9.5);
+
+      doc.setFontSize(5.8);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 116, 139);
+      t(col.line1, col.x, signY + 16);
+      t(col.line2, col.x, signY + 22.5);
+      t(col.line3, col.x, signY + 29);
+    });
+
+    /* Footer Note */
+    doc.setFontSize(6);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(148, 163, 184);
+    t('CubeFit MobileFit Engine · Certified Load Calculation · Strict 1-Page Warehouse Sheet · Generated ' + stampStr, 105, 286, { align: 'center' });
+
+    var cleanName = projName.replace(/[^a-zA-Z0-9_-]/g, '_');
+    var filename = cleanName + '_Forklift_Sheet_Cont_' + (si + 1) + '.pdf';
+    doc.save(filename);
+    if (typeof W.flashMsg === 'function') W.flashMsg('Downloaded ' + filename);
+  }
+  W.generateForkliftPdf = generateForkliftPdf;
+
   (function buildExport() {
     var p3 = $('p3'), out3 = $('out3');
     if (!p3 || !out3) return;
@@ -3590,6 +4249,20 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
     inner.appendChild(status);
 
     if ($('stale3')) inner.appendChild($('stale3'));
+
+    var gForklift = mk('div', 'mf-group mf-forklift-group');
+    gForklift.innerHTML =
+      '<span class="mf-fc-badge">Warehouse Ready</span>' +
+      '<h3 style="margin:2px 0 3px;font-size:12px;font-weight:800;color:var(--ink);letter-spacing:0;text-transform:none">🚜 Forklift Operator Sheet</h3>' +
+      '<p style="margin:0 0 9px;font-size:11px;line-height:1.35;color:var(--mute)">Crisp 1-page PDF: 3D snapshot, CBM/payload KPIs, and 3-stage loading sequence (Nose → Mid → Tail).</p>' +
+      '<button type="button" id="mf-btn-forklift">⬇ Download Forklift Sheet (1-Page PDF)</button>';
+    var fklExpBtn = gForklift.querySelector('#mf-btn-forklift');
+    if (fklExpBtn) {
+      fklExpBtn.onclick = function () {
+        generateForkliftPdf();
+      };
+    }
+    inner.appendChild(gForklift);
 
     var gPdf = mk('div', 'mf-group'); gPdf.appendChild(mk('h3', '', 'PDF report'));
     var colPdf = mk('div', 'mf-gcol');
@@ -3647,7 +4320,17 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
     });
   });
   ['psave', 'pdel', 'prec', 'pload'].forEach(function (id) {
-    on($(id), 'click', function () { setTimeout(renderRecents, 350); });
+    on($(id), 'click', function () {
+      setTimeout(function () {
+        renderRecents();
+        scheduleCubeFitCloudSync();
+      }, 350);
+    });
+  });
+  W.addEventListener('beforeunload', function () {
+    if (cubeFitDirHandle && _cubeFitCloudTimer) {
+      flushCubeFitCloudSync();
+    }
   });
   var plEl = $('pl');
   if (plEl) new MutationObserver(function () { renderRecents(); }).observe(plEl, { childList: true });
