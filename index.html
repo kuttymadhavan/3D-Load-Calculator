@@ -608,10 +608,10 @@ button.tile:not(.on) svg{opacity:.4}button.tile.mix{border-color:var(--accent);b
   --ok:#15803d; --okbg:#dcfce7; --amb:#b45309; --ambbg:#fef3c7; --bad:#dc2626; --badbg:#fee2e2;
   --chart:#3b82f6; --view:#f8fafc;
   --mf-top:#0e5a6a; --mf-top-2:#083b46; --mf-top-mute:#7ce3ed;
-  --mf-navh:58px; --mf-r:18px; --mf-gap:8px;
+  --mf-navh:56px; --mf-r:18px; --mf-gap:8px;
   --mf-edge:0px; --mf-edge-color:var(--bg);
   --mf-top-inset:env(safe-area-inset-top,0px);
-  --mf-bot-inset:max(env(safe-area-inset-bottom,0px),12px);
+  --mf-bot-inset:max(env(safe-area-inset-bottom,0px),20px);
   --select-chevron:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%230f766e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   --shadow-sm:0 3px 10px -1px rgba(11,16,32,.05),0 1px 3px rgba(11,16,32,.03);
   --shadow:0 10px 28px -4px rgba(11,16,32,.08),0 4px 10px -2px rgba(11,16,32,.04);
@@ -650,13 +650,8 @@ button.tile:not(.on) svg{opacity:.4}button.tile.mix{border-color:var(--accent);b
   }
 }
 
+:root, html, html.mf, body, html.mf body{padding:0 !important;margin:0}
 html.mf, html.mf body{height:100%}
-/* The canonical stylesheet pads :root by the safe areas AND the frame below is
-   inset by the same amounts, so the inset was being counted twice: the frame
-   started one status bar too low and ended one status bar too far down — under
-   the tab bar, where the action docks live. Own the safe area exactly once,
-   through --mf-top-inset / --mf-bot-inset, and clear the inherited padding. */
-html.mf, html.mf body{padding-top:0;padding-bottom:0;padding-left:0;padding-right:0}
 html.mf{overflow:hidden}
 html.mf *{box-sizing:border-box}
 html.mf body{
@@ -777,17 +772,17 @@ html.mf #hdr button.thm:active{
 
 /* ---- bottom tab bar ----------------------------------------------------- */
 html.mf nav#steps{
-  position:fixed;left:0;right:0;bottom:0;transform:none;
-  width:100%;max-width:100%;height:calc(var(--mf-navh) + var(--mf-bot-inset));
-  margin:0;padding:5px 8px calc(max(var(--mf-bot-inset),10px));
-  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;
-  background:color-mix(in srgb,var(--panel) 94%,transparent);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border-top:1px solid var(--line);
-  border-left:none;border-right:none;border-bottom:none;
-  border-radius:0;
-  box-shadow:0 -4px 20px rgba(11,16,32,.08);
-  z-index:120;
+  position:fixed !important;left:0 !important;right:0 !important;bottom:0 !important;transform:none !important;
+  width:100% !important;max-width:100% !important;height:calc(var(--mf-navh) + var(--mf-bot-inset)) !important;
+  margin:0 !important;padding:6px 8px var(--mf-bot-inset) !important;
+  display:grid !important;grid-template-columns:repeat(4,minmax(0,1fr)) !important;gap:4px !important;
+  background:color-mix(in srgb,var(--panel) 94%,transparent) !important;
+  backdrop-filter:blur(20px) !important;-webkit-backdrop-filter:blur(20px) !important;
+  border-top:1px solid var(--line) !important;
+  border-left:none !important;border-right:none !important;border-bottom:none !important;
+  border-radius:0 !important;
+  box-shadow:0 -4px 20px rgba(11,16,32,.08) !important;
+  z-index:120 !important;
   transition:opacity .18s ease, transform .18s ease;
 }
 html.mf nav#steps button{
@@ -1275,12 +1270,22 @@ html.mf #vw .row:last-of-type{display:none}
 
 /* full-screen chart keeps the same matte frame as every other screen */
 html.mf #vw.full{
-  position:fixed;z-index:130;
+  position:fixed;z-index:250;
   left:0;right:0;transform:none;
   width:100%;max-width:100%;
   top:0;bottom:0;
   border-radius:0;overflow:auto;
   padding:8px 10px;
+}
+html.mf:has(#vw.full) main,
+body.mf-fullscreen main{
+  z-index:240 !important;
+  bottom:0 !important;
+}
+html.mf:has(#vw.full) nav#steps,
+body.mf-fullscreen nav#steps{
+  display:none !important;
+  pointer-events:none !important;
 }
 html.mf #stepl{font-size:10px;margin:6px 0}
 html.mf #mf-s-details .row{gap:5px;margin:0 0 6px}
@@ -3079,6 +3084,43 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
   }
   markTabs();
   if ($('steps')) new MutationObserver(markTabs).observe($('steps'), { subtree: true, attributes: true, attributeFilter: ['class'] });
+
+  /* Ensure nav#steps is a direct child of document.body on mobile so it attaches directly to glass bottom (Engramos parity) */
+  function placeNav() {
+    var isDesktop = W.innerWidth >= 621;
+    var mainEl = D.querySelector('main');
+    var stepsNav = $('steps');
+    if (stepsNav) {
+      if (isDesktop && mainEl) {
+        if (stepsNav.parentElement !== mainEl) mainEl.appendChild(stepsNav);
+      } else {
+        if (stepsNav.parentElement !== D.body) D.body.appendChild(stepsNav);
+      }
+    }
+  }
+  placeNav();
+  W.addEventListener('resize', placeNav);
+
+  /* Fullscreen sync: when #vw enters full screen (.full), toggle mf-fullscreen on body */
+  function syncFullscreen() {
+    var vw = $('vw');
+    var isFull = vw && vw.classList.contains('full');
+    D.body.classList.toggle('mf-fullscreen', !!isFull);
+  }
+  syncFullscreen();
+  var vwEl = $('vw');
+  if (vwEl) new MutationObserver(syncFullscreen).observe(vwEl, { attributes: true, attributeFilter: ['class'] });
+
+  /* Sync status bar theme-color dynamically with active theme (Engramos parity) */
+  function syncThemeColor() {
+    var isDark = D.documentElement.getAttribute('data-theme') === 'dark' ||
+      (!D.documentElement.getAttribute('data-theme') && W.matchMedia && W.matchMedia('(prefers-color-scheme: dark)').matches);
+    var color = isDark ? '#0b1020' : '#f5f7fc';
+    var tc = D.querySelector('meta[name="theme-color"]');
+    if (tc) tc.setAttribute('content', color);
+  }
+  syncThemeColor();
+  new MutationObserver(syncThemeColor).observe(D.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
   /* ------------------------------------------------------------------ *
    * 2. SHEET FRAME
