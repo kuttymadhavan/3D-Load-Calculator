@@ -1199,14 +1199,15 @@ html.mf .mf-out-inner>#vw{flex:1 1 auto;min-height:0;order:1;display:flex;flex-d
 html.mf .mf-out-inner>#stats{flex:none;order:2}
 
 html.mf #vw{position:relative}
-html.mf #vw>#cv{display:block;width:100%!important;height:auto!important;aspect-ratio:4/3;background:var(--view);margin:auto 0;flex:none}
-html.mf #vw>#glwrap{margin:auto 0;flex:none}
+html.mf #vw>#cv{display:block;width:100%!important;height:100%!important;flex:1 1 0;min-height:0;background:var(--view);margin:0}
+html.mf #vw>#glwrap{margin:0;flex:1 1 0;min-height:0;width:100%;height:100%;position:relative;display:none}
 html.mf #vw>div.row:first-child{flex:none;margin:0 0 2px;padding:0 5px}
 html.mf #vw>div.row:first-child label{display:none}
 html.mf #csel{min-height:36px;font-size:12.5px;max-width:100%!important;width:100%}
 html.mf #vw>#zbar,html.mf #vw>#rbar,html.mf #vw>#ginfo,html.mf #vw>#geditbar{flex:none}
-html.mf #vw.glmode>#cv{display:none}
-html.mf #gl{width:100%;height:auto;aspect-ratio:1400/640;min-height:0;border:0;border-radius:0}
+html.mf #vw.glmode>#cv{display:none!important}
+html.mf #vw.glmode>#glwrap{display:flex!important;flex-direction:column}
+html.mf #gl{width:100%!important;height:100%!important;flex:1 1 0;min-height:0;border:0;border-radius:0;display:block;touch-action:none}
 html.mf #glabels .gl{font-size:9px;padding:1px 4px}
 html.mf #ginfo{font-size:10px;margin:3px 0;padding:5px 7px}
 html.mf #vw>#geditbar{margin:3px 0}
@@ -1430,8 +1431,6 @@ html.mf #mf-s-company #repcard .row button{min-height:42px}
   html.mf #hname{font-size:14px}
   html.mf .pg .card{padding:8px 10px;margin-bottom:6px}
   html.mf .mf-dock button{min-height:42px}
-  html.mf #gl{aspect-ratio:2.3/1}
-  html.mf #vw>#cv{aspect-ratio:2.3/1}
   html.mf #stats .stat{padding:4px 3px}
   html.mf #stats .stat b{font-size:12px}
   html.mf .mf-line{padding:5px 7px;margin-bottom:5px}
@@ -4078,6 +4077,62 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
     exp.onclick = function () { var t = D.querySelector('#steps button[data-p="3"]'); if (t) t.click(); };
     dock.appendChild(details); dock.appendChild(fklBtn); dock.appendChild(exp);
     p2.appendChild(dock);
+
+    /* --- 3D Viewport auto-frame & zero-clipping fit --- */
+    var origGlCamera = W.glCamera;
+    if (typeof origGlCamera === 'function') {
+      W.glCamera = function () {
+        var cv = $('gl');
+        if (cv && W.GL && W.GL.camera && W.GL.renderer && W.R && W.R.C) {
+          var cw = cv.clientWidth || 400;
+          var ch = cv.clientHeight || 400;
+          if (cw > 0 && ch > 0) {
+            var asp = cw / ch;
+            if (Math.abs(W.GL.camera.aspect - asp) > 0.001) {
+              W.GL.camera.aspect = asp;
+              W.GL.camera.updateProjectionMatrix();
+              W.GL.renderer.setSize(cw, ch, false);
+            }
+          }
+          var C = W.R.C;
+          var tv = Math.tan(((W.GL.camera.fov || 38) / 2) * Math.PI / 180);
+          var th = tv * (W.GL.camera.aspect || 1);
+          var rSphere = 0.5 * Math.sqrt(C.l * C.l + C.w * C.w + C.h * C.h);
+          var minTan = Math.min(tv, th);
+          var sphereDist = (rSphere / minTan) * 1.08;
+          if (!W.GL.baseDist || W.GL.baseDist < sphereDist * 0.95 || W.GL.baseDist > sphereDist * 1.25) {
+            W.GL.baseDist = sphereDist;
+          }
+        }
+        return origGlCamera.apply(this, arguments);
+      };
+    }
+
+    if (W.ResizeObserver) {
+      var glWrap = $('glwrap');
+      if (glWrap) {
+        new ResizeObserver(function () {
+          if (W.GL && W.GL.on && W.GL.ok && typeof W.redraw === 'function') {
+            W.redraw();
+          }
+        }).observe(glWrap);
+      }
+      var cvEl = $('cv');
+      if (cvEl) {
+        new ResizeObserver(function () {
+          if (cvEl.clientWidth && cvEl.clientHeight) {
+            var dpr = Math.min(2, W.devicePixelRatio || 1);
+            var tw = Math.round(cvEl.clientWidth * dpr);
+            var th = Math.round(cvEl.clientHeight * dpr);
+            if (cvEl.width !== tw || cvEl.height !== th) {
+              cvEl.width = tw;
+              cvEl.height = th;
+              if (typeof W.redraw === 'function' && (!W.GL || !W.GL.on)) W.redraw();
+            }
+          }
+        }).observe(cvEl);
+      }
+    }
   })();
 
   /* ------------------------------------------------------------------ *
