@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="format-detection" content="telephone=no"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="format-detection" content="telephone=no"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no, interactive-widget=resizes-content">
 <title>CubeFit - 3D Load Calculator</title>
-<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="CubeFit"><meta name="theme-color" content="#0b0f12">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="CubeFit"><meta name="theme-color" content="#0b0f12">
 <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22CubeFit%20-%203D%20Load%20Calculator%22%2C%22short_name%22%3A%22CubeFit%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f7f9fa%22%2C%22theme_color%22%3A%22%230b0f12%22%2C%22description%22%3A%22Offline%203D%20Container%20and%20Truck%20Load%20Calculator%22%7D">
 <script>/* jsPDF 2.5.1 (MIT) - embedded for offline use; licence notice is kept inside the library header */
 /** @license
@@ -608,10 +608,14 @@ button.tile:not(.on) svg{opacity:.4}button.tile.mix{border-color:var(--accent);b
   --ok:#15803d; --okbg:#dcfce7; --amb:#b45309; --ambbg:#fef3c7; --bad:#dc2626; --badbg:#fee2e2;
   --chart:#3b82f6; --view:#f8fafc;
   --mf-top:#0e5a6a; --mf-top-2:#083b46; --mf-top-mute:#7ce3ed;
-  --mf-navh:56px; --mf-r:18px; --mf-gap:8px;
+  --mf-top-height:52px; --mf-navh:56px; --mf-r:18px; --mf-gap:8px;
   --mf-edge:0px; --mf-edge-color:var(--bg);
-  --mf-top-inset:env(safe-area-inset-top,0px);
-  --mf-bot-inset:max(env(safe-area-inset-bottom,0px),20px);
+  --mf-safe-top:env(safe-area-inset-top,0px);
+  --mf-safe-bottom:env(safe-area-inset-bottom,0px);
+  --mf-top-dock-total:calc(var(--mf-top-height) + var(--mf-safe-top));
+  --mf-bottom-dock-total:calc(var(--mf-navh) + var(--mf-safe-bottom));
+  --mf-top-inset:var(--mf-safe-top);
+  --mf-bot-inset:var(--mf-safe-bottom);
   --select-chevron:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%230f766e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   --shadow-sm:0 3px 10px -1px rgba(11,16,32,.05),0 1px 3px rgba(11,16,32,.03);
   --shadow:0 10px 28px -4px rgba(11,16,32,.08),0 4px 10px -2px rgba(11,16,32,.04);
@@ -651,6 +655,10 @@ button.tile:not(.on) svg{opacity:.4}button.tile.mix{border-color:var(--accent);b
 }
 
 :root, html, html.mf, body, html.mf body{padding:0 !important;margin:0}
+html.mf-standalone{
+  --mf-safe-top:max(env(safe-area-inset-top,0px),48px);
+  --mf-safe-bottom:max(env(safe-area-inset-bottom,0px),34px);
+}
 html.mf, html.mf body{height:100%}
 html.mf{overflow:hidden}
 html.mf *{box-sizing:border-box}
@@ -697,7 +705,7 @@ html.mf main{
   position:fixed;left:0;right:0;margin:0 auto;
   width:100%;max-width:100%;
   top:0;
-  bottom:calc(var(--mf-bot-inset) + var(--mf-navh));
+  bottom:var(--mf-bottom-dock-total);
   padding:0 12px;
   display:flex;flex-direction:column;overflow:hidden;background:transparent;
   border:none;border-radius:0;box-shadow:none;
@@ -709,7 +717,7 @@ html.mf #savebanner span{font-size:11px;line-height:1.25}
 html.mf #hdr{
   flex:none;position:relative;top:auto;z-index:30;
   display:flex;align-items:center;justify-content:space-between;gap:8px;
-  margin:0 -12px var(--mf-gap);padding:calc(var(--mf-top-inset) + 8px) 14px 10px;
+  margin:0 -12px var(--mf-gap);padding:calc(var(--mf-safe-top) + 8px) 14px 10px;
   background:color-mix(in srgb,var(--panel) 92%,transparent);
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   border:0;border-bottom:1px solid var(--line);
@@ -773,8 +781,8 @@ html.mf #hdr button.thm:active{
 /* ---- bottom tab bar ----------------------------------------------------- */
 html.mf nav#steps{
   position:fixed !important;left:0 !important;right:0 !important;bottom:0 !important;transform:none !important;
-  width:100% !important;max-width:100% !important;height:calc(var(--mf-navh) + var(--mf-bot-inset)) !important;
-  margin:0 !important;padding:6px 8px var(--mf-bot-inset) !important;
+  width:100% !important;max-width:100% !important;height:var(--mf-bottom-dock-total) !important;
+  margin:0 !important;padding:6px 8px var(--mf-safe-bottom) !important;
   display:grid !important;grid-template-columns:repeat(4,minmax(0,1fr)) !important;gap:4px !important;
   background:color-mix(in srgb,var(--panel) 94%,transparent) !important;
   backdrop-filter:blur(20px) !important;-webkit-backdrop-filter:blur(20px) !important;
@@ -786,8 +794,8 @@ html.mf nav#steps{
   transition:opacity .18s ease, transform .18s ease;
 }
 html.mf nav#steps button{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
-  min-height:46px;padding:3px 2px;border:0;border-radius:12px;background:transparent!important;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:2px;
+  min-height:44px;padding:2px 2px 0;border:0;border-radius:12px;background:transparent!important;
   color:var(--mute);font:inherit;font-size:11px;font-weight:550;letter-spacing:.01em;
   white-space:nowrap;overflow:hidden;
   user-select:none;-webkit-user-select:none;
@@ -811,22 +819,22 @@ html.mf nav#steps button.on svg{
 html.mf nav#steps button:active{transform:scale(.95)}
 
 /* toasts must clear the bar */
-html.mf #toast{bottom:calc(var(--mf-bot-inset) + var(--mf-navh) + 10px);z-index:500}
+html.mf #toast{bottom:calc(var(--mf-bottom-dock-total) + 10px);z-index:500}
 
 /* ---- while the keyboard is up ------------------------------------------ *
    The keyboard owns the bottom of the screen. The tab bar steps aside and the
    frame claims its space, so the field being typed in and the action above it
    are never trapped under the bar and the keyboard at the same time.        */
 html.mf.mf-kbd nav#steps{opacity:0;pointer-events:none}
-html.mf.mf-kbd main{bottom:var(--mf-bot-inset)}
-html.mf.mf-kbd #toast{bottom:calc(var(--mf-bot-inset) + 10px)}
+html.mf.mf-kbd main{bottom:var(--mf-safe-bottom)}
+html.mf.mf-kbd #toast{bottom:calc(var(--mf-safe-bottom) + 10px)}
 
 /* dialogs and progress overlays stay inside the matte frame */
 html.mf .prog{
   left:0;right:0;transform:none;
   width:100%;max-width:100%;
   top:0;
-  bottom:var(--mf-bot-inset);
+  bottom:var(--mf-safe-bottom);
   border-radius:0;overflow:hidden;
 }
 html.mf .prog .box{max-width:calc(100vw - 32px)}
@@ -881,8 +889,6 @@ html.mf .mf-empty{
 html.mf .mf-scroll{
   flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
   -webkit-overflow-scrolling:touch;padding-bottom:24px;scroll-padding-bottom:16px;
-  -webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 16px),transparent);
-  mask-image:linear-gradient(to bottom,#000 calc(100% - 16px),transparent);
 }
 html.mf .mf-fill{flex:1;min-height:0;display:flex;flex-direction:column}
 
@@ -1352,7 +1358,7 @@ html.mf #mf-sheetwrap{
   position:fixed;left:0;right:0;transform:none;
   width:100%;max-width:100%;
   top:0;
-  bottom:calc(var(--mf-bot-inset) + var(--mf-navh));
+  bottom:var(--mf-bottom-dock-total);
   z-index:260;display:none;border-radius:0;overflow:hidden;
 }
 html.mf #mf-sheetwrap.on{display:block}
@@ -3100,6 +3106,26 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
   }
   placeNav();
   W.addEventListener('resize', placeNav);
+
+  /* Engramos-grade Dynamic Viewport Height & Inset Synchronization */
+  function setViewH() {
+    var isDesktop = W.innerWidth >= 621;
+    var isStandalone = !!(W.navigator.standalone || (W.matchMedia && W.matchMedia('(display-mode: standalone)').matches));
+    D.documentElement.classList.toggle('mf-standalone', isStandalone);
+
+    var hd = $('hdr');
+    var h = hd ? hd.getBoundingClientRect().height : 52;
+    var bn = $('steps');
+    var bh = (bn && !bn.classList.contains('hidden') && getComputedStyle(bn).display !== 'none') ? bn.getBoundingClientRect().height : 56;
+
+    if (!isDesktop) {
+      if (h > 0) D.documentElement.style.setProperty('--mf-top-dock-total', Math.round(h) + 'px');
+      if (bh > 0) D.documentElement.style.setProperty('--mf-bottom-dock-total', Math.round(bh) + 'px');
+    }
+  }
+  setViewH();
+  W.addEventListener('resize', setViewH);
+  W.addEventListener('orientationchange', function () { setTimeout(setViewH, 100); });
 
   /* Fullscreen sync: when #vw enters full screen (.full), toggle mf-fullscreen on body */
   function syncFullscreen() {
