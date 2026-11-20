@@ -867,6 +867,11 @@ html.mf .pg .swipehint{display:none!important}
 html.mf #p2>.card>h2,
 html.mf #p3>.card>h2{display:none}
 html.mf #p1>.card>h2{display:none}
+html.mf .mf-card-project>h2,
+html.mf #p0 .card:has(#pn)>h2{display:none!important}
+html.mf .mf-card-project{padding:9px 12px 10px;margin-bottom:8px}
+html.mf .mf-card-project>label{margin-bottom:4px;font-size:10.5px}
+html.mf .mf-card-project>p.note{margin-top:4px;font-size:10.5px;line-height:1.35}
 
 /* form controls styled to match high-precision Engramos inputs */
 html.mf input:not([type=checkbox]):not([type=color]):not([type=range]),
@@ -1498,6 +1503,82 @@ html.mf #mf-s-company #repcard .row button{min-height:42px}
     z-index:260;
   }
 }
+
+/* --- Progressive Navigation Gating --- */
+#steps button.mf-tab-locked {
+  opacity: 0.35 !important;
+  filter: grayscale(0.85);
+  cursor: not-allowed;
+}
+#steps button.mf-tab-locked:active {
+  transform: none;
+}
+
+/* --- Hero Banner Hidden (Recovering 75px vertical space) --- */
+#mf-hero {
+  display: none !important;
+}
+
+/* --- Cargo Editor Sheet Action Dock --- */
+.mf-editor-dock {
+  display: flex;
+  gap: 10px;
+  padding: 14px 4px 10px;
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+  box-sizing: border-box;
+}
+.mf-editor-dock button {
+  flex: 1;
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, filter 0.15s ease;
+  box-sizing: border-box;
+}
+.mf-editor-dock button:active {
+  transform: scale(0.97);
+}
+.mf-editor-btn-ok {
+  background: var(--card);
+  border: 1.5px solid var(--accent);
+  color: var(--accent);
+}
+.mf-editor-btn-next,
+.mf-editor-btn-add {
+  background: var(--accent);
+  border: 1.5px solid var(--accent);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3);
+}
+.mf-editor-btn-del {
+  flex: 0.6;
+  background: var(--card);
+  border: 1.5px solid var(--line);
+  color: #dc2626;
+}
+.mf-editor-btn-del:active {
+  background: rgba(239, 68, 68, 0.12);
+}
+
+/* --- Native Storage & Backup Section --- */
+html.mf .mf-storage-box{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+html.mf .mf-storage-sec{background:var(--card-sub,#f8fafc);border:1.5px solid var(--line,#e2e8f0);border-radius:12px;padding:9px 11px}
+:root[data-theme="dark"] html.mf .mf-storage-sec{background:color-mix(in srgb,var(--panel) 60%,var(--bg))}
+html.mf .mf-storage-sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+html.mf .mf-storage-sec-title{font-size:10.5px;font-weight:750;text-transform:uppercase;letter-spacing:.06em;color:var(--mute,#64748b)}
+html.mf .mf-storage-sec-desc{font-size:11px;color:var(--mute,#64748b);margin-bottom:8px;line-height:1.35}
+html.mf .mf-storage-actions{display:flex;gap:6px;flex-wrap:wrap}
+html.mf .mf-storage-actions button{flex:1;min-height:36px;padding:6px 10px;font-size:12px;font-weight:650;border-radius:9px;border:1.5px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;box-sizing:border-box}
+html.mf .mf-storage-actions button.mf-btn-primary{background:var(--accent);color:#ffffff;border-color:var(--accent);font-weight:750}
+html.mf .mf-storage-actions button:active{transform:scale(0.98)}
+
 
 </style>
 </head>
@@ -3090,13 +3171,58 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
     b.setAttribute('aria-label', TABS[i]);
     b.dataset.mfTab = String(i);
   });
+
+  function hasResults() {
+    return !!((typeof R !== 'undefined' && R && R.sum) || (typeof W.R !== 'undefined' && W.R && W.R.sum));
+  }
+  function isStepLocked(n) {
+    if (W.__mf_unlock_all) return false;
+    if (n === 0) return false;
+    if (n === 1) {
+      var pn = $('pn');
+      var hasPn = !!(pn && pn.value && pn.value.trim());
+      var hasLines = (typeof shownIds === 'function' && typeof lineIds === 'function') ? (shownIds(lineIds()).length > 0) : true;
+      var hasEq = !!($('eq') && $('eq').value !== '');
+      return !(hasPn || hasLines || hasEq || hasResults());
+    }
+    if (n === 2 || n === 3) {
+      return !hasResults();
+    }
+    return false;
+  }
+  function updateNavLockState() {
+    all('#steps button').forEach(function (b, i) {
+      var locked = isStepLocked(i);
+      b.classList.toggle('mf-tab-locked', locked);
+      b.setAttribute('aria-disabled', locked ? 'true' : 'false');
+    });
+  }
+
+  var origGoStep = W.goStep;
+  W.goStep = function (n) {
+    if (isStepLocked(n)) {
+      if (n === 1) {
+        if (typeof W.flashMsg === 'function') W.flashMsg('Please enter a project name or select equipment first.');
+      } else if (n === 2) {
+        if (typeof W.flashMsg === 'function') W.flashMsg('Please add cargo and calculate first.');
+      } else if (n === 3) {
+        if (typeof W.flashMsg === 'function') W.flashMsg('Please calculate a load plan before exporting.');
+      }
+      return;
+    }
+    if (typeof origGoStep === 'function') origGoStep(n);
+    setTimeout(updateNavLockState, 50);
+  };
+
   function markTabs() {
     all('#steps button').forEach(function (b) {
       b.setAttribute('aria-current', b.classList.contains('on') ? 'page' : 'false');
     });
+    updateNavLockState();
   }
   markTabs();
   if ($('steps')) new MutationObserver(markTabs).observe($('steps'), { subtree: true, attributes: true, attributeFilter: ['class'] });
+  setInterval(updateNavLockState, 500);
 
   /* Ensure nav#steps is a direct child of document.body on mobile so it attaches directly to glass bottom (Engramos parity) */
   function placeNav() {
@@ -3324,239 +3450,253 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
   }
 
   /* ------------------------------------------------------------------ *
-   * CLOUD STORAGE & SYNC (Google Drive, OneDrive, Dropbox, iCloud, Local)
+   * NATIVE DEVICE STORAGE & APP HISTORY BACKUP
    * ------------------------------------------------------------------ */
-  var CUBEFIT_CLOUD_PROVIDERS = [
-    { id: 'gdrive', name: 'Google Drive', hint: 'Google Drive > My Drive or streamed folder', icon: '🔵' },
-    { id: 'onedrive', name: 'OneDrive', hint: 'OneDrive folder or SharePoint synced drive', icon: '🔷' },
-    { id: 'dropbox', name: 'Dropbox', hint: 'Dropbox synced personal or team folder', icon: '📦' },
-    { id: 'icloud', name: 'iCloud Drive', hint: 'iCloud Drive (Finder sidebar or Files app)', icon: '☁️' },
-    { id: 'local', name: 'Local Drive', hint: 'Local Documents or corporate network drive', icon: '📁' }
-  ];
-
-  var cubeFitDirHandle = null;
-  var _cubeFitCloudTimer = null;
-
-  function getCubeFitCloudProvider(id) {
-    for (var i = 0; i < CUBEFIT_CLOUD_PROVIDERS.length; i++) {
-      if (CUBEFIT_CLOUD_PROVIDERS[i].id === id) return CUBEFIT_CLOUD_PROVIDERS[i];
+  function getProjectFileName() {
+    var pnInput = $('pn');
+    var raw = (pnInput && pnInput.value) ? pnInput.value.trim() : '';
+    if (!raw) {
+      if (typeof stamp === 'function') raw = 'Load plan ' + stamp().slice(0, 10);
+      else raw = 'Load plan';
     }
-    return null;
+    var clean = raw.replace(/[\\/:*?"<>|]/g, '').trim() || 'Load plan';
+    return clean + '.json';
   }
 
-  function scheduleCubeFitCloudSync() {
-    if (!cubeFitDirHandle) return;
-    if (_cubeFitCloudTimer) clearTimeout(_cubeFitCloudTimer);
-    _cubeFitCloudTimer = setTimeout(function () {
-      flushCubeFitCloudSync();
-    }, 300);
-  }
+  async function saveMobileSyncedProject() {
+    var fileName = getProjectFileName();
+    var curData = (typeof dataObj === 'function') ? dataObj() : {
+      app: 'loadcalc',
+      v: 2,
+      saved: new Date().toISOString(),
+      name: ($('pn') && $('pn').value.trim()) || 'Load plan',
+      sum: (typeof R !== 'undefined' && R) ? R.sum : '',
+      snap: (typeof snap === 'function') ? snap() : null
+    };
+    var jsonText = JSON.stringify(curData, null, 1) + '\n';
+    var blob = new Blob([jsonText], { type: 'application/json' });
 
-  async function flushCubeFitCloudSync() {
-    if (!cubeFitDirHandle) return;
-    try {
-      var P = store();
-      var fileHandle = await cubeFitDirHandle.getFileHandle('cubefit_load_plans.json', { create: true });
-      var writable = await fileHandle.createWritable();
-      var payload = JSON.stringify({
-        version: 2,
-        exportedAt: new Date().toISOString(),
-        generator: 'CubeFit - 3D Load Calculator',
-        projects: P
-      }, null, 2);
-      await writable.write(payload);
-      await writable.close();
-    } catch (err) {
-      console.warn('CubeFit Cloud Sync write error:', err);
-    }
-  }
-
-  function isFolderSupported() {
-    return !!(W.showDirectoryPicker && W.isSecureContext !== false);
-  }
-
-  function pickMobileCloudFile(provId) {
-    if (provId) {
-      try { localStorage.setItem('cubefit_cloud_provider', provId); } catch (_) {}
-    }
-    var pload = $('pload');
-    if (pload) {
-      pload.click();
-    } else {
-      var fin = $('filein') || $('xlsin');
-      if (fin) fin.click();
-    }
-    renderCloudStorageSection();
-  }
-
-  async function connectCubeFitCloudProvider(provId) {
-    if (!isFolderSupported()) {
-      pickMobileCloudFile(provId);
-      return;
-    }
-    try {
-      var dirHandle = await W.showDirectoryPicker({ mode: 'readwrite' });
-      cubeFitDirHandle = dirHandle;
-      var folderName = dirHandle.name || 'Synced Folder';
-      localStorage.setItem('cubefit_cloud_provider', provId);
-      localStorage.setItem('cubefit_cloud_folder_name', folderName);
-
+    var shared = false;
+    if (typeof navigator !== 'undefined' && navigator.canShare && typeof File !== 'undefined') {
       try {
-        var fileHandle = await dirHandle.getFileHandle('cubefit_load_plans.json');
-        var file = await fileHandle.getFile();
-        var text = await file.text();
-        if (text && text.trim().length > 10) {
-          var parsed = JSON.parse(text);
-          var incoming = parsed.projects || parsed.data || parsed;
-          if (incoming && typeof incoming === 'object' && Object.keys(incoming).length > 0) {
-            var confirmed = confirm('Found existing CubeFit load plans (' + Object.keys(incoming).length + ' calculations) in ' + folderName + '.\n\nClick OK to load projects from this cloud folder, or Cancel to overwrite cloud folder with your current local projects.');
-            if (confirmed) {
-              var current = store();
-              Object.keys(incoming).forEach(function (k) { current[k] = incoming[k]; });
-              localStorage.setItem(PK, JSON.stringify(current));
-              renderRecents();
-            } else {
-              await flushCubeFitCloudSync();
-            }
-          } else {
-            await flushCubeFitCloudSync();
-          }
-        } else {
-          await flushCubeFitCloudSync();
+        var file = new File([blob], fileName, { type: 'application/json' });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: fileName,
+            text: 'CubeFit 3D Load Plan'
+          });
+          shared = true;
+          if (typeof W.flashMsg === 'function') W.flashMsg('Shared “' + fileName + '”');
         }
-      } catch (e) {
-        await flushCubeFitCloudSync();
-      }
-
-      renderCloudStorageSection();
-    } catch (err) {
-      if (err && err.name !== 'AbortError') {
-        if (W.console) W.console.warn('Could not connect folder:', err);
-        if (typeof W.flashMsg === 'function') W.flashMsg('Folder selection canceled or unavailable');
+      } catch (shErr) {
+        if (shErr && shErr.name === 'AbortError') return;
       }
     }
-  }
 
-  function disconnectCubeFitCloudStorage() {
-    cubeFitDirHandle = null;
-    localStorage.removeItem('cubefit_cloud_provider');
-    localStorage.removeItem('cubefit_cloud_folder_name');
+    if (!shared) {
+      if (typeof saveData === 'function') {
+        saveData();
+      } else {
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+      }
+      if (typeof W.flashMsg === 'function') W.flashMsg('Saved “' + fileName + '”');
+    }
+
     renderCloudStorageSection();
   }
 
-  async function reconcileCubeFitCloudStorage() {
-    if (!cubeFitDirHandle) return;
-    try {
-      var fileHandle = await cubeFitDirHandle.getFileHandle('cubefit_load_plans.json');
-      var file = await fileHandle.getFile();
-      var text = await file.text();
-      if (text) {
-        var parsed = JSON.parse(text);
-        var incoming = parsed.projects || parsed.data || parsed;
-        if (incoming && typeof incoming === 'object' && Object.keys(incoming).length > 0) {
-          var current = store();
-          Object.keys(incoming).forEach(function (k) { current[k] = incoming[k]; });
-          localStorage.setItem(PK, JSON.stringify(current));
-          renderRecents();
-          if (typeof W.flashMsg === 'function') W.flashMsg('Synchronized ' + Object.keys(incoming).length + ' calculations from cloud folder.');
-          else alert('Synchronized ' + Object.keys(incoming).length + ' calculations from cloud folder.');
-        } else {
-          if (typeof W.flashMsg === 'function') W.flashMsg('Remote cloud file checked (up to date).');
-          else alert('Remote cloud file checked (up to date).');
-        }
-      }
-    } catch (err) {
-      if (typeof W.flashMsg === 'function') W.flashMsg('Reconcile check: ' + (err.message || 'No newer remote file'));
-      else alert('Reconcile check: ' + (err.message || 'No newer remote file'));
+  function openSyncedProject() {
+    var cloudf = $('cloudf');
+    if (cloudf) {
+      cloudf.value = '';
+      cloudf.click();
     }
   }
 
-  function renderCubeFitCloudGrid(activeProvId) {
-    return '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(70px, 1fr)); gap:4px; margin:6px 0 10px;">' +
-      CUBEFIT_CLOUD_PROVIDERS.map(function (p) {
-        var isActive = activeProvId === p.id;
-        var shortName = p.id === 'gdrive' ? 'Google Drive' : (p.id === 'onedrive' ? 'OneDrive' : (p.id === 'dropbox' ? 'Dropbox' : (p.id === 'icloud' ? 'iCloud' : 'Local Drive')));
-        var shortHint = p.id === 'gdrive' ? 'My Drive' : (p.id === 'onedrive' ? 'Sync folder' : (p.id === 'dropbox' ? 'Team/Personal' : (p.id === 'icloud' ? 'Finder/Files' : 'Local/LAN')));
-        return '<div onclick="window.connectCubeFitCloudProvider(\x27' + p.id + '\x27)" ' +
-          'style="display:flex; flex-direction:column; justify-content:space-between; padding:5px 2px 4px; border-radius:6px; border:1px solid ' + (isActive ? '#2563eb' : 'var(--line, #e2e8f0)') + '; background:' + (isActive ? '#eff6ff' : 'var(--card-sub, #f8fafc)') + '; cursor:pointer; text-align:center; min-height:64px; box-sizing:border-box; transition:all 0.15s ease;">' +
-            '<div>' +
-              '<div style="font-size:15px; line-height:1.1; margin-bottom:1px;">' + p.icon + '</div>' +
-              '<div style="font-weight:700; font-size:10px; line-height:1.15; color:' + (isActive ? '#1d4ed8' : 'var(--text, #1e293b)') + '; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + shortName + '</div>' +
-              '<div style="font-size:8.5px; color:var(--mute, #64748b); line-height:1.1; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + shortHint + '</div>' +
-            '</div>' +
-            '<div style="margin-top:2px;">' +
-              '<span style="display:inline-block; font-size:8.5px; font-weight:600; padding:1px 4px; border-radius:3px; ' + (isActive ? 'background:#2563eb; color:#ffffff;' : 'background:rgba(0,0,0,0.06); color:var(--mute, #475569);') + '">' +
-                (isActive ? '✓ Active' : 'Connect') +
-              '</span>' +
-            '</div>' +
-          '</div>';
-      }).join('') +
-    '</div>';
+  async function exportFullHistoryBackup() {
+    var P = store();
+    var count = Object.keys(P).length;
+    var dateStamp = (typeof stamp === 'function') ? stamp().slice(0, 10) : new Date().toISOString().slice(0, 10);
+    var fileName = 'CubeFit_Backup_' + dateStamp + '.json';
+
+    var backupObj = {
+      app: 'CubeFit - 3D Load Calculator',
+      version: 2,
+      type: 'cubefit_full_backup',
+      exportedAt: new Date().toISOString(),
+      projectCount: count,
+      projects: P
+    };
+
+    var jsonText = JSON.stringify(backupObj, null, 2) + '\n';
+    var blob = new Blob([jsonText], { type: 'application/json' });
+
+    var shared = false;
+    if (typeof navigator !== 'undefined' && navigator.canShare && typeof File !== 'undefined') {
+      try {
+        var file = new File([blob], fileName, { type: 'application/json' });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: fileName,
+            text: 'CubeFit Backup (' + count + ' projects)'
+          });
+          shared = true;
+          if (typeof W.flashMsg === 'function') W.flashMsg('Shared backup (' + count + ' projects)');
+        }
+      } catch (shErr) {
+        if (shErr && shErr.name === 'AbortError') return;
+      }
+    }
+
+    if (!shared) {
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+      if (typeof W.flashMsg === 'function') W.flashMsg('Downloaded backup (' + count + ' projects)');
+    }
+  }
+
+  function restoreFullHistoryBackup(file) {
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      try {
+        var data = JSON.parse(e.target.result);
+        var incoming = null;
+        if (data && data.projects && typeof data.projects === 'object') {
+          incoming = data.projects;
+        } else if (data && typeof data === 'object' && !data.app && !data.v) {
+          incoming = data;
+        }
+        if (!incoming || typeof incoming !== 'object') {
+          if (typeof W.flashMsg === 'function') W.flashMsg('Invalid backup file format.');
+          return;
+        }
+        var current = store();
+        var added = 0;
+        Object.keys(incoming).forEach(function (k) {
+          if (incoming[k] && typeof incoming[k] === 'object') {
+            current[k] = incoming[k];
+            added++;
+          }
+        });
+        localStorage.setItem(PK, JSON.stringify(current));
+        renderRecents();
+        var pl = $('pl');
+        if (pl) {
+          Object.keys(current).forEach(function (k) {
+            var exists = false;
+            for (var i = 0; i < pl.options.length; i++) {
+              if (pl.options[i].value === k) { exists = true; break; }
+            }
+            if (!exists) {
+              var opt = D.createElement('option');
+              opt.value = k; opt.textContent = k;
+              pl.appendChild(opt);
+            }
+          });
+        }
+        renderCloudStorageSection();
+        if (typeof W.flashMsg === 'function') W.flashMsg('Restored ' + added + ' projects from backup.');
+      } catch (err) {
+        if (typeof W.flashMsg === 'function') W.flashMsg('Error parsing backup file.');
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function triggerRestoreBackup() {
+    var inp = $('mf-restore-file');
+    if (inp) {
+      inp.value = '';
+      inp.click();
+    }
   }
 
   var cloudBox = mk('div', 'mf-cloud-box'); cloudBox.id = 'mf-cloud-box';
+  (function initStorageBox() {
+    var boxWrap = mk('div', 'mf-storage-box');
+
+    // Section 1: Current Calculation
+    var secCalc = mk('div', 'mf-storage-sec');
+    var secCalcHead = mk('div', 'mf-storage-sec-head');
+    secCalcHead.innerHTML = '<span class="mf-storage-sec-title">Current Calculation</span><span style="font-size:10px; font-weight:700; color:var(--accent);">Active</span>';
+    var secCalcDesc = mk('div', 'mf-storage-sec-desc');
+    secCalcDesc.innerHTML = 'Active file: <strong id="mf-cloud-filename">Load plan.json</strong>. Send directly via email/messaging, or save to device.';
+    var actCalc = mk('div', 'mf-storage-actions'); actCalc.id = 'mf-calc-actions';
+    secCalc.appendChild(secCalcHead);
+    secCalc.appendChild(secCalcDesc);
+    secCalc.appendChild(actCalc);
+
+    // Section 2: App History Backup
+    var secBackup = mk('div', 'mf-storage-sec');
+    var secBackupHead = mk('div', 'mf-storage-sec-head');
+    var secBackupTitle = mk('span', 'mf-storage-sec-title', 'App History Backup');
+    var secBackupBadge = mk('span', '', '0 Saved');
+    secBackupBadge.id = 'mf-backup-badge';
+    secBackupBadge.style.cssText = 'font-size:10px; font-weight:700; color:var(--mute);';
+    secBackupHead.appendChild(secBackupTitle);
+    secBackupHead.appendChild(secBackupBadge);
+    var secBackupDesc = mk('div', 'mf-storage-sec-desc', 'Take a backup file with your calculation history, or restore on this device.');
+    var actBackup = mk('div', 'mf-storage-actions');
+    var btnExportBackup = mk('button', '', '💾 Export Backup'); btnExportBackup.type = 'button';
+    btnExportBackup.onclick = function () { exportFullHistoryBackup(); };
+    var btnRestoreBackup = mk('button', '', '📥 Restore Backup'); btnRestoreBackup.type = 'button';
+    btnRestoreBackup.onclick = function () { triggerRestoreBackup(); };
+    actBackup.appendChild(btnExportBackup);
+    actBackup.appendChild(btnRestoreBackup);
+    secBackup.appendChild(secBackupHead);
+    secBackup.appendChild(secBackupDesc);
+    secBackup.appendChild(actBackup);
+
+    boxWrap.appendChild(secCalc);
+    boxWrap.appendChild(secBackup);
+    cloudBox.appendChild(boxWrap);
+  })();
 
   function renderCloudStorageSection() {
     if (!cloudBox) return;
-    var provId = localStorage.getItem('cubefit_cloud_provider') || '';
-    var folderName = localStorage.getItem('cubefit_cloud_folder_name') || '';
-    var prov = getCubeFitCloudProvider(provId);
-    var isConnected = Boolean(prov && folderName);
-    var fsaOk = isFolderSupported();
-
-    var statusHtml = '';
-    if (isConnected && fsaOk) {
-      statusHtml =
-        '<div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:10px 12px; margin-bottom:8px;">' +
-          '<div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">' +
-            '<div style="display:flex; align-items:center; gap:8px;">' +
-              '<span style="font-size:20px;">' + prov.icon + '</span>' +
-              '<div>' +
-                '<div style="font-weight:700; font-size:12px; color:#1e3a8a;">' + prov.name + ' Connected</div>' +
-                '<div style="font-size:10px; color:#3b82f6;">Folder: <strong>' + folderName + '</strong> &bull; <code>cubefit_load_plans.json</code></div>' +
-              '</div>' +
-            '</div>' +
-            '<span style="display:inline-block; font-size:9px; font-weight:700; padding:2px 7px; border-radius:12px; background:#dcfce7; color:#15803d; border:1px solid #86efac;">300ms Auto-Save</span>' +
-          '</div>' +
-          '<div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">' +
-            '<button type="button" onclick="window.reconcileCubeFitCloudStorage()" style="font-size:11px; padding:3px 8px; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; font-weight:600; cursor:pointer;">⚡ Check Updates / Reconcile</button>' +
-            '<button type="button" onclick="window.connectCubeFitCloudProvider(\x27' + provId + '\x27)" style="font-size:11px; padding:3px 8px; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; font-weight:600; cursor:pointer;">Choose Another Folder</button>' +
-            '<button type="button" onclick="window.disconnectCubeFitCloudStorage()" style="font-size:11px; padding:3px 8px; border-radius:6px; border:none; background:transparent; color:#dc2626; font-weight:600; cursor:pointer;">Disconnect</button>' +
-          '</div>' +
-        '</div>';
-    } else if (prov && !fsaOk) {
-      statusHtml =
-        '<div style="background:color-mix(in srgb,var(--accent) 8%,var(--panel)); border:1.5px solid color-mix(in srgb,var(--accent) 35%,var(--line)); border-radius:10px; padding:9px 12px; margin-bottom:8px;">' +
-          '<div style="display:flex; align-items:center; gap:8px;">' +
-            '<span style="font-size:20px;">' + prov.icon + '</span>' +
-            '<div>' +
-              '<div style="font-weight:750; font-size:12px; color:var(--ink);">' + prov.name + ' Active (Mobile / Files)</div>' +
-              '<div style="font-size:10.5px; color:var(--mute); margin-top:1px;">On iPhone / iPad, load plans open and save directly via <strong>iCloud Drive &amp; Files app</strong>.</div>' +
-            '</div>' +
-          '</div>' +
-        '</div>';
-    } else {
-      statusHtml =
-        '<div style="background:var(--card-sub, #f8fafc); border:1px solid var(--line, #e2e8f0); border-radius:10px; padding:10px 12px; margin-bottom:8px;">' +
-          '<div style="font-weight:700; font-size:12px; color:var(--text, #1e293b);">○ Browser Storage Only</div>' +
-          '<div style="font-size:10.5px; color:var(--mute, #64748b); margin-top:2px;">Calculations are saved inside this browser only. Connect a cloud provider or choose Files app for backup across devices.</div>' +
-        '</div>';
-    }
-
-    var gridHtml =
-      '<div>' +
-        '<div style="font-size:11.5px; font-weight:700; color:var(--text, #1e293b); margin:4px 0 2px;">Cloud Storage Providers</div>' +
-        '<div style="font-size:10px; color:var(--mute, #64748b); margin-bottom:6px;">Select your cloud storage service for automatic background syncing:</div>' +
-        renderCubeFitCloudGrid(provId) +
-      '</div>';
-
-    cloudBox.innerHTML = statusHtml + gridHtml;
+    var fileName = getProjectFileName();
+    var fnEl = $('mf-cloud-filename');
+    if (fnEl) fnEl.textContent = fileName;
+    var P = store();
+    var count = Object.keys(P).length;
+    var badge = $('mf-backup-badge');
+    if (badge) badge.textContent = count + ' Saved';
   }
 
-  W.connectCubeFitCloudProvider = connectCubeFitCloudProvider;
-  W.disconnectCubeFitCloudStorage = disconnectCubeFitCloudStorage;
-  W.reconcileCubeFitCloudStorage = reconcileCubeFitCloudStorage;
+  W.saveMobileSyncedProject = saveMobileSyncedProject;
+  W.openSyncedProject = openSyncedProject;
+  W.exportFullHistoryBackup = exportFullHistoryBackup;
+  W.triggerRestoreBackup = triggerRestoreBackup;
+  W.restoreFullHistoryBackup = restoreFullHistoryBackup;
+  W.deleteCargoLine = function (i) { deleteCargoLine(i); };
+  W.flushCubeFitCloudSync = saveMobileSyncedProject;
+  W.chooseSyncedFolder = saveMobileSyncedProject;
+  W.disconnectSyncedFolder = function () {};
+  W.showSafariFolderNotice = function () {};
   W.renderCubeFitCloudSection = renderCloudStorageSection;
+
+  // Compatibility aliases
+  W.pickMobileCloudFile = openSyncedProject;
+  W.saveMobileCloudFile = saveMobileSyncedProject;
+  W.connectCubeFitCloudProvider = saveMobileSyncedProject;
+  W.disconnectCubeFitCloudStorage = function () {};
+  W.reconcileCubeFitCloudStorage = function () {};
 
   var hero = mk('div', 'mf-hero'); hero.id = 'mf-hero';
   var projScroll = mk('div', 'mf-scroll'); projScroll.id = 'mf-proj-scroll';
@@ -3590,28 +3730,30 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
         list.appendChild(b);
       });
     }
-    hero.textContent = '';
-    hero.appendChild(mk('small', '', 'Continue where you left off'));
-    if (rows.length) {
-      hero.appendChild(mk('b', '', rows[0].name));
-      var bar = mk('div', 'mf-streak');
-      bar.appendChild(mk('i'));
-      hero.appendChild(bar);
-      hero.appendChild(mk('span', '', rows[0].sum || 'Saved calculation'));
-      var go = mk('button', 'go', '›'); go.type = 'button';
-      go.setAttribute('aria-label', 'Open ' + rows[0].name);
-      go.onclick = function () { openSaved(rows[0].name); };
-      hero.appendChild(go);
-    } else {
-      hero.appendChild(mk('b', '', 'Start with equipment'));
-      var bar0 = mk('div', 'mf-streak');
-      bar0.appendChild(mk('i'));
-      hero.appendChild(bar0);
-      hero.appendChild(mk('span', '', 'Choose a container, add cargo, calculate.'));
-      var go2 = mk('button', 'go', '›'); go2.type = 'button';
-      go2.setAttribute('aria-label', 'Open equipment');
-      go2.onclick = function () { setSub('eq'); };
-      hero.appendChild(go2);
+    if (hero && hero.parentElement) {
+      hero.textContent = '';
+      hero.appendChild(mk('small', '', 'Continue where you left off'));
+      if (rows.length) {
+        hero.appendChild(mk('b', '', rows[0].name));
+        var bar = mk('div', 'mf-streak');
+        bar.appendChild(mk('i'));
+        hero.appendChild(bar);
+        hero.appendChild(mk('span', '', rows[0].sum || 'Saved calculation'));
+        var go = mk('button', 'go', '›'); go.type = 'button';
+        go.setAttribute('aria-label', 'Open ' + rows[0].name);
+        go.onclick = function () { openSaved(rows[0].name); };
+        hero.appendChild(go);
+      } else {
+        hero.appendChild(mk('b', '', 'Start with equipment'));
+        var bar0 = mk('div', 'mf-streak');
+        bar0.appendChild(mk('i'));
+        hero.appendChild(bar0);
+        hero.appendChild(mk('span', '', 'Choose a container, add cargo, calculate.'));
+        var go2 = mk('button', 'go', '›'); go2.type = 'button';
+        go2.setAttribute('aria-label', 'Open equipment');
+        go2.onclick = function () { setSub('eq'); };
+        hero.appendChild(go2);
+      }
     }
   }
 
@@ -3663,15 +3805,86 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
   (function buildProjects() {
     if (!proj) return;
     proj.appendChild(projScroll);
-    projScroll.appendChild(hero);
+    if (cardProject) {
+      cardProject.classList.add('mf-card-project');
+      var projH2 = cardProject.querySelector('h2');
+      if (projH2) projH2.style.display = 'none';
+    }
     move(cardProject, projScroll);
     projScroll.appendChild(recents);
     move(cardFiles, projScroll);
     if (cardFiles) {
+      cardFiles.classList.add('mf-card-files');
+      var fH2 = cardFiles.querySelector('h2');
+      if (fH2) fH2.textContent = 'Data & Backups';
+      var fNote = cardFiles.querySelector('p.note');
+      if (fNote) fNote.textContent = 'Share calculation data via email or messaging, or create an app history backup.';
+
+      var restoreInput = mk('input');
+      restoreInput.type = 'file';
+      restoreInput.id = 'mf-restore-file';
+      restoreInput.accept = '.json,application/json';
+      restoreInput.style.display = 'none';
+      restoreInput.onchange = function () {
+        if (restoreInput.files && restoreInput.files[0]) {
+          restoreFullHistoryBackup(restoreInput.files[0]);
+        }
+      };
+      cardFiles.appendChild(restoreInput);
+
       var rowEl = cardFiles.querySelector('.row');
-      if (rowEl) cardFiles.insertBefore(cloudBox, rowEl);
-      else cardFiles.appendChild(cloudBox);
+      if (rowEl) {
+        rowEl.style.display = 'none';
+        cardFiles.insertBefore(cloudBox, rowEl);
+      } else {
+        cardFiles.appendChild(cloudBox);
+      }
+
+      var act1 = cloudBox.querySelector('#mf-calc-actions');
+      var csave = $('csave');
+      var copen = $('copen');
+      if (csave && act1) {
+        csave.className = 'mf-btn-primary';
+        csave.textContent = '↗ Send / Share (.json)';
+        csave.onclick = function (e) {
+          e.preventDefault();
+          saveMobileSyncedProject();
+        };
+        act1.appendChild(csave);
+      }
+      if (copen && act1) {
+        copen.className = '';
+        copen.textContent = '📂 Open Calculation';
+        copen.onclick = function (e) {
+          e.preventDefault();
+          openSyncedProject();
+        };
+        act1.appendChild(copen);
+      }
       renderCloudStorageSection();
+
+      var cloudfInput = $('cloudf');
+      if (cloudfInput) {
+        cloudfInput.addEventListener('change', function () {
+          if (cloudfInput.files && cloudfInput.files[0]) {
+            var f = cloudfInput.files[0];
+            try {
+              if (typeof W.flashMsg === 'function') W.flashMsg('Opening ' + f.name + '...');
+            } catch (_) {}
+            renderCloudStorageSection();
+          }
+        });
+      }
+
+      var pnInput = $('pn');
+      if (pnInput) {
+        var onPnUpdate = function () {
+          var fnEl = $('mf-cloud-filename');
+          if (fnEl) fnEl.textContent = getProjectFileName();
+        };
+        pnInput.addEventListener('input', onPnUpdate);
+        pnInput.addEventListener('change', onPnUpdate);
+      }
     }
     var dock = mk('div', 'mf-dock');
     var fresh = mk('button', '', '↺ Start new calculation'); fresh.type = 'button';
@@ -3879,6 +4092,16 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
       seenHead = head;
     }
   }
+  function addOneCargoLine() {
+    wanted = Math.max(wanted, shownIds(lineIds()).length) + 1;
+    if (lineIds().length < wanted) {
+      var add = $('add');
+      if (add) add.click();
+    }
+    renderLines();
+    return wanted - 1;
+  }
+
   (function buildAdd() {
     var v = VIEWS.add;
     if (!v) return;
@@ -3907,13 +4130,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
       if (!b) return;
       var act = b.dataset.act;
       if (act === 'add') {
-        /* the engine adds three lines per press, so ask for one card at a time
-           and only press the engine button once it has run out of spares */
-        wanted = Math.max(wanted, shownIds(lineIds()).length) + 1;
-        if (lineIds().length < wanted) {
-          var add = $('add');
-          if (add) add.click();
-        }
+        addOneCargoLine();
         closeSheet();
         setTimeout(renderLines, 120);
         return;
@@ -3963,9 +4180,79 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
     var name = (row.n || '').trim();
     return name || ('Cargo ' + (i + 1));
   }
+
+  function deleteCargoLine(targetIndex) {
+    var ids = shownIds(lineIds());
+    var count = ids.length;
+    if (count <= 1) {
+      var clearBtn = D.querySelector('#rows .cx[data-x="0"]');
+      if (clearBtn) clearBtn.click();
+      if (typeof W.clearCargo === 'function') W.clearCargo(0);
+      wanted = 1;
+      if (lineList) lineList.dataset.sig = '';
+      renderLines();
+      if (openName === 'cargo') refreshEditor();
+      if (typeof W.flashMsg === 'function') W.flashMsg('Cargo line cleared (minimum 1 line kept).');
+      return;
+    }
+
+    // Shift lines targetIndex + 1 ... count - 1 into targetIndex ... count - 2
+    var keys = ['n', 'c', 'l', 'w', 'h', 'k', 'q', 'u', 'ctl', 'rm', 'st', 'pr'];
+    for (var j = targetIndex; j < count - 1; j++) {
+      var srcI = j + 1;
+      var dstI = j;
+      keys.forEach(function (k) {
+        var srcEl = D.querySelector('#rows [data-i="' + srcI + '"][data-k="' + k + '"]');
+        var dstEl = D.querySelector('#rows [data-i="' + dstI + '"][data-k="' + k + '"]');
+        if (srcEl && dstEl) {
+          dstEl.value = srcEl.value;
+          if (srcEl.dataset && srcEl.dataset.cv !== undefined) {
+            dstEl.dataset.cv = srcEl.dataset.cv;
+            dstEl.dataset.sh = srcEl.dataset.sh;
+          } else if (dstEl.dataset) {
+            delete dstEl.dataset.cv;
+            delete dstEl.dataset.sh;
+          }
+        }
+      });
+      if (W.CG && W.CG[dstI] && W.CG[srcI]) {
+        W.CG[dstI].p = W.CG[srcI].p;
+        W.CG[dstI].x = W.CG[srcI].x;
+      }
+    }
+
+    // Clear the vacated tail line
+    var tailIdx = count - 1;
+    var tailBtn = D.querySelector('#rows .cx[data-x="' + tailIdx + '"]');
+    if (tailBtn) tailBtn.click();
+    if (typeof W.clearCargo === 'function') W.clearCargo(tailIdx);
+
+    // Update wanted count
+    wanted = Math.max(1, count - 1);
+    if (lineList) lineList.dataset.sig = '';
+
+    // Update engine calculation state
+    if (typeof W.chips === 'function') W.chips();
+    if (typeof W.cbmRefresh === 'function') W.cbmRefresh();
+    if (W.R && typeof W.markStale === 'function') W.markStale();
+    if (typeof W.autosave === 'function') W.autosave();
+
+    // Update editor sheet state if open
+    if (openName === 'cargo') {
+      if (editLine >= wanted) {
+        editLine = Math.max(0, wanted - 1);
+      }
+      openEditor(editLine);
+    }
+
+    renderLines();
+    if (typeof W.flashMsg === 'function') W.flashMsg('Deleted Cargo ' + (targetIndex + 1));
+  }
+
   function renderLines() {
     if (!lineList) return;
     noteFreshCalc();
+    updateCtlPlaceholders();
     var ids = lineIds();
     var show = shownIds(ids);
     var du = $('du') && $('du').value === 'cm' ? 'cm' : 'in';
@@ -4010,12 +4297,11 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
         setTimeout(renderLines, 80);
       };
       var clr = mk('button', 'ic', '✕'); clr.type = 'button';
-      clr.setAttribute('aria-label', 'Clear ' + lineLabel(i, row));
+      clr.setAttribute('aria-label', (show.length > 1 ? 'Delete ' : 'Clear ') + lineLabel(i, row));
+      clr.title = (show.length > 1 ? 'Delete ' : 'Clear ') + lineLabel(i, row);
       clr.onclick = function (e) {
         e.stopPropagation();
-        var b = D.querySelector('#rows .cx[data-x="' + i + '"]');
-        if (b) b.click();
-        setTimeout(function () { renderLines(); if (openName === 'cargo') refreshEditor(); }, 80);
+        deleteCargoLine(i);
       };
 
       card.appendChild(dot); card.appendChild(t);
@@ -4039,8 +4325,23 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
       if (ti === t) { tb.classList.remove('mf-c0', 'mf-c1', 'mf-c2'); tb.classList.add('mf-c' + c); }
     });
   }
+  function updateCtlPlaceholders() {
+    all('#rows input[data-k="ctl"]').forEach(function (inp) {
+      if (inp.placeholder !== 'Optional') {
+        inp.placeholder = 'Optional';
+        inp.setAttribute('aria-label', 'Max Top Load (Optional)');
+      }
+    });
+    all('#rows th').forEach(function (th) {
+      if (th.textContent.indexOf('Max Top Load') !== -1 && th.textContent.indexOf('Optional') === -1) {
+        th.innerHTML = th.innerHTML.replace(/(Max Top Load\s*\([^)]*\))/, '$1 <span style="font-size:10.5px; font-weight:normal; opacity:0.75;">(Optional)</span>');
+      }
+    });
+  }
+
   function refreshEditor() {
     noteFreshCalc();
+    updateCtlPlaceholders();
     var ids = shownIds(lineIds()), view = VIEWS.cargo;
     if (!view) return;
     if (!ids.length) {
@@ -4066,6 +4367,56 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
     }
     h2.textContent = 'Cargo ' + (editLine + 1);
     showLine(editLine);
+
+    var editorDock = view.querySelector('.mf-editor-dock');
+    if (!editorDock) {
+      editorDock = mk('div', 'mf-editor-dock');
+      view.appendChild(editorDock);
+    }
+    editorDock.textContent = '';
+
+    var delBtn = mk('button', 'mf-editor-btn-del', ids.length > 1 ? '🗑 Delete' : '✕ Clear');
+    delBtn.type = 'button';
+    delBtn.setAttribute('aria-label', (ids.length > 1 ? 'Delete' : 'Clear') + ' Cargo ' + (editLine + 1));
+    delBtn.onclick = function () {
+      deleteCargoLine(editLine);
+    };
+    editorDock.appendChild(delBtn);
+
+    var okBtn = mk('button', 'mf-editor-btn-ok', '✓ OK');
+    okBtn.type = 'button';
+    okBtn.onclick = function () {
+      closeSheet();
+      renderLines();
+    };
+    editorDock.appendChild(okBtn);
+
+    var curIdx = ids.indexOf(editLine);
+    var hasNext = curIdx !== -1 && curIdx < ids.length - 1;
+    if (hasNext) {
+      var nextBtn = mk('button', 'mf-editor-btn-next', 'Next Cargo (' + (ids[curIdx + 1] + 1) + ') ›');
+      nextBtn.type = 'button';
+      nextBtn.onclick = function () {
+        editLine = ids[curIdx + 1];
+        showLine(editLine);
+        refreshEditor();
+        var body = $('mf-sheet-body');
+        if (body) body.scrollTop = 0;
+      };
+      editorDock.appendChild(nextBtn);
+    } else {
+      var addBtn = mk('button', 'mf-editor-btn-add', '+ New Cargo Line');
+      addBtn.type = 'button';
+      addBtn.onclick = function () {
+        var n = addOneCargoLine();
+        editLine = n;
+        renderLines();
+        refreshEditor();
+        var body = $('mf-sheet-body');
+        if (body) body.scrollTop = 0;
+      };
+      editorDock.appendChild(addBtn);
+    }
   }
   function openEditor(i) {
     editLine = i;
@@ -4132,14 +4483,14 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
     }
 
     var dock = mk('div', 'mf-dock');
-    var details = mk('button', '', 'Details'); details.type = 'button';
+    var details = mk('button', '', '📋 Load Details'); details.type = 'button';
     details.setAttribute('data-mf-sheet', 'details');
-    var fklBtn = mk('button', '', '🚜 Forklift PDF'); fklBtn.type = 'button';
+    details.style.flex = '1';
+    var fklBtn = mk('button', 'primary', '🚜 Forklift PDF'); fklBtn.type = 'button';
     fklBtn.title = 'Generate 1-page Forklift Operator Loading Sheet';
     fklBtn.onclick = function () { generateForkliftPdf(); };
-    var exp = mk('button', 'primary', 'Export ›'); exp.type = 'button';
-    exp.onclick = function () { var t = D.querySelector('#steps button[data-p="3"]'); if (t) t.click(); };
-    dock.appendChild(details); dock.appendChild(fklBtn); dock.appendChild(exp);
+    fklBtn.style.flex = '1';
+    dock.appendChild(details); dock.appendChild(fklBtn);
     p2.appendChild(dock);
 
     /* --- 3D Viewport auto-frame & zero-clipping fit --- */
@@ -4594,14 +4945,9 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
     on($(id), 'click', function () {
       setTimeout(function () {
         renderRecents();
-        scheduleCubeFitCloudSync();
+        renderCloudStorageSection();
       }, 350);
     });
-  });
-  W.addEventListener('beforeunload', function () {
-    if (cubeFitDirHandle && _cubeFitCloudTimer) {
-      flushCubeFitCloudSync();
-    }
   });
   var plEl = $('pl');
   if (plEl) new MutationObserver(function () { renderRecents(); }).observe(plEl, { childList: true });
