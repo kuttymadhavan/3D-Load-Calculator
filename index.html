@@ -611,7 +611,7 @@ button.tile:not(.on) svg{opacity:.4}button.tile.mix{border-color:var(--accent);b
   --mf-top-height:52px; --mf-navh:56px; --mf-r:18px; --mf-gap:8px;
   --mf-edge:0px; --mf-edge-color:var(--bg);
   --mf-safe-top:env(safe-area-inset-top,0px);
-  --mf-safe-bottom:env(safe-area-inset-bottom,0px);
+  --mf-safe-bottom:max(env(safe-area-inset-bottom,0px),20px);
   --mf-top-dock-total:calc(var(--mf-top-height) + var(--mf-safe-top));
   --mf-bottom-dock-total:calc(var(--mf-navh) + var(--mf-safe-bottom));
   --mf-top-inset:var(--mf-safe-top);
@@ -656,8 +656,10 @@ button.tile:not(.on) svg{opacity:.4}button.tile.mix{border-color:var(--accent);b
 
 :root, html, html.mf, body, html.mf body{padding:0 !important;margin:0}
 html.mf-standalone{
-  --mf-safe-top:max(env(safe-area-inset-top,0px),48px);
+  --mf-safe-top:max(env(safe-area-inset-top,0px),44px);
   --mf-safe-bottom:max(env(safe-area-inset-bottom,0px),34px);
+  --mf-top-dock-total:calc(var(--mf-top-height) + var(--mf-safe-top));
+  --mf-bottom-dock-total:calc(var(--mf-navh) + var(--mf-safe-bottom));
 }
 html.mf, html.mf body{height:100%}
 html.mf{overflow:hidden}
@@ -781,9 +783,12 @@ html.mf #hdr button.thm:active{
 /* ---- bottom tab bar ----------------------------------------------------- */
 html.mf nav#steps{
   position:fixed !important;left:0 !important;right:0 !important;bottom:0 !important;transform:none !important;
-  width:100% !important;max-width:100% !important;height:var(--mf-bottom-dock-total) !important;
+  width:100% !important;max-width:100% !important;
+  min-height:70px !important;height:var(--mf-bottom-dock-total) !important;
   margin:0 !important;padding:6px 8px var(--mf-safe-bottom) !important;
+  box-sizing:border-box !important;
   display:grid !important;grid-template-columns:repeat(4,minmax(0,1fr)) !important;gap:4px !important;
+  align-items:start !important;
   background:color-mix(in srgb,var(--panel) 94%,transparent) !important;
   backdrop-filter:blur(20px) !important;-webkit-backdrop-filter:blur(20px) !important;
   border-top:1px solid var(--line) !important;
@@ -2931,6 +2936,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
   var D = document, W = window;
   if (W.__cubeFitShell) return;
   W.__cubeFitShell = true;
+  console.log('CubeFit v2.2 (Engramos-Fit Active)');
 
   var $ = function (id) { return D.getElementById(id); };
   var all = function (sel, root) { return Array.prototype.slice.call((root || D).querySelectorAll(sel)); };
@@ -3055,7 +3061,8 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
   var htitle = $('htitle');
   if (htitle && !$('mf-brand-stack')) {
     var brandStack = mk('div', 'mf-brand-stack'); brandStack.id = 'mf-brand-stack';
-    var brandTitle = mk('span', 'mf-brand-title', 'CUBEFIT');
+    var brandTitle = mk('span', 'mf-brand-title');
+    brandTitle.innerHTML = 'CUBEFIT<small style="font-size:10px;font-weight:700;vertical-align:middle;padding:1px 6px;border-radius:6px;background:var(--accbg);color:var(--accent);margin-left:6px;letter-spacing:0;text-transform:none">v2.2</small>';
     var brandSub = mk('span', 'mf-brand-sub', 'Cargo, engineered.');
     brandStack.appendChild(brandTitle);
     brandStack.appendChild(brandSub);
@@ -3107,21 +3114,10 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
   placeNav();
   W.addEventListener('resize', placeNav);
 
-  /* Engramos-grade Dynamic Viewport Height & Inset Synchronization */
+  /* Engramos-grade Standalone Detection (Pure CSS handles view heights & safe insets) */
   function setViewH() {
-    var isDesktop = W.innerWidth >= 621;
     var isStandalone = !!(W.navigator.standalone || (W.matchMedia && W.matchMedia('(display-mode: standalone)').matches));
     D.documentElement.classList.toggle('mf-standalone', isStandalone);
-
-    var hd = $('hdr');
-    var h = hd ? hd.getBoundingClientRect().height : 52;
-    var bn = $('steps');
-    var bh = (bn && !bn.classList.contains('hidden') && getComputedStyle(bn).display !== 'none') ? bn.getBoundingClientRect().height : 56;
-
-    if (!isDesktop) {
-      if (h > 0) D.documentElement.style.setProperty('--mf-top-dock-total', Math.round(h) + 'px');
-      if (bh > 0) D.documentElement.style.setProperty('--mf-bottom-dock-total', Math.round(bh) + 'px');
-    }
   }
   setViewH();
   W.addEventListener('resize', setViewH);
