@@ -656,8 +656,8 @@ button.tile:not(.on) svg{opacity:.4}button.tile.mix{border-color:var(--accent);b
 
 :root, html, html.mf, body, html.mf body{padding:0 !important;margin:0}
 html.mf-standalone{
-  --mf-safe-top:max(env(safe-area-inset-top,0px),34px);
-  --mf-safe-bottom:max(env(safe-area-inset-bottom,0px),34px);
+  --mf-safe-top:env(safe-area-inset-top,0px);
+  --mf-safe-bottom:max(env(safe-area-inset-bottom,0px),20px);
   --mf-top-dock-total:calc(var(--mf-top-height) + var(--mf-safe-top));
   --mf-bottom-dock-total:calc(var(--mf-navh) + var(--mf-safe-bottom));
 }
@@ -719,7 +719,7 @@ html.mf #savebanner span{font-size:11px;line-height:1.25}
 html.mf #hdr{
   flex:none;position:relative;top:auto;z-index:30;
   display:flex;align-items:center;justify-content:space-between;gap:8px;
-  margin:0 -12px var(--mf-gap);padding:calc(var(--mf-safe-top) + 2px) 14px 6px;
+  margin:0 -12px var(--mf-gap);padding:calc(var(--mf-safe-top) + 6px) 14px 6px;
   background:color-mix(in srgb,var(--panel) 92%,transparent);
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   border:0;border-bottom:1px solid var(--line);
@@ -2936,7 +2936,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
   var D = document, W = window;
   if (W.__cubeFitShell) return;
   W.__cubeFitShell = true;
-  console.log('CubeFit v2.3 (Engramos-Fit Max-Screen Active)');
+  console.log('CubeFit v2.4 (Engramos-Fit Max-Screen Active)');
 
   var $ = function (id) { return D.getElementById(id); };
   var all = function (sel, root) { return Array.prototype.slice.call((root || D).querySelectorAll(sel)); };
@@ -3062,7 +3062,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
   if (htitle && !$('mf-brand-stack')) {
     var brandStack = mk('div', 'mf-brand-stack'); brandStack.id = 'mf-brand-stack';
     var brandTitle = mk('span', 'mf-brand-title');
-    brandTitle.innerHTML = 'CUBEFIT<small style="font-size:10px;font-weight:700;vertical-align:middle;padding:1px 6px;border-radius:6px;background:var(--accbg);color:var(--accent);margin-left:6px;letter-spacing:0;text-transform:none">v2.3</small>';
+    brandTitle.innerHTML = 'CUBEFIT<small style="font-size:10px;font-weight:700;vertical-align:middle;padding:1px 6px;border-radius:6px;background:var(--accbg);color:var(--accent);margin-left:6px;letter-spacing:0;text-transform:none">v2.4</small>';
     var brandSub = mk('span', 'mf-brand-sub', 'Cargo, engineered.');
     brandStack.appendChild(brandTitle);
     brandStack.appendChild(brandSub);
