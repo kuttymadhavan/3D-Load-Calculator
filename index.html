@@ -3011,7 +3011,15 @@ $("cloudf").onchange=async function(){var f=this.files&&this.files[0];if(!f)retu
    return;
   }
   var isApp=!o.app||o.app=="loadcalc"||o.app=="cubefit"||o.app=="CubeFit - 3D Load Calculator";
-  if(!isApp||!o.snap||typeof o.snap!=="object")throw new Error("That file isn’t a recognized CubeFit save file.");
+  if(!isApp)throw new Error("That file isn’t a recognized CubeFit save file.");
+  if(!o.snap||typeof o.snap!=="object"){
+   var curCache=ls(PK)||{},cachedItem=o.name&&curCache[o.name];
+   if(cachedItem&&cachedItem.snap&&typeof cachedItem.snap==="object"){
+    o.snap=cachedItem.snap;
+   }else{
+    throw new Error("“"+(o.name||f.name)+"” contains no cargo inputs (snap is empty).");
+   }
+  }
   clearResults();restore(o.snap);
   var pName=(o.name&&o.name!="Load plan")?o.name:f.name.replace(/\.(json|zip)$/i,"");
   if(!pName)pName="Load plan "+stamp().slice(0,10);
@@ -3519,6 +3527,7 @@ if($("palapply")) {
   };
 }
 
+window.snap=snap;window.dataObj=dataObj;window.saveData=saveData;window.restore=restore;window.stamp=stamp;window.clearResults=clearResults;window.markStale=markStale;window.autosave=autosave;window.chips=chips;window.cbmRefresh=cbmRefresh;window.clearCargo=clearCargo;window.askConfirm=askConfirm;window.draw=draw;window.PDF_T=PDF_T;window.calc=calc;window.redraw=redraw;window.glCamera=glCamera;window.GL=GL;window.CG=CG;
 labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();updateUndo();show(0);
 })();
 </script><script id="mf-shell">
@@ -4076,13 +4085,15 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
 
   async function saveMobileSyncedProject() {
     var fileName = getProjectFileName();
-    var curData = (typeof dataObj === 'function') ? dataObj() : {
+    var curData = (typeof W.dataObj === 'function') ? W.dataObj() :
+                  (typeof dataObj === 'function') ? dataObj() : {
       app: 'loadcalc',
       v: 2,
       saved: new Date().toISOString(),
       name: ($('pn') && $('pn').value.trim()) || 'Load plan',
-      sum: (typeof R !== 'undefined' && R) ? R.sum : '',
-      snap: (typeof snap === 'function') ? snap() : null
+      sum: (typeof W.R !== 'undefined' && W.R) ? W.R.sum : ((typeof R !== 'undefined' && R) ? R.sum : ''),
+      snap: (typeof W.snap === 'function') ? W.snap() :
+            (typeof snap === 'function') ? snap() : null
     };
     var jsonText = JSON.stringify(curData, null, 1) + '\n';
     var blob = new Blob([jsonText], { type: 'application/json' });
@@ -4106,7 +4117,9 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
     }
 
     if (!shared) {
-      if (typeof saveData === 'function') {
+      if (typeof W.saveData === 'function') {
+        W.saveData();
+      } else if (typeof saveData === 'function') {
         saveData();
       } else {
         var url = URL.createObjectURL(blob);
