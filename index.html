@@ -1741,6 +1741,50 @@ html.mf .mf-card-history-head p{
   font-size:11px;line-height:1.4;color:var(--mute);margin:0;
 }
 
+/* ---- App Update Row (Engramos Parity) ---- */
+html.mf .mf-card-update{
+  background:var(--panel);border:1.5px solid var(--line);
+  border-radius:var(--mf-r);padding:12px 13px;margin:0 0 var(--mf-gap);
+  box-shadow:var(--shadow-sm);
+}
+html.mf .mf-card-update h2{
+  font-size:10.5px;margin:0 0 4px;color:var(--mute);text-transform:uppercase;letter-spacing:.08em;font-weight:800;
+}
+html.mf .mf-card-update .note{
+  font-size:11px;line-height:1.4;color:var(--mute);margin:0 0 8px;
+}
+html.mf .mf-update-row{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:var(--accbg);border:1.2px solid color-mix(in srgb,var(--accent) 25%,transparent);
+  border-radius:12px;padding:10px 12px;cursor:pointer;
+  transition:background .15s ease,transform .12s ease;
+}
+html.mf .mf-update-row:active{
+  transform:scale(0.98);
+  background:color-mix(in srgb,var(--accent) 15%,var(--panel));
+}
+html.mf .mf-update-left{
+  display:flex;align-items:center;gap:10px;min-width:0;flex:1;
+}
+html.mf .mf-update-icon{
+  font-size:20px;flex:none;line-height:1;
+}
+html.mf .mf-update-texts{
+  min-width:0;flex:1;
+}
+html.mf .mf-update-title{
+  font-size:13px;font-weight:750;color:var(--ink);letter-spacing:-0.01em;
+}
+html.mf .mf-update-sub{
+  font-size:10.5px;color:var(--mute);line-height:1.35;margin-top:2px;
+}
+html.mf .mf-update-btn{
+  background:var(--panel);color:var(--accent);border:1px solid var(--line);
+  border-radius:20px;font-size:11px;font-weight:750;padding:5px 11px;
+  flex:none;cursor:pointer;white-space:nowrap;pointer-events:none;
+}
+
+
 
 
 </style>
@@ -3968,6 +4012,71 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
   W.showSafariFolderNotice = function () {};
   W.renderCubeFitCloudSection = renderCloudStorageSection;
 
+  /* ---------- PWA Auto-Update Lifecycle & Cache-Buster System (Engramos Parity) ---------- */
+  var refreshingPWA = false;
+  if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('controllerchange', function () {
+      if (refreshingPWA) return;
+      refreshingPWA = true;
+      try { W.location.reload(true); } catch (e) { W.location.reload(); }
+    });
+  }
+
+  function forceAppUpdate() {
+    if (typeof W.flashMsg === 'function') {
+      W.flashMsg('Checking for updates and refreshing app shell…');
+    }
+    var tasks = [];
+    try {
+      if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+        tasks.push(
+          navigator.serviceWorker.getRegistrations().then(function (regs) {
+            if (regs && regs.length) {
+              return Promise.all(regs.map(function (r) {
+                try { r.update(); } catch (_) {}
+                return r.unregister();
+              }));
+            }
+          }).catch(function () {})
+        );
+      }
+      if (typeof caches !== 'undefined' && caches.keys) {
+        tasks.push(
+          caches.keys().then(function (keys) {
+            if (keys && keys.length) {
+              return Promise.all(keys.map(function (k) { return caches.delete(k); }));
+            }
+          }).catch(function () {})
+        );
+      }
+    } catch (e) {}
+
+    Promise.all(tasks).then(function () {
+      setTimeout(function () {
+        try { W.location.reload(true); } catch (e) { W.location.reload(); }
+      }, 350);
+    }).catch(function () {
+      setTimeout(function () {
+        try { W.location.reload(true); } catch (e) { W.location.reload(); }
+      }, 350);
+    });
+  }
+  W.forceAppUpdate = forceAppUpdate;
+
+  try {
+    if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistration().then(function (reg) {
+        if (!reg) return;
+        try { reg.update(); } catch (e) {}
+        D.addEventListener('visibilitychange', function () {
+          if (D.visibilityState === 'visible') {
+            try { reg.update(); } catch (e) {}
+          }
+        });
+      }).catch(function () {});
+    }
+  } catch (e) {}
+
   // Compatibility aliases
   W.pickMobileCloudFile = openSyncedProject;
   W.saveMobileCloudFile = saveMobileSyncedProject;
@@ -4206,6 +4315,36 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
       histManageBtn.innerHTML = '<span class="t"><b>Manage Saved Projects</b><small>Recalculate · load inputs · delete</small></span><span class="chev">›</span>';
       histManageCard.appendChild(histManageBtn);
       histScroll.appendChild(histManageCard);
+
+      var updateCard = mk('div', 'card mf-card-update');
+      updateCard.id = 'mf-card-update';
+      updateCard.innerHTML = '<h2>App Version &amp; Updates</h2>' +
+        '<p class="note">Installed: <b>CubeFit v2.7</b> · Single-file offline PWA</p>' +
+        '<div class="mf-update-row" id="mf-btn-check-update" role="button" tabindex="0">' +
+        '  <div class="mf-update-left">' +
+        '    <span class="mf-update-icon">🔄</span>' +
+        '    <div class="mf-update-texts">' +
+        '      <div class="mf-update-title">Check for Updates</div>' +
+        '      <div class="mf-update-sub">Refresh app shell &amp; flush cached updates (PWA auto-update)</div>' +
+        '    </div>' +
+        '  </div>' +
+        '  <button type="button" class="mf-update-btn">Refresh ›</button>' +
+        '</div>';
+
+      var btnCheckUpdate = updateCard.querySelector('#mf-btn-check-update');
+      if (btnCheckUpdate) {
+        btnCheckUpdate.onclick = function (e) {
+          e.preventDefault();
+          forceAppUpdate();
+        };
+        btnCheckUpdate.onkeydown = function (e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            forceAppUpdate();
+          }
+        };
+      }
+      histScroll.appendChild(updateCard);
     }
 
     if (cardFiles) {
