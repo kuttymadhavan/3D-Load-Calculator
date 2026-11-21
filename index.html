@@ -706,7 +706,7 @@ html.mf body{
   font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   -webkit-text-size-adjust:100%;overscroll-behavior:none;
 }
-/* Engramos custom select chevrons & focus rings */
+/* Custom select chevrons & focus rings */
 html.mf select{
   appearance:none;-webkit-appearance:none;
   background-image:var(--select-chevron)!important;
@@ -906,7 +906,7 @@ html.mf .mf-card-project{padding:9px 12px 10px;margin-bottom:8px}
 html.mf .mf-card-project>label{margin-bottom:4px;font-size:10.5px}
 html.mf .mf-card-project>p.note{margin-top:4px;font-size:10.5px;line-height:1.35}
 
-/* form controls styled to match high-precision Engramos inputs */
+/* High-precision form control styling */
 html.mf input:not([type=checkbox]):not([type=color]):not([type=range]),
 html.mf textarea{
   border-radius:13px;border:1.5px solid var(--line);
@@ -1741,7 +1741,7 @@ html.mf .mf-card-history-head p{
   font-size:11px;line-height:1.4;color:var(--mute);margin:0;
 }
 
-/* ---- App Update Row (Engramos Parity) ---- */
+/* ---- App update row ---- */
 html.mf .mf-card-update{
   background:var(--panel);border:1.5px solid var(--line);
   border-radius:var(--mf-r);padding:12px 13px;margin:0 0 var(--mf-gap);
@@ -1982,7 +1982,7 @@ html.mf .mf-rec-btn.del:active{color:var(--bad);background:var(--badbg)}
 
 <section class="pg" id="p0">
 <div class="card"><h2>Project</h2><label for="pn">Project Name</label><input id="pn" placeholder="Example: Order 1042" autocapitalize="sentences" enterkeyhint="done"><p class="note" style="margin:6px 0 0">Used as the file name for PDF, Excel and project export files.</p></div>
-<div class="card"><h2>Saved Files &amp; Backups</h2><p class="note" style="margin-top:0">Open a saved .json or .zip load plan from Files, iCloud Drive, Google Drive or OneDrive, or download your current inputs to your device.</p>
+<div class="card"><h2>Saved Files &amp; Backups</h2><p class="note" style="margin-top:0">Open a saved .json or .zip load plan from Files or your cloud storage, or download your current inputs to your device.</p>
 <div class="row" style="margin-top:0"><button class="primary" id="copen" type="button">Open Saved File (.json / .zip)</button><button id="csave" type="button">Save Inputs (.json)</button><span class="note" id="cmsg"></span></div>
 <input type="file" id="cloudf" accept=".zip,.json,application/zip,application/json" style="display:none"></div>
 <div class="card"><h2>Container or Truck</h2>
@@ -2060,7 +2060,7 @@ html.mf .mf-rec-btn.del:active{color:var(--bad);background:var(--badbg)}
   </div>
 </div>
 </details>
-<div class="stalebar" id="stale3"><span>Inputs changed — recalculate before exporting, or files are locked to protect accuracy.</span><button class="primary sm" id="recalc3" type="button">Recalculate Now</button></div><div class="row" style="margin:0 0 10px"><select id="pdfmode" style="width:auto"><option value="row">PDF: one page per row</option><option value="layer">PDF: one page per layer</option><option value="none">PDF: summary only</option></select><button class="primary" id="pdf" type="button">Generate PDF</button><button id="xls" type="button">Export Excel Sheet</button><button id="pkg" type="button">Download Package (.zip)</button><button id="dat" type="button">Save Data (.json)</button><span class="note" id="pmsg"></span></div><p class="note" style="margin:0 0 8px">Downloads save directly on desktop or open the iOS/Android share sheet for Google Drive, OneDrive, iCloud Drive, email or WhatsApp.</p>
+<div class="stalebar" id="stale3"><span>Inputs changed — recalculate before exporting, or files are locked to protect accuracy.</span><button class="primary sm" id="recalc3" type="button">Recalculate Now</button></div><div class="row" style="margin:0 0 10px"><select id="pdfmode" style="width:auto"><option value="row">PDF: one page per row</option><option value="layer">PDF: one page per layer</option><option value="none">PDF: summary only</option></select><button class="primary" id="pdf" type="button">Generate PDF</button><button id="xls" type="button">Export Excel Sheet</button><button id="pkg" type="button">Download Package (.zip)</button><button id="dat" type="button">Save Data (.json)</button><span class="note" id="pmsg"></span></div><p class="note" style="margin:0 0 8px">Downloads save directly on desktop or open the iOS/Android share sheet for your cloud storage, email or messaging apps.</p>
 <p class="note" id="eqs"></p></div></div><div class="navrow"><button type="button" data-go="2">‹ Back: Results</button><button type="button" id="newcalc">↺ Start New Calculation</button></div></section>
 </main>
 <div class="prog" id="colmapmodal" role="dialog" aria-modal="true" aria-labelledby="colmapttl">
@@ -2764,7 +2764,6 @@ async function buildPdf(){
 }
 $("pdf").onclick=async function(){if(!R)return;busy("Building PDF…",5);lockExports(true);try{var b=await buildPdf();if(b)await saveFile(fname()+".pdf",b,"application/pdf")}catch(e){}finally{notBusy()}};
 async function saveFile(name,buf,mime){
- if(window.claude&&claude.use){var dl=null;try{dl=await claude.use("downloads")}catch(e){}if(dl){await dl.save({filename:name,data:buf});return}}
  var cp=window.Capacitor,pl=cp&&cp.Plugins;
  if(cp&&cp.isNativePlatform&&cp.isNativePlatform()&&pl&&pl.Filesystem&&pl.Share){
   var u8=new Uint8Array(buf),bin="";for(var i=0;i<u8.length;i+=8192)bin+=String.fromCharCode.apply(null,u8.subarray(i,i+8192));
@@ -2897,11 +2896,46 @@ $("pkg").onclick=async function(){
   await saveFile(fname()+".zip",buf,"application/zip");cmsg("Package ready: data to recall, PDF and Excel in one file.")
  }catch(e){cmsg(/cancel/i.test(e&&e.message||"")?"Save cancelled.":"Couldn’t save the package.")}finally{notBusy()}};
 $("copen").onclick=function(){$("cloudf").value="";$("cloudf").click()};
-$("cloudf").onchange=async function(){var f=this.files&&this.files[0];if(!f)return;$("cmsg").textContent="Opening…";
- try{var txt;if(/\.json$/i.test(f.name))txt=await f.text();else{var z=await JSZip.loadAsync(f),d=z.file("data.json");if(!d)throw new Error("x");txt=await d.async("string")}
-  var o=JSON.parse(txt);if(!o||o.app!="loadcalc"||!o.snap)throw new Error("x");
-  clearResults();restore(o.snap);$("pn").value=o.name&&o.name!="Load plan"?o.name:"";$("cmsg").textContent="Opened “"+(o.name||f.name)+"”. Recalculating…";calc(true);if(o.snap&&o.snap.ml)restoreManual(o.snap.ml)
- }catch(e){$("cmsg").textContent="That file isn’t a Load Calculator save file."}};
+$("cloudf").onchange=async function(){var f=this.files&&this.files[0];if(!f)return;cmsg("Opening…");
+ if(window.W&&typeof window.W.flashMsg==="function")window.W.flashMsg("Opening "+f.name+"…");
+ try{var txt;
+  if(/\.json$/i.test(f.name))txt=await f.text();
+  else{if(!window.JSZip)throw new Error("Zip library not loaded.");var z=await JSZip.loadAsync(f),d=z.file("data.json");if(!d)throw new Error("Zip package does not contain data.json.");txt=await d.async("string")}
+  var o=JSON.parse(txt);if(!o||typeof o!=="object")throw new Error("Invalid file content.");
+  if((o.type==="cubefit_full_backup"||o.projects)&&typeof o.projects==="object"){
+   var cur=ls(PK)||{},cnt=0;
+   Object.keys(o.projects).forEach(function(k){if(o.projects[k]&&typeof o.projects[k]==="object"){cur[k]=o.projects[k];cnt++}});
+   lw(PK,cur);plist();
+   if(window.W&&typeof window.W.renderRecents==="function")window.W.renderRecents();
+   if(window.W&&typeof window.W.renderCloudStorageSection==="function")window.W.renderCloudStorageSection();
+   var bmsg="Restored "+cnt+" project(s) from backup.";
+   cmsg(bmsg);
+   if(window.W&&typeof window.W.flashMsg==="function")window.W.flashMsg(bmsg);
+   return;
+  }
+  var isApp=!o.app||o.app=="loadcalc"||o.app=="cubefit"||o.app=="CubeFit - 3D Load Calculator";
+  if(!isApp||!o.snap)throw new Error("That file isn’t a recognized CubeFit save file.");
+  clearResults();restore(o.snap);
+  var pName=(o.name&&o.name!="Load plan")?o.name:f.name.replace(/\.(json|zip)$/i,"");
+  if(!pName)pName="Load plan "+stamp().slice(0,10);
+  $("pn").value=pName;
+  var curP=ls(PK)||{};
+  curP[pName]={name:pName,updated:Date.now(),snap:o.snap,sum:o.sum||""};
+  lw(PK,curP);plist();
+  cmsg("Opened “"+pName+"”. Recalculating…");
+  calc(true);if(o.snap&&o.snap.ml)restoreManual(o.snap.ml);
+  if(window.W&&typeof window.W.renderRecents==="function")window.W.renderRecents();
+  if(window.W&&typeof window.W.renderLines==="function")window.W.renderLines();
+  if(window.W&&typeof window.W.renderCloudStorageSection==="function")window.W.renderCloudStorageSection();
+  if(window.W&&typeof window.W.flashMsg==="function")window.W.flashMsg("Opened “"+pName+"” successfully");
+  if(window.W&&typeof window.W.goStep==="function")window.W.goStep(2);
+  else show(2);
+ }catch(e){
+  var m=e&&e.message&&e.message!="x"?e.message:"That file isn’t a recognized save file.";
+  cmsg(m);
+  if(window.W&&typeof window.W.flashMsg==="function")window.W.flashMsg(m,true);
+  else alert(m);
+ }};
 plist();var last=ls(KEY);if(last){try{restore(last)}catch(e){if(window.console)console.error("restore failed",e);tb.innerHTML="";CG.length=0;addBlock()}}else addBlock();
 document.addEventListener("focusin",function(e){var t=e.target;if(t&&(t.tagName=="INPUT"||t.tagName=="SELECT")&&t.type!="range"&&t.type!="checkbox"){setTimeout(function(){try{t.scrollIntoView({block:"center",behavior:"smooth"})}catch(_){}},350)}});
 var TCS="h1,h2,summary,label,button,option,th,.stat span",SMW={and:1,or:1,of:1,to:1,the:1,a:1,an:1,for:1,with:1,from:1,by:1,per:1,at:1,on:1,in:1,as:1,is:1};
@@ -3411,7 +3445,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
   var D = document, W = window;
   if (W.__cubeFitShell) return;
   W.__cubeFitShell = true;
-  console.log('CubeFit v2.7 (Engramos-Fit Max-Screen Active)');
+  console.log('CubeFit v2.7');
 
   var $ = function (id) { return D.getElementById(id); };
   var all = function (sel, root) { return Array.prototype.slice.call((root || D).querySelectorAll(sel)); };
@@ -3534,7 +3568,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
     });
   })();
 
-  /* Build Engramos-style brand header stack */
+  /* Build brand header stack */
   var htitle = $('htitle');
   if (htitle && !$('mf-brand-stack')) {
     var brandStack = mk('div', 'mf-brand-stack'); brandStack.id = 'mf-brand-stack';
@@ -3704,7 +3738,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
   if ($('steps')) new MutationObserver(markTabs).observe($('steps'), { subtree: true, attributes: true, attributeFilter: ['class'] });
   setInterval(updateNavLockState, 500);
 
-  /* Ensure nav#steps is a direct child of document.body on mobile so it attaches directly to glass bottom (Engramos parity) */
+  /* Ensure nav#steps is a direct child of document.body on mobile so it attaches directly to glass bottom */
   function placeNav() {
     var isDesktop = W.innerWidth >= 621;
     var mainEl = D.querySelector('main');
@@ -3720,7 +3754,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
   placeNav();
   W.addEventListener('resize', placeNav);
 
-  /* Engramos-grade Standalone Detection (Pure CSS handles view heights & safe insets) */
+  /* Standalone detection (Pure CSS handles view heights & safe insets) */
   function setViewH() {
     var isStandalone = !!(W.navigator.standalone || (W.matchMedia && W.matchMedia('(display-mode: standalone)').matches));
     D.documentElement.classList.toggle('mf-standalone', isStandalone);
@@ -3739,7 +3773,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
   var vwEl = $('vw');
   if (vwEl) new MutationObserver(syncFullscreen).observe(vwEl, { attributes: true, attributeFilter: ['class'] });
 
-  /* Sync status bar theme-color dynamically with active theme (Engramos parity) */
+  /* Sync status bar theme-color dynamically with active theme */
   function syncThemeColor() {
     var isDark = D.documentElement.getAttribute('data-theme') === 'dark' ||
       (!D.documentElement.getAttribute('data-theme') && W.matchMedia && W.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -4170,8 +4204,11 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
   W.disconnectSyncedFolder = function () {};
   W.showSafariFolderNotice = function () {};
   W.renderCubeFitCloudSection = renderCloudStorageSection;
+  W.renderCloudStorageSection = renderCloudStorageSection;
+  W.renderRecents = function () { renderRecents(); };
+  W.renderLines = function () { renderLines(); };
 
-  /* ---------- PWA Auto-Update Lifecycle & Cache-Buster System (Engramos Parity) ---------- */
+  /* ---------- PWA auto-update lifecycle & cache-buster ---------- */
   var refreshingPWA = false;
   if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
     navigator.serviceWorker.addEventListener('controllerchange', function () {
