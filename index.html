@@ -1784,6 +1784,193 @@ html.mf .mf-update-btn{
   flex:none;cursor:pointer;white-space:nowrap;pointer-events:none;
 }
 
+/* ==========================================================================
+   GOLDFISH REVIEW ENHANCEMENTS (Recommendations 1 - 7)
+   ========================================================================== */
+
+/* 1. Touch Target Hit Expansions (Recommendation 1) */
+html.mf #hdr button.navb, html.mf #hdr button.thm{
+  position:relative;
+}
+html.mf #hdr button.navb::after,
+html.mf #hdr button.thm::after{
+  content:"";position:absolute;top:-8px;bottom:-8px;left:-8px;right:-8px;
+}
+html.mf .mf-line .ic{
+  width:40px;height:40px;min-width:40px;min-height:40px;
+  font-size:14px;position:relative;border-radius:10px;
+}
+html.mf .mf-line .ic::after{
+  content:"";position:absolute;top:-4px;bottom:-4px;left:-4px;right:-4px;
+}
+html.mf .mf-line .ic.mf-btn-del:active{
+  background:var(--badbg);color:var(--bad);border-color:var(--bad);
+}
+
+/* 2. Appearance & Palette Card in History (Recommendation 1) */
+html.mf .mf-palette-card{
+  background:var(--panel);border:1.5px solid var(--line);
+  border-radius:var(--mf-r);padding:12px 13px;margin:0 0 var(--mf-gap);
+  box-shadow:var(--shadow-sm);
+}
+html.mf .mf-palette-card h2{
+  font-size:10.5px;margin:0 0 4px;color:var(--mute);text-transform:uppercase;letter-spacing:.08em;font-weight:800;
+}
+html.mf .mf-palette-card .note{
+  font-size:11px;line-height:1.4;color:var(--mute);margin:0 0 10px;
+}
+html.mf .mf-palette-segments{
+  display:flex;flex-direction:column;gap:7px;
+}
+html.mf .mf-pal-seg{
+  display:flex;align-items:center;gap:12px;
+  background:var(--bg);border:1.5px solid var(--line);
+  border-radius:12px;padding:9px 12px;min-height:50px;
+  cursor:pointer;text-align:left;font:inherit;
+  transition:border-color .15s ease,background .15s ease,transform .1s ease,box-shadow .15s ease;
+}
+html.mf .mf-pal-seg:active{transform:scale(0.985)}
+html.mf .mf-pal-seg.on{
+  border-color:var(--accent);background:var(--accbg);
+  box-shadow:0 0 0 1.5px var(--accent);
+}
+html.mf .mf-pal-seg-dot{
+  width:22px;height:22px;border-radius:50%;border:2px solid;flex:none;
+}
+html.mf .mf-pal-seg-texts{
+  flex:1;min-width:0;
+}
+html.mf .mf-pal-seg-texts b{
+  display:block;font-size:13px;font-weight:750;color:var(--ink);
+}
+html.mf .mf-pal-seg-texts small{
+  display:block;font-size:10.5px;color:var(--mute);line-height:1.3;margin-top:1px;
+}
+html.mf .mf-pal-seg-badge{
+  font-size:10px;font-weight:750;padding:2px 8px;border-radius:20px;
+  background:var(--accent);color:var(--on-accent);display:none;
+}
+html.mf .mf-pal-seg.on .mf-pal-seg-badge{display:inline-block}
+
+/* 3. Screen 1 Single Full-Width Primary Dock & Utility Action (Recommendation 3) */
+html.mf #mf-proj>.mf-dock{
+  display:flex;flex-direction:column;gap:0;padding-top:6px;
+}
+html.mf #mf-btn-to-cargo{
+  width:100% !important;min-height:50px !important;font-size:14px !important;
+  font-weight:800 !important;letter-spacing:.02em !important;
+  border-radius:14px !important;
+}
+html.mf .mf-proj-util-row{
+  display:flex;align-items:center;justify-content:center;
+  padding:4px 0 2px;margin:2px 0 0;
+}
+html.mf .mf-link-fresh{
+  background:transparent;border:0;color:var(--mute);font:inherit;
+  font-size:11.5px;font-weight:650;padding:6px 14px;cursor:pointer;
+  border-radius:8px;text-decoration:none;
+  transition:color .15s ease,background .15s ease;
+}
+html.mf .mf-link-fresh:active{
+  color:var(--bad);background:var(--badbg);
+}
+
+/* 4. Pro-Tips Manual Nav (Recommendation 4) */
+html.mf .mf-tip-header{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px;
+}
+html.mf .mf-tip-nav{
+  display:inline-flex;align-items:center;gap:6px;
+}
+html.mf .mf-tip-nav-btn{
+  width:24px;height:24px;border-radius:50%;border:1px solid var(--line);
+  background:var(--panel);color:var(--ink);font-size:13px;font-weight:800;
+  display:grid;place-items:center;cursor:pointer;padding:0;line-height:1;
+  transition:background .12s ease;
+}
+html.mf .mf-tip-nav-btn:active{background:var(--accbg);color:var(--accent)}
+
+/* 5. Quick Add Cargo Bar on Screen 2 (Recommendation 5) */
+html.mf .mf-quick-add{
+  background:var(--panel);border:1.5px solid var(--line);
+  border-left:4.5px solid var(--accent);
+  border-radius:var(--mf-r);padding:10px 12px;margin:0 0 var(--mf-gap);
+  box-shadow:var(--shadow-sm);
+}
+html.mf .mf-qa-head{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px;
+}
+html.mf .mf-qa-title{
+  font-size:11px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;
+}
+html.mf .mf-qa-hint{
+  font-size:10px;color:var(--mute);
+}
+html.mf .mf-qa-form{
+  display:flex;flex-direction:column;gap:6px;
+}
+html.mf .mf-qa-inp{
+  min-height:34px;height:34px;border:1.2px solid var(--line);border-radius:8px;
+  background:var(--bg);color:var(--ink);font:inherit;font-size:12.5px;padding:3px 7px;
+}
+html.mf .mf-qa-inp:focus{border-color:var(--accent);outline:none;background:var(--panel)}
+html.mf .mf-qa-name{
+  width:100%;font-weight:600;
+}
+html.mf .mf-qa-num-row{
+  display:flex;align-items:center;gap:4px;width:100%;
+}
+html.mf .mf-qa-num-row .mf-qa-inp{
+  flex:1;min-width:0;text-align:center;padding:3px 4px;
+}
+html.mf .mf-qa-x{
+  font-size:10px;color:var(--mute);flex:none;font-weight:700;
+}
+html.mf .mf-qa-btn{
+  background:var(--cta,#ea580c);color:var(--cta-ink,#ffffff);
+  border:1.2px solid var(--cta,#ea580c);border-radius:8px;
+  font-size:11.5px;font-weight:800;padding:4px 10px;min-height:34px;
+  cursor:pointer;flex:none;white-space:nowrap;
+  box-shadow:0 2px 8px color-mix(in srgb,var(--cta,#ea580c) 30%,transparent);
+}
+html.mf .mf-qa-btn:active{transform:scale(0.95)}
+
+/* 6. Camera Presets in #rbar (Recommendation 6) */
+html.mf #rbar button[data-v]{
+  min-height:32px;font-size:10.5px;font-weight:750;padding:3px 8px;
+  border-radius:8px;background:var(--panel);border:1.2px solid var(--line);
+  color:var(--ink);display:inline-flex;align-items:center;gap:4px;
+  box-shadow:var(--shadow-sm);
+}
+html.mf #rbar button[data-v]:active{
+  background:var(--accbg);border-color:var(--accent);color:var(--accent);
+}
+
+/* 7. Unified Saved Project Card Actions (Recommendation 2) */
+html.mf .mf-recent{
+  display:flex;flex-direction:column;gap:6px;padding:9px 10px;margin-bottom:6px;
+  background:var(--bg);border:1.2px solid var(--line);border-radius:12px;
+  text-align:left;width:100%;
+}
+html.mf .mf-recent-top{
+  display:flex;align-items:center;gap:8px;width:100%;cursor:pointer;
+}
+html.mf .mf-recent-actions{
+  display:flex;align-items:center;justify-content:flex-end;gap:6px;
+  border-top:1px solid color-mix(in srgb,var(--line) 60%,transparent);
+  padding-top:6px;margin-top:2px;
+}
+html.mf .mf-rec-btn{
+  background:var(--panel);border:1px solid var(--line);border-radius:8px;
+  font-size:10.5px;font-weight:700;color:var(--ink);padding:4px 8px;
+  cursor:pointer;display:inline-flex;align-items:center;gap:3px;
+  transition:all .12s ease;
+}
+html.mf .mf-rec-btn:active{transform:scale(0.95)}
+html.mf .mf-rec-btn.open{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 30%,transparent)}
+html.mf .mf-rec-btn.del:active{color:var(--bad);background:var(--badbg)}
+
+
 
 
 
@@ -3367,38 +3554,10 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
     all('.mf-pal-dot').forEach(function (d) {
       d.classList.toggle('on', d.dataset.pal === pal);
     });
-  }
-
-  var hdr = $('hdr'), themeBtn = $('theme');
-  if (hdr && !$('mf-palette-picker')) {
-    var picker = mk('div', 'mf-palette-picker');
-    picker.id = 'mf-palette-picker';
-    picker.setAttribute('role', 'radiogroup');
-    picker.setAttribute('aria-label', 'Color Palette');
-
-    var palettes = [
-      { id: 'maritime', name: 'Maritime Blue & Orange', bg: '#1d4ed8', border: '#ea580c' },
-      { id: 'teal', name: 'Ocean Teal & Mint', bg: '#0f766e', border: '#14b8a6' },
-      { id: 'steel', name: 'Steel Slate & Amber', bg: '#334155', border: '#d97706' }
-    ];
-
-    palettes.forEach(function (p) {
-      var dot = mk('button', 'mf-pal-dot');
-      dot.type = 'button';
-      dot.dataset.pal = p.id;
-      dot.title = p.name;
-      dot.setAttribute('aria-label', p.name);
-      dot.style.background = p.bg;
-      dot.style.borderColor = p.border;
-      dot.onclick = function () { applyPalette(p.id); };
-      picker.appendChild(dot);
+    all('.mf-pal-seg').forEach(function (s) {
+      s.classList.toggle('on', s.dataset.pal === pal);
+      s.setAttribute('aria-checked', s.dataset.pal === pal ? 'true' : 'false');
     });
-
-    if (themeBtn && themeBtn.parentNode === hdr) {
-      hdr.insertBefore(picker, themeBtn);
-    } else {
-      hdr.appendChild(picker);
-    }
   }
 
   var curPal = 'maritime';
@@ -4023,6 +4182,16 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
   }
 
   function forceAppUpdate() {
+    var isWebHosted = (W.location.protocol === 'http:' || W.location.protocol === 'https:');
+    if (!isWebHosted) {
+      if (typeof W.flashMsg === 'function') {
+        W.flashMsg('Offline Local File · v2.7 (Reloading local file…)');
+      }
+      setTimeout(function () {
+        try { W.location.reload(true); } catch (e) { W.location.reload(); }
+      }, 400);
+      return;
+    }
     if (typeof W.flashMsg === 'function') {
       W.flashMsg('Checking for updates and refreshing app shell…');
     }
@@ -4094,6 +4263,62 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
   manage.innerHTML = '<span class="t"><b>Manage saved projects</b><small>Save · load inputs · delete</small></span><span class="chev">›</span>';
   recents.appendChild(manage);
 
+  function deleteSingleProject(name) {
+    if (!name) return;
+    var confirmFn = (typeof W.askConfirm === 'function') ? W.askConfirm : function (msg, cb) { if (confirm(msg)) cb(); };
+    confirmFn('Delete saved calculation “' + name + '”?', function () {
+      var P = store();
+      if (P[name]) {
+        delete P[name];
+        write(P);
+        if (typeof W.plist === 'function') W.plist();
+        var pmsg2 = $('pmsg2');
+        if (pmsg2) pmsg2.textContent = 'Deleted “' + name + '”.';
+        if (typeof W.flashMsg === 'function') W.flashMsg('Deleted “' + name + '”.');
+        if (list) list.dataset.sig = '';
+        renderRecents();
+        renderCloudStorageSection();
+      }
+    });
+  }
+
+  function shareSingleProject(name) {
+    var P = store();
+    if (!P[name] || !P[name].snap) {
+      if (typeof W.flashMsg === 'function') W.flashMsg('No data found for ' + name);
+      return;
+    }
+    var snap = P[name].snap;
+    var obj = { app: 'loadcalc', v: 2, saved: new Date(P[name].ts || Date.now()).toISOString(), name: name, sum: P[name].sum || '', snap: snap };
+    var jsonText = JSON.stringify(obj, null, 2);
+    var fileName = name.replace(/[\\/:*?"<>|]/g, '').trim() || 'load_plan';
+    fileName = fileName + '.json';
+
+    if (navigator.share && navigator.canShare) {
+      try {
+        var file = new File([jsonText], fileName, { type: 'application/json' });
+        if (navigator.canShare({ files: [file] })) {
+          navigator.share({
+            title: name,
+            text: 'CubeFit 3D Load Plan data for ' + name,
+            files: [file]
+          }).catch(function () {});
+          return;
+        }
+      } catch (_) {}
+    }
+    var blob = new Blob([jsonText], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = D.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    D.body.appendChild(a);
+    a.click();
+    D.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    if (typeof W.flashMsg === 'function') W.flashMsg('Downloading ' + fileName);
+  }
+
   function renderRecents() {
     if (!list) return;
     var rows = items();
@@ -4105,14 +4330,47 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
         list.appendChild(mk('div', 'mf-empty', 'No saved calculations yet. Your work is saved on this device each time you calculate.'));
       }
       rows.forEach(function (r, i) {
-        var b = mk('button', 'mf-recent'); b.type = 'button';
-        b.appendChild(mk('span', 'ico', i === 0 ? '★' : '▤'));
+        var b = mk('div', 'mf-recent');
+        b.tabIndex = 0;
+        b.setAttribute('role', 'button');
+        b.onclick = function () { openSaved(r.name); };
+
+        var top = mk('div', 'mf-recent-top');
+        top.appendChild(mk('span', 'ico', i === 0 ? '★' : '▤'));
         var t = mk('span', 't');
         t.appendChild(mk('b', '', r.name));
         t.appendChild(mk('small', '', r.sum || 'Saved calculation'));
-        b.appendChild(t);
-        b.appendChild(mk('span', 'when', when(r.ts)));
-        b.onclick = function () { openSaved(r.name); };
+        top.appendChild(t);
+        top.appendChild(mk('span', 'when', when(r.ts)));
+        b.appendChild(top);
+
+        var acts = mk('div', 'mf-recent-actions');
+        var openBtn = mk('button', 'mf-rec-btn open', '📂 Open');
+        openBtn.type = 'button';
+        openBtn.onclick = function (e) {
+          e.stopPropagation();
+          openSaved(r.name);
+        };
+
+        var shareBtn = mk('button', 'mf-rec-btn', '↗ Share');
+        shareBtn.type = 'button';
+        shareBtn.onclick = function (e) {
+          e.stopPropagation();
+          shareSingleProject(r.name);
+        };
+
+        var delBtn = mk('button', 'mf-rec-btn del', '🗑 Delete');
+        delBtn.type = 'button';
+        delBtn.onclick = function (e) {
+          e.stopPropagation();
+          deleteSingleProject(r.name);
+        };
+
+        acts.appendChild(openBtn);
+        acts.appendChild(shareBtn);
+        acts.appendChild(delBtn);
+        b.appendChild(acts);
+
         list.appendChild(b);
       });
     }
@@ -4190,7 +4448,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
     if (bs && SUBS_BY_APP[cur] && bs.textContent !== SUBS_BY_APP[cur]) bs.textContent = SUBS_BY_APP[cur];
   }
 
-  /* ---- Dynamic Logistics Pro-Tips ---- */
+  /* ---- Logistics Pro-Tips (Manual Nav - Recommendation 4) ---- */
   var TIPS = [
     "Standard 40' High Cube fits up to 76.4 m³ — Maximize internal volume before reaching container payload limit.",
     "Heavy cargo low and centered: Prevents trailer rollover and distributes axle weight over kingpin and bogeys.",
@@ -4200,7 +4458,6 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
     "Prevent DOT axle fines: Centre of Gravity (CG) offset checks keep truck and trailer within highway legal limits."
   ];
   var curTipIdx = 0;
-  var tipTimer = null;
 
   function renderTip(idx) {
     var contentEl = $('mf-tip-content');
@@ -4213,13 +4470,6 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
       if (countEl) countEl.textContent = (curTipIdx + 1) + ' of ' + TIPS.length;
       contentEl.style.opacity = '1';
     }, 150);
-  }
-
-  function startTipTimer() {
-    if (tipTimer) clearInterval(tipTimer);
-    tipTimer = setInterval(function () {
-      renderTip(curTipIdx + 1);
-    }, 6500);
   }
 
   /* ---- Step 5: History pane ---- */
@@ -4241,16 +4491,30 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
     if (!proj) return;
     proj.appendChild(projScroll);
 
-    /* Dynamic rotating pro-tips banner */
+    /* Logistics pro-tips banner with manual controls (Recommendation 4) */
     var tipsCard = mk('div', 'mf-tips-card');
     tipsCard.id = 'mf-tips-card';
-    tipsCard.innerHTML = '<div class="mf-tip-header"><span class="mf-tip-badge">💡 PRO-TIP</span><span class="mf-tip-counter" id="mf-tip-counter">1 of ' + TIPS.length + '</span></div><div class="mf-tip-content" id="mf-tip-content">' + TIPS[0] + '</div>';
-    tipsCard.onclick = function () {
-      renderTip(curTipIdx + 1);
-      startTipTimer();
+    tipsCard.innerHTML = '<div class="mf-tip-header">' +
+      '<span class="mf-tip-badge">💡 PRO-TIP</span>' +
+      '<div class="mf-tip-nav">' +
+      '<button type="button" class="mf-tip-nav-btn" id="mf-tip-prev" aria-label="Previous tip">‹</button>' +
+      '<span class="mf-tip-counter" id="mf-tip-counter">1 of ' + TIPS.length + '</span>' +
+      '<button type="button" class="mf-tip-nav-btn" id="mf-tip-next" aria-label="Next tip">›</button>' +
+      '</div></div>' +
+      '<div class="mf-tip-content" id="mf-tip-content">' + TIPS[0] + '</div>';
+
+    tipsCard.onclick = function (e) {
+      if (e.target && e.target.id === 'mf-tip-prev') {
+        e.stopPropagation();
+        renderTip(curTipIdx - 1);
+      } else if (e.target && e.target.id === 'mf-tip-next') {
+        e.stopPropagation();
+        renderTip(curTipIdx + 1);
+      } else {
+        renderTip(curTipIdx + 1);
+      }
     };
     projScroll.appendChild(tipsCard);
-    startTipTimer();
 
     if (cardProject) {
       cardProject.classList.add('mf-card-project');
@@ -4316,19 +4580,48 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
       histManageCard.appendChild(histManageBtn);
       histScroll.appendChild(histManageCard);
 
+      /* Color Palette Card (Recommendation 1) */
+      var palCard = mk('div', 'card mf-palette-card');
+      palCard.id = 'mf-palette-card';
+      palCard.innerHTML = '<h2>Color Theme &amp; Accent</h2>' +
+        '<p class="note">Select high-contrast industrial theme tailored for warehouse lighting &amp; outdoor sun.</p>' +
+        '<div class="mf-palette-options" role="radiogroup" aria-label="Theme Palette">' +
+        '  <button type="button" class="mf-pal-seg' + (curPal === 'maritime' ? ' on' : '') + '" data-pal="maritime" role="radio" aria-checked="' + (curPal === 'maritime') + '">' +
+        '    <div class="mf-pal-preview mf-pal-maritime"></div>' +
+        '    <div class="mf-pal-info"><span class="mf-pal-title">Maritime Navy</span><span class="mf-pal-sub">Navy &amp; Safety Orange</span></div>' +
+        '  </button>' +
+        '  <button type="button" class="mf-pal-seg' + (curPal === 'teal' ? ' on' : '') + '" data-pal="teal" role="radio" aria-checked="' + (curPal === 'teal') + '">' +
+        '    <div class="mf-pal-preview mf-pal-teal"></div>' +
+        '    <div class="mf-pal-info"><span class="mf-pal-title">Ocean Teal</span><span class="mf-pal-sub">Dark Slate &amp; Emerald</span></div>' +
+        '  </button>' +
+        '  <button type="button" class="mf-pal-seg' + (curPal === 'steel' ? ' on' : '') + '" data-pal="steel" role="radio" aria-checked="' + (curPal === 'steel') + '">' +
+        '    <div class="mf-pal-preview mf-pal-steel"></div>' +
+        '    <div class="mf-pal-info"><span class="mf-pal-title">Steel Slate</span><span class="mf-pal-sub">Steel Blue &amp; Electric Amber</span></div>' +
+        '  </button>' +
+        '</div>';
+      palCard.onclick = function (e) {
+        var seg = e.target.closest('.mf-pal-seg');
+        if (seg && seg.dataset.pal) {
+          applyPalette(seg.dataset.pal);
+        }
+      };
+      histScroll.appendChild(palCard);
+
+      /* App Version & Updates Card (Recommendation 7) */
+      var isWebHosted = (typeof location !== 'undefined' && (location.protocol === 'http:' || location.protocol === 'https:'));
       var updateCard = mk('div', 'card mf-card-update');
       updateCard.id = 'mf-card-update';
       updateCard.innerHTML = '<h2>App Version &amp; Updates</h2>' +
-        '<p class="note">Installed: <b>CubeFit v2.7</b> · Single-file offline PWA</p>' +
+        '<p class="note">Installed: <b>CubeFit v2.7</b> · ' + (isWebHosted ? 'Single-file PWA web app' : 'Offline local HTML file') + '</p>' +
         '<div class="mf-update-row" id="mf-btn-check-update" role="button" tabindex="0">' +
         '  <div class="mf-update-left">' +
         '    <span class="mf-update-icon">🔄</span>' +
         '    <div class="mf-update-texts">' +
         '      <div class="mf-update-title">Check for Updates</div>' +
-        '      <div class="mf-update-sub">Refresh app shell &amp; flush cached updates (PWA auto-update)</div>' +
+        '      <div class="mf-update-sub">' + (isWebHosted ? 'Refresh app shell &amp; flush cached updates (PWA auto-update)' : 'Offline Local File · Version 2.7 (Latest)') + '</div>' +
         '    </div>' +
         '  </div>' +
-        '  <button type="button" class="mf-update-btn">Refresh ›</button>' +
+        '  <button type="button" class="mf-update-btn">' + (isWebHosted ? 'Refresh ›' : 'Reload ↺') + '</button>' +
         '</div>';
 
       var btnCheckUpdate = updateCard.querySelector('#mf-btn-check-update');
@@ -4421,18 +4714,9 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
       }
     }
 
-    /* Screen 1 Bottom Dock: High-Contrast Primary Forward Action + Start Fresh */
-    var dock = mk('div', 'mf-dock');
-    var nextCargo = mk('button', 'primary mf-btn-primary', 'Enter Cargo & Cartons ›');
-    nextCargo.type = 'button';
-    nextCargo.id = 'mf-btn-to-cargo';
-    nextCargo.onclick = function () {
-      var t = D.querySelector('#steps button[data-p="1"]');
-      if (t) t.click();
-      else W.goStep(1);
-    };
-
-    var fresh = mk('button', '', '↺ Start fresh');
+    /* Utility row above dock: Start fresh (Recommendation 3) */
+    var utilRow = mk('div', 'mf-proj-util-row');
+    var fresh = mk('button', 'mf-link-fresh', '↺ Start fresh');
     fresh.type = 'button';
     fresh.id = 'mf-btn-fresh';
     fresh.onclick = function () {
@@ -4446,9 +4730,20 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
         }
       }, 100);
     };
+    utilRow.appendChild(fresh);
+    projScroll.appendChild(utilRow);
 
+    /* Screen 1 Bottom Dock: 100% full-width dominant primary forward dock */
+    var dock = mk('div', 'mf-dock');
+    var nextCargo = mk('button', 'primary mf-btn-primary mf-btn-full', 'Enter Cargo & Cartons ›');
+    nextCargo.type = 'button';
+    nextCargo.id = 'mf-btn-to-cargo';
+    nextCargo.onclick = function () {
+      var t = D.querySelector('#steps button[data-p="1"]');
+      if (t) t.click();
+      else W.goStep(1);
+    };
     dock.appendChild(nextCargo);
-    dock.appendChild(fresh);
     proj.appendChild(dock);
   })();
 
@@ -4624,6 +4919,82 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
 
     cargoCard.appendChild(uploadCard);
     cargoCard.appendChild(templLink);
+
+    /* Quick Add manual carton bar (Recommendation 5) */
+    var quickAddCard = mk('div', 'mf-quick-add');
+    quickAddCard.id = 'mf-quick-add';
+    quickAddCard.innerHTML = '<div class="mf-qa-head">' +
+      '<span class="mf-qa-title">⚡ Quick Add Carton</span>' +
+      '<span class="mf-qa-hint">Direct inline SKU entry</span>' +
+      '</div>' +
+      '<div class="mf-qa-form">' +
+      '  <input type="text" class="mf-qa-inp mf-qa-name" id="mf-qa-name" placeholder="SKU / Description (e.g. Box A)" enterkeyhint="next">' +
+      '  <div class="mf-qa-num-row">' +
+      '    <input type="number" class="mf-qa-inp" id="mf-qa-l" placeholder="L (cm)" min="1" step="any" enterkeyhint="next">' +
+      '    <span class="mf-qa-x">×</span>' +
+      '    <input type="number" class="mf-qa-inp" id="mf-qa-w" placeholder="W (cm)" min="1" step="any" enterkeyhint="next">' +
+      '    <span class="mf-qa-x">×</span>' +
+      '    <input type="number" class="mf-qa-inp" id="mf-qa-h" placeholder="H (cm)" min="1" step="any" enterkeyhint="next">' +
+      '    <input type="number" class="mf-qa-inp" id="mf-qa-wt" placeholder="Wt (kg)" min="0" step="any" enterkeyhint="next">' +
+      '    <input type="number" class="mf-qa-inp" id="mf-qa-qty" placeholder="Qty" min="1" step="1" value="10" enterkeyhint="done">' +
+      '    <button type="button" class="mf-qa-btn" id="mf-qa-btn">＋ Add</button>' +
+      '  </div>' +
+      '</div>';
+    cargoCard.appendChild(quickAddCard);
+
+    var btnQuickAdd = quickAddCard.querySelector('#mf-qa-btn');
+    if (btnQuickAdd) {
+      btnQuickAdd.onclick = function (e) {
+        e.preventDefault();
+        var qName = $('mf-qa-name'), qL = $('mf-qa-l'), qW = $('mf-qa-w'), qH = $('mf-qa-h'), qWt = $('mf-qa-wt'), qQty = $('mf-qa-qty');
+        var lVal = parseFloat(qL ? qL.value : 0), wVal = parseFloat(qW ? qW.value : 0), hVal = parseFloat(qH ? qH.value : 0);
+        if (!lVal || !wVal || !hVal) {
+          if (typeof W.flashMsg === 'function') W.flashMsg('Please enter L, W, and H dimensions.');
+          if (qL && !lVal) qL.focus();
+          return;
+        }
+        var targetLineIdx = 0;
+        var existingIds = lineIds();
+        var hasFirstContent = existingIds.length > 0 && lineHasContent(existingIds[0]);
+        if (hasFirstContent) {
+          targetLineIdx = addOneCargoLine();
+        } else {
+          wanted = Math.max(wanted, 1);
+        }
+        var allLines = lineIds();
+        var id = allLines[targetLineIdx] != null ? allLines[targetLineIdx] : allLines[allLines.length - 1];
+        if (id != null) {
+          var setField = function(k, val) {
+            var el = D.querySelector('#rows [data-i="' + id + '"][data-k="' + k + '"]');
+            if (el) {
+              el.value = val;
+              fire(el, 'input');
+              fire(el, 'change');
+            }
+          };
+          setField('n', qName && qName.value.trim() ? qName.value.trim() : ('Cargo ' + (targetLineIdx + 1)));
+          setField('l', lVal);
+          setField('w', wVal);
+          setField('h', hVal);
+          setField('k', qWt && qWt.value ? parseFloat(qWt.value) || 0 : 0);
+          setField('q', qQty && qQty.value ? parseInt(qQty.value, 10) || 1 : 10);
+          if (typeof W.chips === 'function') W.chips();
+          if (typeof W.cbmRefresh === 'function') W.cbmRefresh();
+          if (W.R && typeof W.markStale === 'function') W.markStale();
+          if (typeof W.autosave === 'function') W.autosave();
+          renderLines();
+          if (typeof W.flashMsg === 'function') W.flashMsg('Added ' + (qName && qName.value.trim() ? qName.value.trim() : 'cargo line') + ' (' + (qQty ? qQty.value : 10) + ' pcs)');
+          if (qName) qName.value = '';
+          if (qL) qL.value = '';
+          if (qW) qW.value = '';
+          if (qH) qH.value = '';
+          if (qWt) qWt.value = '';
+          if (qQty) qQty.value = '10';
+          if (qName) qName.focus();
+        }
+      };
+    }
+
     cargoCard.appendChild(lineList);
 
     /* the real action row stays in the document; proxies live in the Add sheet. */
@@ -5117,6 +5488,25 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
           }
         }).observe(cvEl);
       }
+    }
+
+    /* Enhance camera angle presets in #rbar (Recommendation 6) */
+    var rbar = $('rbar');
+    if (rbar) {
+      var camLabels = {
+        '340,28': '🧊 Isometric',
+        '0,90': '📐 Top View',
+        '0,0': '↔ Side View',
+        '270,15': '🚪 Door End',
+        '90,15': '📦 Front Wall'
+      };
+      all('button[data-v]', rbar).forEach(function (btn) {
+        var v = btn.getAttribute('data-v');
+        if (camLabels[v]) {
+          btn.textContent = camLabels[v];
+          btn.title = 'Set camera angle: ' + camLabels[v];
+        }
+      });
     }
   })();
 
