@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="format-detection" content="telephone=no"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no, interactive-widget=resizes-content">
+<meta name="format-detection" content="telephone=no"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>CubeFit - 3D Load Calculator</title>
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="CubeFit"><meta name="theme-color" content="#0b0f12">
-<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22CubeFit%20-%203D%20Load%20Calculator%22%2C%22short_name%22%3A%22CubeFit%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f7f9fa%22%2C%22theme_color%22%3A%22%230b0f12%22%2C%22description%22%3A%22Offline%203D%20Container%20and%20Truck%20Load%20Calculator%22%7D">
+<link rel="apple-touch-icon" href="icon-192.png"><link rel="icon" type="image/svg+xml" href="icon.svg"><link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22CubeFit%20-%203D%20Load%20Calculator%22%2C%22short_name%22%3A%22CubeFit%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f7f9fa%22%2C%22theme_color%22%3A%22%230b0f12%22%2C%22description%22%3A%22Offline%203D%20Container%20and%20Truck%20Load%20Calculator%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22icon.svg%22%2C%22sizes%22%3A%22any%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%2C%7B%22src%22%3A%22icon-192.png%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%20maskable%22%7D%2C%7B%22src%22%3A%22icon-512.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
 <script>/* jsPDF 2.5.1 (MIT) - embedded for offline use; licence notice is kept inside the library header */
 /** @license
  *
@@ -1989,7 +1990,7 @@ html.mf .mf-rec-btn.del:active{color:var(--bad);background:var(--badbg)}
 <div class="grid"><div><label for="eq">Equipment</label><select id="eq"></select></div>
 <div><label for="du">Dimensions in</label><select id="du"><option value="in">Inches</option><option value="cm">Centimetres</option></select></div>
 <div><label for="wu">Weight in</label><select id="wu"><option value="kg">Kilograms</option><option value="lb">Pounds</option></select></div></div>
-<div class="grid" id="custeq"><div><label for="ceql" id="lceql">Inside Length (in)</label><input id="ceql" type="number" min="1" step="any" inputmode="decimal" value="473.7"></div><div><label for="ceqw" id="lceqw">Inside Width (in)</label><input id="ceqw" type="number" min="1" step="any" inputmode="decimal" value="92.6"></div><div><label for="ceqh" id="lceqh">Inside Height (in)</label><input id="ceqh" type="number" min="1" step="any" inputmode="decimal" value="106.2"></div><div><label for="ceqp" id="lceqp">Max Payload (kg)</label><input id="ceqp" type="number" min="1" step="any" inputmode="decimal" value="26500"></div></div>
+<div class="grid" id="custeq"><div><label for="ceqname">Equipment Name</label><input id="ceqname" placeholder="e.g. 24ft Box Truck / Custom Reef" maxlength="40"></div><div><label for="ceql" id="lceql">Inside Length (in)</label><input id="ceql" type="number" min="1" step="any" inputmode="decimal" value="473.7"></div><div><label for="ceqw" id="lceqw">Inside Width (in)</label><input id="ceqw" type="number" min="1" step="any" inputmode="decimal" value="92.6"></div><div><label for="ceqh" id="lceqh">Inside Height (in)</label><input id="ceqh" type="number" min="1" step="any" inputmode="decimal" value="106.2"></div><div><label for="ceqp" id="lceqp">Max Payload (kg)</label><input id="ceqp" type="number" min="1" step="any" inputmode="decimal" value="26500"></div><div><label for="ceqt" id="lceqt">Tare Weight (kg)</label><input id="ceqt" type="number" min="0" step="any" inputmode="decimal" value="3800"></div><div style="grid-column:1/-1;display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px"><button class="primary sm" id="ceq_save" type="button" style="width:auto;min-height:36px;padding:6px 14px">Save to Equipment Library</button><button class="sm" id="ceq_del" type="button" style="width:auto;min-height:36px;padding:6px 14px;display:none">Delete from Library</button><span class="note" id="ceq_msg" style="margin:0"></span></div></div>
 <p class="note" id="eqinfo" style="margin:8px 0 0"></p></div>
 <div class="card"><h2>Quick Cargo Presets <span class="note">(Optional)</span></h2><div class="row" style="margin-top:0"><div style="flex:1;min-width:200px"><label for="ptype">Select a Standard Preset</label><select id="ptype"></select></div><button id="padd" type="button" style="align-self:flex-end">Add to Cargo List</button></div>
 <div class="chips" id="chips"></div><p class="note" id="pamsg" style="margin:8px 0 0">Add standard pallets/cartons here, or enter custom cargo sizes directly on Step 2.</p></div>
@@ -1997,7 +1998,7 @@ html.mf .mf-rec-btn.del:active{color:var(--bad);background:var(--badbg)}
 <div class="lrg"><h3>Packing</h3><div class="grid lr"><div class="fld"><div class="fh"><label for="rot">Default Orientation Rule</label><span class="hlp" tabindex="0" role="button" aria-label="Help: Default orientation" data-t="Default orientation" data-w="How cartons may be turned when they are placed. Upright fixed: never turned. Upright + turn on floor: can be spun flat (length and width swap) but always stay top-up. Any direction: may also be laid on their side or end. You can override this for a single cargo line on Step 2." data-u="Keep Upright + turn on floor. Use Any direction only for sturdy goods where the top does not matter. Liquids, machinery and cartons marked This Side Up must stay upright.">?</span></div><select id="rot"><option value="0">Upright fixed (none)</option><option value="1" selected>Upright + turn on floor</option><option value="2">Any direction (may lay cartons on their side)</option></select></div><div class="fld"><div class="fh"><label for="alw">Packing Allowance (mm)</label><span class="hlp" tabindex="0" role="button" aria-label="Help: Packing allowance" data-t="Packing allowance" data-w="Extra millimetres added to every carton length, width and height when checking fit, to cover carton bulge, wrapping and loading clearance. Larger allowance means fewer cartons per container but a safer fit." data-u="Leave 5 mm. Use 0 only for rigid cartons measured exactly. For soft goods that bulge (towels, garments) you can try 10 mm.">?</span></div><input id="alw" type="number" min="0" step="any" inputmode="decimal" value="5"></div></div></div>
 <div class="lrg"><h3>Stacking</h3><div class="grid lr"><div class="fld"><div class="fh"><label class="chk" for="stack"><input id="stack" type="checkbox" checked> Allow Stacking</label><span class="hlp" tabindex="0" role="button" aria-label="Help: Allow stacking" data-t="Allow stacking" data-w="When ticked, cartons may be placed on top of each other. When off, every carton stays on the floor in a single layer." data-u="Keep it ticked unless your cartons cannot take any weight. Block Stacking on Top for individual lines on Step 2 instead of switching stacking off for everything.">?</span></div></div><div class="fld"><div class="fh"><label class="chk" for="nohv"><input id="nohv" type="checkbox" checked> No Heavier Carton on a Lighter One</label><span class="hlp" tabindex="0" role="button" aria-label="Help: No heavier on lighter" data-t="No heavier on lighter" data-w="Stops the planner from putting a heavier carton on top of a lighter one, so light cartons are not crushed." data-u="Keep it ticked. Switch it off only if all your cartons weigh about the same or are strong enough to carry heavier ones.">?</span></div></div></div></div>
 <div class="lrg"><h3>Space and Weight Limits</h3><div class="grid lr"><div class="fld"><div class="fh"><label for="clr" id="lclr">Door-Side Clearance (in)</label><span class="hlp" tabindex="0" role="button" aria-label="Help: Door-side clearance" data-t="Door-side clearance" data-w="Empty space kept free at the door end of the container, so the doors close easily and cartons do not press against them. The unit follows the Dimensions unit on this page." data-u="Leave 0 for a normal load. If your forwarder or shipper asks for a gap at the doors, or the load may shift, enter 5 to 10 cm (2 to 4 in).">?</span></div><input id="clr" type="number" min="0" step="any" inputmode="decimal" value="0"></div><div class="fld"><div class="fh"><label for="clrt" id="lclrt">Top Clearance (in)</label><span class="hlp" tabindex="0" role="button" aria-label="Help: Top clearance" data-t="Top clearance" data-w="Empty height kept free under the roof (headroom). It reduces the usable height of every container." data-u="Leave 0 for a normal load. Use 5 to 10 cm (2 to 4 in) if cartons must not touch the roof or you load with a forklift.">?</span></div><input id="clrt" type="number" min="0" step="any" inputmode="decimal" value="0"></div><div class="fld"><div class="fh"><label for="plim" id="lplim">Payload Limit Override (kg)</label><span class="hlp" tabindex="0" role="button" aria-label="Help: Payload limit override" data-t="Payload limit override" data-w="The most cargo weight you are allowed to load per container, if that is lower than the container’s own payload. For example a road weight limit or a limit set by the shipping line. 0 means use the payload of the selected equipment." data-u="Leave 0. If you are not sure, ask your forwarder or trucker for the permitted cargo weight on your route and enter that number.">?</span></div><input id="plim" type="number" min="0" step="any" inputmode="decimal" value="0"></div></div></div>
-<div class="lrg"><h3>Chassis &amp; Multi-Drop Logistics</h3><div class="grid lr"><div class="fld"><div class="fh"><label for="chassis">Vehicle / Axle Dynamics</label><span class="hlp" tabindex="0" role="button" aria-label="Help: Vehicle chassis" data-t="Vehicle chassis" data-w="Calculates highway road compliance for steer, drive and trailer axles based on fifth-wheel kingpin and bogie moments." data-u="Use Standard Semi-Trailer for highway compliance checks.">?</span></div><select id="chassis"><option value="standard">Standard Container (2-Point Centroid %)</option><option value="semi3" selected>3-Axle Tractor + Tridem Trailer (EU 40t / US DOT)</option><option value="truck2">2-Axle Straight Truck (18t Max)</option></select></div><div class="fld"><div class="fh"><label class="chk" for="lifozones" style="margin-top:20px"><input id="lifozones" type="checkbox" checked> Strict LIFO Multi-Drop Containment (Bulkhead Isolation)</label><span class="hlp" tabindex="0" role="button" aria-label="Help: LIFO containment" data-t="LIFO containment" data-w="Prevents later delivery stops from filling voids behind earlier stops, ensuring clean unloading at each destination." data-u="Keep ticked for multi-destination shipments.">?</span></div></div></div>
+<div class="lrg"><h3>Chassis &amp; Multi-Drop Logistics</h3><div class="grid lr"><div class="fld"><div class="fh"><label for="chassis">Vehicle / Axle Dynamics</label><span class="hlp" tabindex="0" role="button" aria-label="Help: Vehicle chassis" data-t="Vehicle chassis" data-w="Calculates highway road compliance for steer, drive and trailer axles based on fifth-wheel kingpin and bogie moments." data-u="Use Standard Semi-Trailer for highway compliance checks.">?</span></div><select id="chassis"><option value="standard" selected>Standard Container (No Road Axle Check)</option><option value="semi3">3-Axle Tractor + Tridem Trailer (EU 40t / US DOT)</option><option value="truck2">2-Axle Straight Truck (18t Max)</option></select></div><div class="fld"><div class="fh"><label class="chk" for="lifozones" style="margin-top:20px"><input id="lifozones" type="checkbox" checked> Strict LIFO Multi-Drop Containment (Bulkhead Isolation)</label><span class="hlp" tabindex="0" role="button" aria-label="Help: LIFO containment" data-t="LIFO containment" data-w="Prevents later delivery stops from filling voids behind earlier stops, ensuring clean unloading at each destination." data-u="Keep ticked for multi-destination shipments.">?</span></div></div></div>
 <details id="chassis_adv" style="margin-top:8px"><summary style="font-size:.85rem;color:var(--mute);cursor:pointer">Custom Chassis Dimensions &amp; Curb Weights (Optional)</summary>
   <div class="grid lr" style="margin-top:8px">
     <div><label for="ch_kp">Kingpin Position (% from front)</label><input id="ch_kp" type="number" min="5" max="35" step="1" placeholder="15"></div>
@@ -2113,8 +2114,10 @@ html.mf .mf-rec-btn.del:active{color:var(--bad);background:var(--badbg)}
 <div class="prog" id="prog" role="status" aria-live="polite"><div class="box"><div class="top"><span class="spin"></span><span class="no-tc" id="progmsg">Working…</span></div><div class="pbar" id="progwrap"><i id="progbar"></i></div></div></div>
 <script>
 (function(){
-var EQ=[["Auto – 20’ first, then 40’ high cube",0,0,0,0],["20’ standard container",589.8,235.2,239.3,28200],["40’ high cube container",1203.2,235.2,269.8,26500],["20’ high cube container",589.8,235.2,269.8,28200],["40’ standard container",1203.2,235.2,239.5,26700],["45’ high cube container",1355.6,235.2,269.8,27600],["13.6 m curtain-sided truck",1360,245,270,24000],["20’ refrigerated (reefer)",545.6,229.4,226.4,27400],["40’ high cube reefer",1158.4,229.4,254.0,29100],["40’ open top / flat rack (235 cm max H)",1203.2,235.2,235.0,38000],["53’ dry van trailer (US)",1600.2,250.2,274.3,20412],["Custom container / truck",1203.2,235.2,269.8,26500]];
+var EQ=[["Auto – 20’ first, then 40’ high cube",0,0,0,0,0],["20’ standard container",589.8,235.2,239.3,28200,2200],["40’ high cube container",1203.2,235.2,269.8,26500,3980],["20’ high cube container",589.8,235.2,269.8,28200,2340],["40’ standard container",1203.2,235.2,239.5,26700,3750],["45’ high cube container",1355.6,235.2,269.8,27600,4800],["13.6 m curtain-sided truck",1360,245,270,24000,7500],["20’ refrigerated (reefer)",545.6,229.4,226.4,27400,3080],["40’ high cube reefer",1158.4,229.4,254.0,29100,4600],["40’ open top container",1203.2,235.2,235.0,31500,3850],["40’ flat rack container",1203.2,235.2,235.0,39000,5300],["53’ dry van trailer (US)",1600.2,250.2,274.3,20412,6120],["Custom container / truck",1203.2,235.2,269.8,26500,3800]];
 var CUST_EQ=EQ.length-1;
+function getCustomEq(){try{var s=localStorage.getItem("loadcalc.custom_eq");if(!s)return[];var a=JSON.parse(s);return Array.isArray(a)?a:[]}catch(_){return[]}}
+function saveCustomEq(a){try{localStorage.setItem("loadcalc.custom_eq",JSON.stringify(a))}catch(_){}}
 var PRE=[["Standard pallet (48×40)",48,40,48,500],["Euro pallet (47×31)",47.2,31.5,48,500],["Small carton",16,12,12,8],["Medium carton",24,16,16,15],["Large carton",30,20,20,25],["Drum",23,23,35,200]];
 var COL=["#1f6f78","#e07a1f","#6b5bd2","#3f9142","#c2410c","#0e7490","#b8860b","#a21caf"];
 var $=function(i){return document.getElementById(i)},tb=document.getElementById("rows");
@@ -2122,7 +2125,26 @@ var du="in",wu="kg",R=null;
 function df(){return du=="in"?2.54:1}function wf(){return wu=="kg"?1:0.45359237}
 function ebase(id){var e=$(id);if(!e||!e.dataset||e.dataset.cv===undefined||e.value!==e.dataset.sh)return null;return +e.dataset.cv}
 function uval(id,f){var b=ebase(id);return b!=null?b:(+$(id).value||0)*f}
-function getEq(ix){var e=EQ[ix]||EQ[1];if(ix==CUST_EQ){var l=Math.max(10,uval("ceql",df())),w=Math.max(10,uval("ceqw",df())),h=Math.max(10,uval("ceqh",df())),p=Math.max(10,uval("ceqp",wf()));return{l:l,w:w,h:h,p:p,name:"Custom ("+fm(l/df(),0)+"×"+fm(w/df(),0)+"×"+fm(h/df(),0)+" "+du+")"}}return{l:e[1],w:e[2],h:e[3],p:e[4],name:e[0]}}
+function getEq(ix){
+ if(ix>CUST_EQ){
+  var cList=getCustomEq(),ci=ix-CUST_EQ-1,ce=cList[ci];
+  if(+$("eq").value==ix){
+   var l=Math.max(10,uval("ceql",df())),w=Math.max(10,uval("ceqw",df())),h=Math.max(10,uval("ceqh",df())),p=Math.max(10,uval("ceqp",wf())),t=Math.max(0,uval("ceqt",wf()));
+   var n=($("ceqname")&&$("ceqname").value.trim())||(ce?ce.name:"Custom");
+   return{l:l,w:w,h:h,p:p,tare:t,name:n+" ("+fm(l/df(),0)+"×"+fm(w/df(),0)+"×"+fm(h/df(),0)+" "+du+")"};
+  }
+  if(ce){
+   return{l:ce.l,w:ce.w,h:ce.h,p:ce.p,tare:ce.tare||0,name:ce.name+" ("+fm(ce.l/df(),0)+"×"+fm(ce.w/df(),0)+"×"+fm(ce.h/df(),0)+" "+du+")"};
+  }
+ }
+ if(ix==CUST_EQ){
+  var l=Math.max(10,uval("ceql",df())),w=Math.max(10,uval("ceqw",df())),h=Math.max(10,uval("ceqh",df())),p=Math.max(10,uval("ceqp",wf())),t=Math.max(0,uval("ceqt",wf()));
+  var n=($("ceqname")&&$("ceqname").value.trim())||"Custom";
+  return{l:l,w:w,h:h,p:p,tare:t,name:n+" ("+fm(l/df(),0)+"×"+fm(w/df(),0)+"×"+fm(h/df(),0)+" "+du+")"};
+ }
+ var e=EQ[ix]||EQ[1];
+ return{l:e[1],w:e[2],h:e[3],p:e[4],tare:e[5]||0,name:e[0]};
+}
 function fm(v,d){var p=Math.pow(10,d);return (Math.round(v*p)/p).toLocaleString()}
 function nf(v,d){var p=Math.pow(10,d),s=(Math.round(v*p)/p).toFixed(d);if(s.indexOf(".")>=0)s=s.replace(/0+$/,"").replace(/\.$/,"");return s==="-0"?"0":s}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
@@ -2130,6 +2152,7 @@ var toastT=null;
 function flashMsg(t,ok){var m=$("msg");if(m)m.textContent=t;var el=$("toast");if(!el)return;el.innerHTML="<b>"+(ok?"Done":"Action needed")+"</b>"+esc(t);el.classList.add("on");clearTimeout(toastT);toastT=setTimeout(function(){el.classList.remove("on")},ok?3500:8000)}
 function hideToast(){clearTimeout(toastT);var el=$("toast");if(el)el.classList.remove("on")}
 if($("toast"))$("toast").onclick=hideToast;
+window.flashMsg=flashMsg;window.hideToast=hideToast;
 function shortEq(n){return String(n||"Container").replace(/\s+container$/i,"").replace(/\s{2,}/g," ").trim()||"Container"}
 function hasNonLatin(s){return /[^\u0000-\u00ff\u0152\u0153\u0160\u0161\u0178\u017d\u017e\u0192\u02c6\u02dc\u2013\u2014\u2018-\u201e\u2020\u2021\u2022\u2026\u2030\u2039\u203a\u20ac\u2122]/.test(String(s==null?"":s))}
 function PDF_T(d,str,x,y,o){str=String(str==null?"":str);if(!hasNonLatin(str)){d["text"](str,x,y,o);return}
@@ -2203,8 +2226,15 @@ function renderCG(){if(!R)return;var u=R.du,wu=R.wu,fd=u=="in"?2.54:1,fw=wu=="kg
  var fl=[];R.loads.forEach(function(L,k){if(L.chk&&L.chk.msgs.length)fl.push("Container "+(k+1)+": "+L.chk.msgs.join("; "))});
  R.balMsg=fl.length?"Balance check - "+fl.join(" | "):"";
  var ba=$("balalert");if(ba){if(R.balMsg){ba.innerHTML='<b>\u26a0</b><span>'+esc(R.balMsg)+'</span>';ba.classList.add("on")}else{ba.innerHTML="";ba.classList.remove("on")}}}
-EQ.forEach(function(e,i){var o=document.createElement("option");o.value=i;o.textContent=e[0];$("eq").appendChild(o)});
-$("eq").value=0;
+function populateEq(selectedVal){
+ var sel=$("eq");if(!sel)return;var prev=selectedVal!=null?selectedVal:sel.value;sel.innerHTML="";
+ EQ.forEach(function(e,i){var o=document.createElement("option");o.value=i;o.textContent=e[0];sel.appendChild(o)});
+ var cList=getCustomEq();
+ cList.forEach(function(ce,ci){var o=document.createElement("option");o.value=CUST_EQ+1+ci;o.textContent=ce.name+" — "+fm(ce.l/df(),0)+"×"+fm(ce.w/df(),0)+"×"+fm(ce.h/df(),0)+" "+du+", "+fm(ce.p/wf(),0)+" "+wu;sel.appendChild(o)});
+ if(prev!=null&&sel.querySelector('option[value="'+prev+'"]')){sel.value=prev}
+ if(typeof window.renderEq==="function")window.renderEq();
+}
+populateEq(0);
 (function(){var pt=$("ptype"),o0=document.createElement("option");o0.value="";o0.textContent="Choose…";pt.appendChild(o0);
  PRE.forEach(function(p,i){var o=document.createElement("option");o.value=i;o.textContent=p[0]+" — "+p[1]+" × "+p[2]+" × "+p[3]+" in, "+p[4]+" kg";pt.appendChild(o)})})();
 var PT=["Equipment & Cargo","Enter Cargo Data","Results","Load Plan & Exports"],cur=0;
@@ -2295,15 +2325,51 @@ function presetLabels(){var pt=$("ptype");for(var i=0;i<PRE.length;i++){var o=pt
 function labels(){var d=du=="in"?"in":"cm";
  document.querySelectorAll("#rows [data-u]").forEach(function(e){e.textContent=ulab(e.dataset.u)});
  $("lceql").textContent="Inside Length ("+d+")";$("lceqw").textContent="Inside Width ("+d+")";$("lceqh").textContent="Inside Height ("+d+")";$("lceqp").textContent="Max Payload ("+wu+")";
- presetLabels();$("lclr").textContent="Door-Side Clearance ("+d+")";$("lclrt").textContent="Top Clearance ("+d+")";$("lplim").textContent="Payload Limit Override ("+wu+")";cbmRefresh()}
+ if($("lceqt"))$("lceqt").textContent="Tare Weight ("+wu+")";
+ presetLabels();populateEq(+$("eq").value);$("lclr").textContent="Door-Side Clearance ("+d+")";$("lclrt").textContent="Top Clearance ("+d+")";$("lplim").textContent="Payload Limit Override ("+wu+")";cbmRefresh()}
 function conv(sel,oF,nF){document.querySelectorAll(sel).forEach(function(x){if(x.value==="")return;var base=(x.dataset.cv!==undefined&&x.value===x.dataset.sh)?+x.dataset.cv:(+x.value)*oF,t=nf(base/nF,2);x.value=t;x.dataset.cv=base;x.dataset.sh=t})}
 $("du").onchange=function(){if($("du").value==du)return;var oF=du=="in"?2.54:1,nF=$("du").value=="in"?2.54:1;conv('#rows [data-k="l"],#rows [data-k="w"],#rows [data-k="h"],#clr,#clrt,#ceql,#ceqw,#ceqh',oF,nF);du=$("du").value;labels();info()};
-$("wu").onchange=function(){if($("wu").value==wu)return;var oF=wu=="kg"?1:0.45359237,nF=$("wu").value=="kg"?1:0.45359237;conv('#rows [data-k="k"],#ceqp,#plim',oF,nF);wu=$("wu").value;labels();info()};
-function info(){var i=+$("eq").value,e=getEq(i);$("custeq").classList.toggle("on",i==CUST_EQ);
- $("eqinfo").textContent=i==0?"Tries the 20’ first and uses it if everything fits. Otherwise it uses 40’ high cubes, and adds a 20’ for a small remainder if that is enough.":"Inside "+fm(e.l/df(),1)+" × "+fm(e.w/df(),1)+" × "+fm(e.h/df(),1)+" "+du+", payload "+fm(e.p/wf(),0)+" "+wu+". More of the same container are added if the cargo doesn’t fit."}
-$("eq").onchange=function(){info();preview()};
+$("wu").onchange=function(){if($("wu").value==wu)return;var oF=wu=="kg"?1:0.45359237,nF=$("wu").value=="kg"?1:0.45359237;conv('#rows [data-k="k"],#ceqp,#ceqt,#plim',oF,nF);wu=$("wu").value;labels();info()};
+function info(){var i=+$("eq").value,e=getEq(i);$("custeq").classList.toggle("on",i>=CUST_EQ);
+ if($("ceq_del"))$("ceq_del").style.display=(i>CUST_EQ)?"":"none";
+ $("eqinfo").textContent=i==0?"Tries the 20’ first and uses it if everything fits. Otherwise it uses 40’ high cubes, and adds a 20’ for a small remainder if that is enough.":"Inside "+fm(e.l/df(),1)+" × "+fm(e.w/df(),1)+" × "+fm(e.h/df(),1)+" "+du+", payload "+fm(e.p/wf(),0)+" "+wu+", tare "+fm((e.tare||0)/wf(),0)+" "+wu+". More of the same container are added if the cargo doesn’t fit."}
+$("eq").onchange=function(){
+ var i=+$("eq").value;
+ if(i>CUST_EQ){
+  var cList=getCustomEq(),ce=cList[i-CUST_EQ-1];
+  if(ce){
+   $("ceql").value=nf(ce.l/df(),1);$("ceqw").value=nf(ce.w/df(),1);$("ceqh").value=nf(ce.h/df(),1);$("ceqp").value=nf(ce.p/wf(),0);
+   if($("ceqt"))$("ceqt").value=nf((ce.tare||0)/wf(),0);if($("ceqname"))$("ceqname").value=ce.name;
+   ["ceql","ceqw","ceqh","ceqp","ceqt"].forEach(function(id){var el=$(id);if(el&&el.dataset){delete el.dataset.cv;delete el.dataset.sh}});
+  }
+ }
+ info();preview();
+};
+if($("ceq_save"))$("ceq_save").onclick=function(){
+ var nameField=$("ceqname"),n=nameField?nameField.value.trim():"";
+ if(!n){flashMsg("Enter an equipment name before saving.");if(nameField)nameField.focus();return}
+ var l=Math.max(10,uval("ceql",df())),w=Math.max(10,uval("ceqw",df())),h=Math.max(10,uval("ceqh",df())),p=Math.max(10,uval("ceqp",wf())),t=Math.max(0,uval("ceqt",wf()));
+ var list=getCustomEq(),curVal=+$("eq").value;
+ var targetIdx=curVal>CUST_EQ?(curVal-CUST_EQ-1):-1;
+ if(targetIdx<0){targetIdx=list.findIndex(function(x){return x.name.toLowerCase()===n.toLowerCase()})}
+ var item={id:(targetIdx>=0&&list[targetIdx]&&list[targetIdx].id)?list[targetIdx].id:("eq_"+Date.now()),name:n,l:Math.round(l*10)/10,w:Math.round(w*10)/10,h:Math.round(h*10)/10,p:Math.round(p),tare:Math.round(t)};
+ if(targetIdx>=0){list[targetIdx]=item}else{list.push(item);targetIdx=list.length-1}
+ saveCustomEq(list);
+ var newEqVal=CUST_EQ+1+targetIdx;
+ populateEq(newEqVal);info();preview();autosave();
+ flashMsg("Saved “"+n+"” to Equipment Library.",true);
+};
+if($("ceq_del"))$("ceq_del").onclick=function(){
+ var curVal=+$("eq").value;if(curVal<=CUST_EQ)return;
+ var idx=curVal-CUST_EQ-1,list=getCustomEq();if(!list[idx])return;
+ var delName=list[idx].name;
+ askConfirm("Delete “"+delName+"” from the Equipment Library?",function(){
+  var l2=getCustomEq();l2.splice(idx,1);saveCustomEq(l2);populateEq(CUST_EQ);
+  info();preview();autosave();flashMsg("Deleted “"+delName+"” from Equipment Library.",true);
+ });
+};
 $("rot").addEventListener("change",function(){renderPack()});
-["ceql","ceqw","ceqh","ceqp"].forEach(function(id){$(id).addEventListener("input",function(){info();preview()})});
+["ceql","ceqw","ceqh","ceqp","ceqt","ceqname"].forEach(function(id){var el=$(id);if(el)el.addEventListener("input",function(){info();preview()})});
 function orients(l,w,h,m,mk){
  var d=[l,w,h],PM=[[0,1,2],[1,0,2],[0,2,1],[2,0,1],[1,2,0],[2,1,0]],out=[];
  for(var i=0;i<6;i++){var ok=mk?!!mk[i]:(i==0||(i==1&&m>=1)||m>=2);if(!ok)continue;var q=PM[i],r=[d[q[0]],d[q[1]],d[q[2]]];r.up=q.indexOf(2);r.pi=i;out.push(r)}
@@ -2815,7 +2881,7 @@ var KEY="loadcalc.last",PK="loadcalc.projects";
 function p2(n){return (n<10?"0":"")+n}
 function stamp(){var d=new Date();return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())+" "+p2(d.getHours())+":"+p2(d.getMinutes())}
 function snap(){var rw=[];CG.forEach(function(g,i){rw.push({n:cval(i,"n"),l:cval(i,"l"),w:cval(i,"w"),h:cval(i,"h"),k:cval(i,"k"),q:cval(i,"q"),u:cval(i,"u"),ctl:cval(i,"ctl"),c:cval(i,"c"),rm:cval(i,"rm"),st:cval(i,"st"),pr:cval(i,"pr"),p:g.p,x:g.x?1:0})});
- var o={pn:$("pn").value,du:du,wu:wu,eq:$("eq").value,ceql:$("ceql").value,ceqw:$("ceqw").value,ceqh:$("ceqh").value,ceqp:$("ceqp").value,rot:$("rot").value,clr:$("clr").value,stack:$("stack").checked,alw:$("alw").value,ld:LD,clrt:$("clrt").value,cgl:$("cgl").value,hsl:$("hsl").value,plim:$("plim").value,nohv:$("nohv").checked,chassis:$("chassis")?$("chassis").value:"semi3",lifozones:$("lifozones")?$("lifozones").checked:true,rep_ship:$("rep_ship")?$("rep_ship").value:"",rep_cons:$("rep_cons")?$("rep_cons").value:"",rep_bol:$("rep_bol")?$("rep_bol").value:"",rep_seal:$("rep_seal")?$("rep_seal").value:"",rows:rw};
+ var o={v:2,pn:$("pn").value,du:du,wu:wu,eq:$("eq").value,ceql:$("ceql").value,ceqw:$("ceqw").value,ceqh:$("ceqh").value,ceqp:$("ceqp").value,ceqt:$("ceqt")?$("ceqt").value:"3800",ceqname:$("ceqname")?$("ceqname").value:"",rot:$("rot").value,clr:$("clr").value,stack:$("stack").checked,alw:$("alw").value,ld:LD,clrt:$("clrt").value,cgl:$("cgl").value,hsl:$("hsl").value,plim:$("plim").value,nohv:$("nohv").checked,chassis:$("chassis")?$("chassis").value:"standard",lifozones:$("lifozones")?$("lifozones").checked:true,rep_ship:$("rep_ship")?$("rep_ship").value:"",rep_cons:$("rep_cons")?$("rep_cons").value:"",rep_bol:$("rep_bol")?$("rep_bol").value:"",rep_seal:$("rep_seal")?$("rep_seal").value:"",rows:rw};
  if(R&&R.manual&&!R.stale&&R.tot<=1500)o.ml=R.loads.map(function(L){return L.P.map(function(b){return{x:Math.round(b.x*10)/10,y:Math.round(b.y*10)/10,z:Math.round(b.z*10)/10,l:Math.round(b.l*10)/10,w:Math.round(b.w*10)/10,h:Math.round(b.h*10)/10,up:b.up,id:b.t.id}})});
  return o}
 function restoreManual(ml){if(!R||!ml||!Array.isArray(ml)||ml.length!==R.loads.length)return false;
@@ -2831,13 +2897,22 @@ function restoreManual(ml){if(!R||!ml||!Array.isArray(ml)||ml.length!==R.loads.l
   L.P=pairs.map(function(p){var b=p.b,m=p.m;b.x=+m.x||0;b.y=+m.y||0;b.z=+m.z||0;b.l=+m.l||b.l;b.w=+m.w||b.w;b.h=+m.h||b.h;if(m.up!=null)b.up=m.up;return b});
   try{seq(L)}catch(_){}});
  R.manual=true;R.C=R.loads[0].C;R.P=R.loads[0].P;renderCG();if(GL.on&&GL.ok)glBuild();setSteps();return true}
-function restore(o){if(!o)return;if(o.pn!=null)$("pn").value=o.pn;du=o.du||"in";wu=o.wu||"kg";$("du").value=du;$("wu").value=wu;$("eq").value=o.eq;
+function restore(o){if(!o)return;
+ var fv=o.v||1;
+ if(o.pn!=null)$("pn").value=o.pn;du=o.du||"in";wu=o.wu||"kg";$("du").value=du;$("wu").value=wu;
  if(o.ceql!=null)$("ceql").value=o.ceql;if(o.ceqw!=null)$("ceqw").value=o.ceqw;if(o.ceqh!=null)$("ceqh").value=o.ceqh;if(o.ceqp!=null)$("ceqp").value=o.ceqp;
+ if(o.ceqt!=null&&$("ceqt"))$("ceqt").value=o.ceqt;if(o.ceqname!=null&&$("ceqname"))$("ceqname").value=o.ceqname;
+ var eqVal=+o.eq||0;
+ if(o.ceqt===undefined&&eqVal>=10)eqVal+=1;
+ populateEq(eqVal);
+ $("eq").value=eqVal;
  $("rot").value=o.rot!=null?o.rot:1;$("clr").value=o.clr||0;$("stack").checked=o.stack!=null?!!o.stack:true;$("alw").value=o.alw!=null?o.alw:5;LD=o.ld==="f"?"f":"w";$("clrt").value=o.clrt||0;$("cgl").value=o.cgl||10;$("hsl").value=o.hsl||60;$("plim").value=o.plim||0;setAllow();$("nohv").checked=o.nohv!=null?!!o.nohv:true;
- ["ceql","ceqw","ceqh","ceqp","clr","clrt","plim"].forEach(function(id){var e=$(id);if(e&&e.dataset){delete e.dataset.cv;delete e.dataset.sh}});
+ ["ceql","ceqw","ceqh","ceqp","ceqt","clr","clrt","plim"].forEach(function(id){var e=$(id);if(e&&e.dataset){delete e.dataset.cv;delete e.dataset.sh}});
  tb.innerHTML="";CG.length=0;var rows=o.rows||[],nb=Math.max(1,Math.ceil(rows.length/3));for(var b=0;b<nb;b++)addBlock();
- if(o.chassis!=null&&$("chassis"))$("chassis").value=o.chassis;if(o.lifozones!=null&&$("lifozones"))$("lifozones").checked=!!o.lifozones;if(o.rep_ship!=null&&$("rep_ship"))$("rep_ship").value=o.rep_ship;if(o.rep_cons!=null&&$("rep_cons"))$("rep_cons").value=o.rep_cons;if(o.rep_bol!=null&&$("rep_bol"))$("rep_bol").value=o.rep_bol;if(o.rep_seal!=null&&$("rep_seal"))$("rep_seal").value=o.rep_seal;
-  rows.forEach(function(r,i){fillCargo(i,r.n,r.l,r.w,r.h,r.k,r.q,r.p,r.c,r.u,r.rm,r.st,r.pr,r.ctl);CG[i].x=!!r.x});chips();labels();info();setTimeout(function(){try{renderPack()}catch(e){}},0)}
+ if($("chassis"))$("chassis").value=(o.chassis!=null?o.chassis:"standard");
+ if($("lifozones"))$("lifozones").checked=(o.lifozones!=null?!!o.lifozones:true);
+ if(o.rep_ship!=null&&$("rep_ship"))$("rep_ship").value=o.rep_ship;if(o.rep_cons!=null&&$("rep_cons"))$("rep_cons").value=o.rep_cons;if(o.rep_bol!=null&&$("rep_bol"))$("rep_bol").value=o.rep_bol;if(o.rep_seal!=null&&$("rep_seal"))$("rep_seal").value=o.rep_seal;
+ rows.forEach(function(r,i){fillCargo(i,r.n,r.l,r.w,r.h,r.k,r.q,r.p,r.c,r.u,r.rm,r.st,r.pr,r.ctl);CG[i].x=!!r.x});chips();labels();info();setTimeout(function(){try{renderPack()}catch(e){}},0)}
 function ls(k){try{return JSON.parse(localStorage.getItem(k)||"null")}catch(e){return null}}
 function setSaveFail(b){var e=document.getElementById("savebanner");if(e)e.classList.toggle("on",b)}
 var dlgReturn=null;
@@ -2859,9 +2934,9 @@ document.addEventListener("click",function(e){if(!R||!isFormTarget(e.target))ret
 function plist(sel){var P=ls(PK)||{},ks=Object.keys(P).sort(function(a,b){return (P[b].ts||0)-(P[a].ts||0)});$("pl").innerHTML=ks.map(function(k){var o=P[k];return '<option value="'+esc(k)+'">'+esc(k)+(o.sum?" — "+esc(o.sum):"")+'</option>'}).join("");if(sel)$("pl").value=sel}
 function histAdd(sum){var P=ls(PK)||{},n=$("pn").value.trim(),k=n||("Calc "+stamp()),ex=P[k];
  if(ex&&!ex.a)k=k+" · "+stamp();
- P[k]={snap:snap(),sum:sum,ts:Date.now(),a:1};
+ P[k]={v:2,snap:snap(),sum:sum,ts:Date.now(),a:1};
  Object.keys(P).filter(function(x){return P[x].a}).sort(function(a,b){return P[b].ts-P[a].ts}).slice(20).forEach(function(x){delete P[x]});lw(PK,P);plist(k)}
-$("psave").onclick=function(){var n=$("pn").value.trim();if(!n){$("pmsg2").textContent="Enter a project name first.";return}var P=ls(PK)||{};P[n]={snap:snap(),sum:R?R.sum:"",ts:Date.now(),a:0};lw(PK,P);plist(n);$("pmsg2").textContent="Saved “"+n+"”."};
+$("psave").onclick=function(){var n=$("pn").value.trim();if(!n){$("pmsg2").textContent="Enter a project name first.";return}var P=ls(PK)||{};P[n]={v:2,snap:snap(),sum:R?R.sum:"",ts:Date.now(),a:0};lw(PK,P);plist(n);$("pmsg2").textContent="Saved “"+n+"”."};
 function openP(go){var P=ls(PK)||{},n=$("pl").value;if(!n||!P[n]){$("pmsg2").textContent="Select a saved calculation first.";return}pushUndo();restore(P[n].snap);if(!P[n].a)$("pn").value=n;if(go){calc(true);if(P[n].snap&&P[n].snap.ml)restoreManual(P[n].snap.ml)}else{clearResults();$("pmsg2").textContent="Loaded “"+n+"”. Results cleared — press Calculate to refresh."}}
 $("prec").onclick=function(){openP(true)};$("pload").onclick=function(){openP(false)};
 $("pdel").onclick=function(){var P=ls(PK)||{},n=$("pl").value;if(!n)return;askConfirm("Delete “"+n+"”?",function(){var P2=ls(PK)||{};delete P2[n];lw(PK,P2);plist();$("pmsg2").textContent="Deleted “"+n+"”."})};
@@ -2871,8 +2946,9 @@ function doNewCalc(){
  var e;
  e=$("pn");if(e)e.value="";e=$("clr");if(e)e.value=0;
  $("eq").value=0;$("ceql").value="473.7";$("ceqw").value="92.6";$("ceqh").value="106.2";$("ceqp").value="26500";
- ["ceql","ceqw","ceqh","ceqp","clr","clrt","plim"].forEach(function(id){var e=$(id);if(e&&e.dataset){delete e.dataset.cv;delete e.dataset.sh}});
- $("rot").value=1;$("stack").checked=true;$("alw").value=5;setAllow();LD="w";$("nohv").checked=true;$("clrt").value=0;$("plim").value=0;$("cgl").value=10;$("hsl").value=60;
+ if($("ceqt"))$("ceqt").value="3800";if($("ceqname"))$("ceqname").value="";
+ ["ceql","ceqw","ceqh","ceqp","ceqt","clr","clrt","plim"].forEach(function(id){var e=$(id);if(e&&e.dataset){delete e.dataset.cv;delete e.dataset.sh}});
+ $("rot").value=1;$("stack").checked=true;$("alw").value=5;setAllow();LD="w";$("nohv").checked=true;$("clrt").value=0;$("plim").value=0;$("cgl").value=10;$("hsl").value=60;if($("chassis"))$("chassis").value="standard";
  du="in";wu="kg";$("du").value="in";$("wu").value="kg";
  e=$("ptype");if(e)e.value="";
  if($("csvbox"))$("csvbox").classList.remove("on");if($("csvtxt"))$("csvtxt").value="";if($("csvmsg"))$("csvmsg").textContent="";
@@ -2896,45 +2972,66 @@ $("pkg").onclick=async function(){
   await saveFile(fname()+".zip",buf,"application/zip");cmsg("Package ready: data to recall, PDF and Excel in one file.")
  }catch(e){cmsg(/cancel/i.test(e&&e.message||"")?"Save cancelled.":"Couldn’t save the package.")}finally{notBusy()}};
 $("copen").onclick=function(){$("cloudf").value="";$("cloudf").click()};
-$("cloudf").onchange=async function(){var f=this.files&&this.files[0];if(!f)return;cmsg("Opening…");
- if(window.W&&typeof window.W.flashMsg==="function")window.W.flashMsg("Opening "+f.name+"…");
+$("cloudf").onchange=async function(){var f=this.files&&this.files[0];if(!f)return;cmsg("Opening "+f.name+"…");
+ function uniqProj(n,ex){
+  var b=n||"Load plan";if(!ex[b])return b;
+  var m=b.match(/^(.*?)\s*\((\d+)\)$/),stem=m?m[1]:b,i=m?parseInt(m[2],10)+1:2;
+  while(ex[stem+" ("+i+")"])i++;
+  return stem+" ("+i+")";
+ }
  try{var txt;
   if(/\.json$/i.test(f.name))txt=await f.text();
   else{if(!window.JSZip)throw new Error("Zip library not loaded.");var z=await JSZip.loadAsync(f),d=z.file("data.json");if(!d)throw new Error("Zip package does not contain data.json.");txt=await d.async("string")}
   var o=JSON.parse(txt);if(!o||typeof o!=="object")throw new Error("Invalid file content.");
   if((o.type==="cubefit_full_backup"||o.projects)&&typeof o.projects==="object"){
-   var cur=ls(PK)||{},cnt=0;
-   Object.keys(o.projects).forEach(function(k){if(o.projects[k]&&typeof o.projects[k]==="object"){cur[k]=o.projects[k];cnt++}});
-   lw(PK,cur);plist();
-   if(window.W&&typeof window.W.renderRecents==="function")window.W.renderRecents();
-   if(window.W&&typeof window.W.renderCloudStorageSection==="function")window.W.renderCloudStorageSection();
-   var bmsg="Restored "+cnt+" project(s) from backup.";
+   var cur=ls(PK)||{},restored=0,skipped=0,copies=0;
+   Object.keys(o.projects).forEach(function(k){
+    var item=o.projects[k];
+    if(!item||typeof item!=="object"||!item.snap||typeof item.snap!=="object"){skipped++;return}
+    var origName=(typeof item.name==="string"&&item.name.trim())?item.name.trim():k;
+    if(!origName)origName="Load plan";
+    var finalName=origName;
+    if(cur[finalName]){finalName=uniqProj(finalName,cur);copies++}
+    cur[finalName]={name:finalName,updated:item.updated||Date.now(),snap:item.snap,sum:item.sum||""};
+    restored++;
+   });
+   if(restored>0){lw(PK,cur);plist()}
+   if(typeof window.renderRecents==="function")window.renderRecents();
+   if(typeof window.renderCloudStorageSection==="function")window.renderCloudStorageSection();
+   var parts=[];
+   var newCount=restored-copies;
+   if(newCount>0)parts.push("Restored "+newCount);
+   else if(copies>0)parts.push("Restored "+copies+" (as "+(copies===1?"copy":"copies")+")");
+   else parts.push("Restored 0");
+   if(skipped>0)parts.push("skipped "+skipped+" invalid");
+   if(copies>0&&newCount>0)parts.push("kept "+copies+(copies===1?" as copy":" as copies"));
+   var bmsg=parts.join(", ")+".";
    cmsg(bmsg);
-   if(window.W&&typeof window.W.flashMsg==="function")window.W.flashMsg(bmsg);
+   if(restored>0)flashMsg(bmsg,true);else flashMsg(bmsg);
    return;
   }
   var isApp=!o.app||o.app=="loadcalc"||o.app=="cubefit"||o.app=="CubeFit - 3D Load Calculator";
-  if(!isApp||!o.snap)throw new Error("That file isn’t a recognized CubeFit save file.");
+  if(!isApp||!o.snap||typeof o.snap!=="object")throw new Error("That file isn’t a recognized CubeFit save file.");
   clearResults();restore(o.snap);
   var pName=(o.name&&o.name!="Load plan")?o.name:f.name.replace(/\.(json|zip)$/i,"");
   if(!pName)pName="Load plan "+stamp().slice(0,10);
-  $("pn").value=pName;
   var curP=ls(PK)||{};
-  curP[pName]={name:pName,updated:Date.now(),snap:o.snap,sum:o.sum||""};
+  var finalName=curP[pName]?uniqProj(pName,curP):pName;
+  $("pn").value=finalName;
+  curP[finalName]={name:finalName,updated:Date.now(),snap:o.snap,sum:o.sum||""};
   lw(PK,curP);plist();
-  cmsg("Opened “"+pName+"”. Recalculating…");
+  cmsg("Opened “"+finalName+"”. Recalculating…");
   calc(true);if(o.snap&&o.snap.ml)restoreManual(o.snap.ml);
-  if(window.W&&typeof window.W.renderRecents==="function")window.W.renderRecents();
-  if(window.W&&typeof window.W.renderLines==="function")window.W.renderLines();
-  if(window.W&&typeof window.W.renderCloudStorageSection==="function")window.W.renderCloudStorageSection();
-  if(window.W&&typeof window.W.flashMsg==="function")window.W.flashMsg("Opened “"+pName+"” successfully");
-  if(window.W&&typeof window.W.goStep==="function")window.W.goStep(2);
+  if(typeof window.renderRecents==="function")window.renderRecents();
+  if(typeof window.renderLines==="function")window.renderLines();
+  if(typeof window.renderCloudStorageSection==="function")window.renderCloudStorageSection();
+  flashMsg("Opened “"+finalName+"” successfully",true);
+  if(typeof window.goStep==="function")window.goStep(2);
   else show(2);
  }catch(e){
   var m=e&&e.message&&e.message!="x"?e.message:"That file isn’t a recognized save file.";
   cmsg(m);
-  if(window.W&&typeof window.W.flashMsg==="function")window.W.flashMsg(m,true);
-  else alert(m);
+  flashMsg(m);
  }};
 plist();var last=ls(KEY);if(last){try{restore(last)}catch(e){if(window.console)console.error("restore failed",e);tb.innerHTML="";CG.length=0;addBlock()}}else addBlock();
 document.addEventListener("focusin",function(e){var t=e.target;if(t&&(t.tagName=="INPUT"||t.tagName=="SELECT")&&t.type!="range"&&t.type!="checkbox"){setTimeout(function(){try{t.scrollIntoView({block:"center",behavior:"smooth"})}catch(_){}},350)}});
@@ -3445,7 +3542,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
   var D = document, W = window;
   if (W.__cubeFitShell) return;
   W.__cubeFitShell = true;
-  console.log('CubeFit v2.7');
+  console.log('CubeFit v2.8.1');
 
   var $ = function (id) { return D.getElementById(id); };
   var all = function (sel, root) { return Array.prototype.slice.call((root || D).querySelectorAll(sel)); };
@@ -3573,7 +3670,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
   if (htitle && !$('mf-brand-stack')) {
     var brandStack = mk('div', 'mf-brand-stack'); brandStack.id = 'mf-brand-stack';
     var brandTitle = mk('span', 'mf-brand-title');
-    brandTitle.innerHTML = 'CUBEFIT<small style="font-size:10px;font-weight:700;vertical-align:middle;padding:1px 6px;border-radius:6px;background:var(--accbg);color:var(--accent);margin-left:6px;letter-spacing:0;text-transform:none">v2.7</small>';
+    brandTitle.innerHTML = 'CUBEFIT<small style="font-size:10px;font-weight:700;vertical-align:middle;padding:1px 6px;border-radius:6px;background:var(--accbg);color:var(--accent);margin-left:6px;letter-spacing:0;text-transform:none">v2.8.1</small>';
     var brandSub = mk('span', 'mf-brand-sub', 'Cargo, engineered.');
     brandStack.appendChild(brandTitle);
     brandStack.appendChild(brandSub);
@@ -4001,7 +4098,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
             text: 'CubeFit 3D Load Plan'
           });
           shared = true;
-          if (typeof W.flashMsg === 'function') W.flashMsg('Shared “' + fileName + '”');
+          if (typeof W.flashMsg === 'function') W.flashMsg('Shared “' + fileName + '”', true);
         }
       } catch (shErr) {
         if (shErr && shErr.name === 'AbortError') return;
@@ -4021,7 +4118,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
         a.remove();
         setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
       }
-      if (typeof W.flashMsg === 'function') W.flashMsg('Saved “' + fileName + '”');
+      if (typeof W.flashMsg === 'function') W.flashMsg('Saved “' + fileName + '”', true);
     }
 
     renderCloudStorageSection();
@@ -4064,7 +4161,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
             text: 'CubeFit Backup (' + count + ' projects)'
           });
           shared = true;
-          if (typeof W.flashMsg === 'function') W.flashMsg('Shared backup (' + count + ' projects)');
+          if (typeof W.flashMsg === 'function') W.flashMsg('Shared backup (' + count + ' projects)', true);
         }
       } catch (shErr) {
         if (shErr && shErr.name === 'AbortError') return;
@@ -4080,7 +4177,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
       a.click();
       a.remove();
       setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
-      if (typeof W.flashMsg === 'function') W.flashMsg('Downloaded backup (' + count + ' projects)');
+      if (typeof W.flashMsg === 'function') W.flashMsg('Downloaded backup (' + count + ' projects)', true);
     }
   }
 
@@ -4125,7 +4222,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
           });
         }
         renderCloudStorageSection();
-        if (typeof W.flashMsg === 'function') W.flashMsg('Restored ' + added + ' projects from backup.');
+        if (typeof W.flashMsg === 'function') W.flashMsg('Restored ' + added + ' projects from backup.', true);
       } catch (err) {
         if (typeof W.flashMsg === 'function') W.flashMsg('Error parsing backup file.');
       }
@@ -4216,13 +4313,22 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
       refreshingPWA = true;
       try { W.location.reload(true); } catch (e) { W.location.reload(); }
     });
+    if (W.location.protocol === 'http:' || W.location.protocol === 'https:') {
+      W.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').then(function (reg) {
+          try { reg.update(); } catch (_) {}
+        }).catch(function (err) {
+          console.warn('[PWA] Service worker registration error:', err);
+        });
+      });
+    }
   }
 
   function forceAppUpdate() {
     var isWebHosted = (W.location.protocol === 'http:' || W.location.protocol === 'https:');
     if (!isWebHosted) {
       if (typeof W.flashMsg === 'function') {
-        W.flashMsg('Offline Local File · v2.7 (Reloading local file…)');
+        W.flashMsg('Offline Local File · v2.8.1 (Reloading local file…)');
       }
       setTimeout(function () {
         try { W.location.reload(true); } catch (e) { W.location.reload(); }
@@ -4329,7 +4435,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
         }
         var pmsg2 = $('pmsg2');
         if (pmsg2) pmsg2.textContent = 'Deleted “' + keyToDelete + '”.';
-        if (typeof W.flashMsg === 'function') W.flashMsg('Deleted “' + keyToDelete + '”.');
+        if (typeof W.flashMsg === 'function') W.flashMsg('Deleted “' + keyToDelete + '”.', true);
         if (list) list.dataset.sig = '';
         renderRecents();
         renderCloudStorageSection();
@@ -4371,7 +4477,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
     a.click();
     D.body.removeChild(a);
     setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
-    if (typeof W.flashMsg === 'function') W.flashMsg('Downloading ' + fileName);
+    if (typeof W.flashMsg === 'function') W.flashMsg('Downloading ' + fileName, true);
   }
 
   function renderRecents() {
@@ -4667,7 +4773,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
       var updateCard = mk('div', 'card mf-card-update');
       updateCard.id = 'mf-card-update';
       updateCard.innerHTML = '<h2>App Version &amp; Updates</h2>' +
-        '<p class="note">Installed: <b>CubeFit v2.7</b> · ' + (isWebHosted ? 'Single-file PWA web app' : 'Offline local HTML file') + '</p>' +
+        '<p class="note">Installed: <b>CubeFit v2.8.1</b> · ' + (isWebHosted ? 'Single-file PWA web app' : 'Offline local HTML file') + '</p>' +
         '<div class="mf-update-row" id="mf-btn-check-update" role="button" tabindex="0">' +
         '  <div class="mf-update-left">' +
         '    <span class="mf-update-icon">🔄</span>' +
@@ -4749,10 +4855,6 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
       if (cloudfInput) {
         cloudfInput.addEventListener('change', function () {
           if (cloudfInput.files && cloudfInput.files[0]) {
-            var f = cloudfInput.files[0];
-            try {
-              if (typeof W.flashMsg === 'function') W.flashMsg('Opening ' + f.name + '...');
-            } catch (_) {}
             renderCloudStorageSection();
           }
         });
@@ -4848,6 +4950,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
       });
     }
     renderEq();
+    W.renderEq = renderEq;
     on(eq, 'change', renderEq);
 
     function seg2(sel, label) {
@@ -5038,7 +5141,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
           if (W.R && typeof W.markStale === 'function') W.markStale();
           if (typeof W.autosave === 'function') W.autosave();
           renderLines();
-          if (typeof W.flashMsg === 'function') W.flashMsg('Added ' + (qName && qName.value.trim() ? qName.value.trim() : 'cargo line') + ' (' + (qQty ? qQty.value : 10) + ' pcs)');
+          if (typeof W.flashMsg === 'function') W.flashMsg('Added ' + (qName && qName.value.trim() ? qName.value.trim() : 'cargo line') + ' (' + (qQty ? qQty.value : 10) + ' pcs)', true);
           if (qName) qName.value = '';
           if (qL) qL.value = '';
           if (qW) qW.value = '';
@@ -5188,7 +5291,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
       if (lineList) lineList.dataset.sig = '';
       renderLines();
       if (openName === 'cargo') refreshEditor();
-      if (typeof W.flashMsg === 'function') W.flashMsg('Cargo line cleared (minimum 1 line kept).');
+      if (typeof W.flashMsg === 'function') W.flashMsg('Cargo line cleared (minimum 1 line kept).', true);
       return;
     }
 
@@ -5242,7 +5345,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
     }
 
     renderLines();
-    if (typeof W.flashMsg === 'function') W.flashMsg('Deleted Cargo ' + (targetIndex + 1));
+    if (typeof W.flashMsg === 'function') W.flashMsg('Deleted Cargo ' + (targetIndex + 1), true);
   }
 
   function renderLines() {
@@ -5571,12 +5674,10 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
   function generateForkliftPdf(targetIndex) {
     if (!W.jspdf || !W.jspdf.jsPDF) {
       if (typeof W.flashMsg === 'function') W.flashMsg('PDF library not ready');
-      else alert('PDF library not ready');
       return;
     }
     if (!W.R || !W.R.loads || !W.R.loads.length) {
       if (typeof W.flashMsg === 'function') W.flashMsg('Please calculate a load plan first.');
-      else alert('Please calculate a load plan first.');
       return;
     }
 
@@ -5868,7 +5969,7 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
     var cleanName = projName.replace(/[^a-zA-Z0-9_-]/g, '_');
     var filename = cleanName + '_Forklift_Sheet_Cont_' + (si + 1) + '.pdf';
     doc.save(filename);
-    if (typeof W.flashMsg === 'function') W.flashMsg('Downloaded ' + filename);
+    if (typeof W.flashMsg === 'function') W.flashMsg('Downloaded ' + filename, true);
   }
   W.generateForkliftPdf = generateForkliftPdf;
 
