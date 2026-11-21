@@ -4268,13 +4268,31 @@ labels();info();chips();resizeCv();tcUI(document.body);renderPack();preview();up
     var confirmFn = (typeof W.askConfirm === 'function') ? W.askConfirm : function (msg, cb) { if (confirm(msg)) cb(); };
     confirmFn('Delete saved calculation “' + name + '”?', function () {
       var P = store();
+      var keyToDelete = null;
       if (P[name]) {
-        delete P[name];
-        write(P);
-        if (typeof W.plist === 'function') W.plist();
+        keyToDelete = name;
+      } else {
+        Object.keys(P).forEach(function (k) {
+          if (k.trim() === name.trim()) keyToDelete = k;
+        });
+      }
+      if (keyToDelete) {
+        delete P[keyToDelete];
+        try {
+          localStorage.setItem(PK, JSON.stringify(P));
+        } catch (_) {}
+        var pl = $('pl');
+        if (pl) {
+          for (var i = 0; i < pl.options.length; i++) {
+            if (pl.options[i].value === keyToDelete) {
+              pl.remove(i);
+              break;
+            }
+          }
+        }
         var pmsg2 = $('pmsg2');
-        if (pmsg2) pmsg2.textContent = 'Deleted “' + name + '”.';
-        if (typeof W.flashMsg === 'function') W.flashMsg('Deleted “' + name + '”.');
+        if (pmsg2) pmsg2.textContent = 'Deleted “' + keyToDelete + '”.';
+        if (typeof W.flashMsg === 'function') W.flashMsg('Deleted “' + keyToDelete + '”.');
         if (list) list.dataset.sig = '';
         renderRecents();
         renderCloudStorageSection();
